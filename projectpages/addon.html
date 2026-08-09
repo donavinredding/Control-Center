@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Control Center Addon Projects</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header>
+        <h1>Welcome to My Control Center</h1>
+        <p>What's going on in my world right now.</p>
+        <button id="home-button" class="project-button" onclick="window.location.href='../index.html'"> Home </button>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="hub-grid-addon">
+        <!-- Life Updates Section -->
+        <section class="card">
+            <h2>Current Top Priorities Projects & Status</h2>
+            <ol>
+                <li>
+                    <h3>Elytra Models Project for CurseForge</h3>
+                    <img src="../images/elytra-models.png" alt="Elytra Models Project" class="project-image">
+                    <h3>Project Status:</h3>
+                    <p>Updating old models and their textures to look better.
+                </li>
+            </ol>
+        </section>
+        <!-- Scratchpad 2 -->
+        <section class="card">
+            <h2>Project Scratchpad</h2>
+            <div class="scratchpad-container">
+                <div class="scratchpad-toolbar">
+                    <button type="button" onclick="addLink('scratchpad2')" title="Add Link">⚯</button>
+                    <button type="button" onclick="triggerImageUpload('scratchpad2')" title="Attach Image">🗀</button>
+                    <button type="button" onclick="addCheckbox('scratchpad2')" title="Add Checkbox">☑</button>
+                    <button type="button" onclick="addList('scratchpad2', 'insertUnorderedList')" title="Bullet List">•≡</button>
+                    <button type="button" onclick="addList('scratchpad2', 'insertOrderedList')" title="Numbered List">1≡</button>
+                </div>
+                <div id="scratchpad2" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes for this project..."></div>
+                <input type="file" id="file-scratchpad2" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad2')">
+            </div>
+        </section>
+    </main>
+    <script src="../script.js"></script>
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 My Control Center</p>
+    </footer>
+</body>
+</html>

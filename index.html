@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Control Center</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header>
+        <h1>My Control Center</h1>
+        <p>What's going on in my world right now.</p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="hub-grid">
+        <!-- Replace your videos section with this -->
+        <section class="card youtube-section">
+            <h2>Latest From My Favorite Creators</h2>
+            <div id="youtube-feed-container" class="video-grid">
+                <!-- JS will inject the buttons here -->
+                <p>Loading latest videos...</p>
+            </div>
+        </section>
+        <!-- Life Updates Section -->
+        <section class="card">
+            <h2>Priorities Projects</h2>
+            <ol>
+                <li>
+                    <p>Learning JavaScript on Scrimba</p>
+                    <button class="project-button" onclick="window.location.href='https://scrimba.com/learn-javascript-c0v'">
+                        <img src="./images/scrimbacource.png" alt="Scrimba Logo" class="project-image">
+                    </button>
+                </li>
+                <li>
+                    <p>Elytra Models Project</p>
+                    <button class="project-button" onclick="window.location.href='./projectpages/addon.html'">
+                        <img src="./images/elytra-models.png" alt="Elytra Models Logo" class="project-image">
+                    </button>
+                </li>
+            </ol>
+            <!-- <ol>
+                <li>
+                    <p>Learning JavaScript on Scrimba</p>
+                    <button id="scrimba-button" class="project-button" onclick="window.open('https://scrimba.com/learn-javascript-c0v', '_blank')"></button>
+                </li>
+                <li>
+                    <p>Creating Elytra Models for CurseForge</p>
+                    <button id="elytra-button" class="project-button" onclick="window.location.href='./projectpages/addon.html'"></button>
+                </li>
+            </ol> -->
+        </section>
+        <section class="card">
+            <h2>Scratchpad</h2>
+            <div class="scratchpad-container">
+                <div class="scratchpad-toolbar">
+                    <button type="button" onclick="addLink('scratchpad')" title="Add Link">⚯</button>
+                    <button type="button" onclick="triggerImageUpload('scratchpad')" title="Attach Image">🗀</button>
+                    <button type="button" onclick="addCheckbox('scratchpad')" title="Add Checkbox">□</button>
+                    <button type="button" onclick="addList('scratchpad', 'insertUnorderedList')" title="Bullet List">•≡</button>
+                    <button type="button" onclick="addList('scratchpad', 'insertOrderedList')" title="Numbered List">1≡</button>
+                </div>
+                <div id="scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes or paste images here..."></div>
+                <input type="file" id="file-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad')">
+            </div>
+        </section>
+        <section class="card links-section">
+            <h2>Quick Links</h2>
+            <ul>
+                <li><a href="https://www.curseforge.com/members/dredding/projects" target="_blank">CurseForge</a></li>
+                <li><a href="https://www.youtube.com/@dredding2000" target="_blank">YouTube</a></li>
+                <li><a href="https://scrimba.com/learn-javascript-c0v" target="_blank">Scrimba</a></li>
+            </ul>
+        </section>
+    </main>
+    <script src="script.js"></script>
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 My Control Center</p>
+    </footer>
+</body>
+</html>
