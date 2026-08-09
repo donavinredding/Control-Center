@@ -202,26 +202,30 @@ function insertImageBlob(pad, blob, storageKey) {
     reader.readAsDataURL(blob);
 }
 
-// --- Updated Tool Functions ---
+// --- Corrected Image Upload Logic ---
+function triggerImageUpload(event, id) {
+    event.preventDefault(); // Stop any unexpected behavior
+    document.getElementById('file-' + id).click();
+}
 
+// --- Corrected Text Tool Functions ---
 function addCheckbox(event, id) {
-    event.preventDefault(); // Keeps the cursor in the text box
+    event.preventDefault();
     const pad = document.getElementById(id);
-    pad.focus();
+    pad.focus(); // Explicitly focus the pad first
 
     const selection = window.getSelection();
     if (!selection.rangeCount) return;
     const range = selection.getRangeAt(0);
 
     const wrapper = document.createElement('div');
-    // Using a span so we can select the text easily
     wrapper.innerHTML = '<input type="checkbox"> <span contenteditable="true"> </span><br>';
     
     range.deleteContents();
     range.insertNode(wrapper);
     
-    // Collapse selection to end of the new task
-    range.setStartAfter(wrapper);
+    // Collapse to the span inside the wrapper
+    range.setStart(wrapper.querySelector('span'), 0);
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
@@ -232,22 +236,27 @@ function addCheckbox(event, id) {
 function addList(event, id, command) {
     event.preventDefault();
     const pad = document.getElementById(id);
-    pad.focus();
+    pad.focus(); // Re-focus before running the command
     document.execCommand(command, false, null);
+    pad.focus(); // Re-focus again after, just to be safe
     saveToStorage(id);
 }
 
 function addLink(event, id) {
     event.preventDefault();
     const pad = document.getElementById(id);
-    pad.focus();
+    pad.focus(); // Focus before the prompt steals it
     
-    const selection = window.getSelection();
-    let selectedText = selection.toString();
     let url = prompt("Enter the URL:");
     if (!url) return;
     
     if (!url.startsWith('http')) url = 'https://' + url;
+    
+    // Re-focus after the prompt closes
+    pad.focus(); 
+    
+    const selection = window.getSelection();
+    let selectedText = selection.toString();
     
     if (selectedText.length > 0) {
         document.execCommand('createLink', false, url);
@@ -256,6 +265,7 @@ function addLink(event, id) {
     }
     saveToStorage(id);
 }
+
 
 // Helper to save to the correct storage key
 function saveToStorage(id) {
