@@ -202,81 +202,64 @@ function insertImageBlob(pad, blob, storageKey) {
     reader.readAsDataURL(blob);
 }
 
-function addCheckbox(id) {
+// --- Updated Tool Functions ---
+
+function addCheckbox(event, id) {
+    event.preventDefault(); // Keeps the cursor in the text box
     const pad = document.getElementById(id);
     pad.focus();
-    
+
     const selection = window.getSelection();
     if (!selection.rangeCount) return;
     const range = selection.getRangeAt(0);
-    
+
     const wrapper = document.createElement('div');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    
-    const textSpan = document.createElement('span');
-    textSpan.textContent = 'New task';
-    
-    wrapper.appendChild(checkbox);
-    wrapper.appendChild(document.createTextNode(' '));
-    wrapper.appendChild(textSpan);
-    wrapper.appendChild(document.createElement('br'));
+    // Using a span so we can select the text easily
+    wrapper.innerHTML = '<input type="checkbox"> <span contenteditable="true"> </span><br>';
     
     range.deleteContents();
     range.insertNode(wrapper);
     
-    const newRange = document.createRange();
-    newRange.selectNodeContents(textSpan);
+    // Collapse selection to end of the new task
+    range.setStartAfter(wrapper);
+    range.collapse(true);
     selection.removeAllRanges();
-    selection.addRange(newRange);
-    
-    const storageKey = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
-    localStorage.setItem(storageKey, pad.innerHTML);
+    selection.addRange(range);
+
+    saveToStorage(id);
 }
 
-function addList(id, command) {
+function addList(event, id, command) {
+    event.preventDefault();
     const pad = document.getElementById(id);
     pad.focus();
     document.execCommand(command, false, null);
-    const storageKey = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
-    localStorage.setItem(storageKey, pad.innerHTML);
+    saveToStorage(id);
 }
 
-function addLink(id) {
+function addLink(event, id) {
+    event.preventDefault();
     const pad = document.getElementById(id);
     pad.focus();
     
     const selection = window.getSelection();
     let selectedText = selection.toString();
-    
-    let url = prompt("Enter the URL (e.g., https://example.com):");
+    let url = prompt("Enter the URL:");
     if (!url) return;
     
-    // Automatically add https:// if they forgot it
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-    }
+    if (!url.startsWith('http')) url = 'https://' + url;
     
     if (selectedText.length > 0) {
-        // If text was highlighted, convert it into a link
         document.execCommand('createLink', false, url);
     } else {
-        // If nothing was highlighted, ask for display text
-        let linkText = prompt("Enter the text to display for this link:", url);
-        if (!linkText) linkText = url;
-        
-        const range = selection.rangeCount ? selection.getRangeAt(0) : null;
-        if (range) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.textContent = linkText;
-            a.target = '_blank'; // Opens link in a new tab safely
-            
-            range.deleteContents();
-            range.insertNode(a);
-        }
+        document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${url}</a>`);
     }
-    
-    const storageKey = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
-    localStorage.setItem(storageKey, pad.innerHTML);
+    saveToStorage(id);
+}
+
+// Helper to save to the correct storage key
+function saveToStorage(id) {
+    const pad = document.getElementById(id);
+    const key = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
+    localStorage.setItem(key, pad.innerHTML);
 }
