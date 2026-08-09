@@ -202,69 +202,69 @@ function insertImageBlob(pad, blob, storageKey) {
     reader.readAsDataURL(blob);
 }
 
-// --- Corrected Image Upload Logic ---
-function triggerImageUpload(event, id) {
-    event.preventDefault(); // Stop any unexpected behavior
-    document.getElementById('file-' + id).click();
-}
+// // --- Corrected Image Upload Logic ---
+// function triggerImageUpload(event, id) {
+//     event.preventDefault(); // Stop any unexpected behavior
+//     document.getElementById('file-' + id).click();
+// }
 
-// --- Corrected Text Tool Functions ---
-function addCheckbox(event, id) {
-    event.preventDefault();
-    const pad = document.getElementById(id);
-    pad.focus(); // Explicitly focus the pad first
+// // --- Corrected Text Tool Functions ---
+// function addCheckbox(event, id) {
+//     event.preventDefault();
+//     const pad = document.getElementById(id);
+//     pad.focus(); // Explicitly focus the pad first
 
-    const selection = window.getSelection();
-    if (!selection.rangeCount) return;
-    const range = selection.getRangeAt(0);
+//     const selection = window.getSelection();
+//     if (!selection.rangeCount) return;
+//     const range = selection.getRangeAt(0);
 
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = '<input type="checkbox"> <span contenteditable="true"> </span><br>';
+//     const wrapper = document.createElement('div');
+//     wrapper.innerHTML = '<input type="checkbox"> <span contenteditable="true"> </span><br>';
     
-    range.deleteContents();
-    range.insertNode(wrapper);
+//     range.deleteContents();
+//     range.insertNode(wrapper);
     
-    // Collapse to the span inside the wrapper
-    range.setStart(wrapper.querySelector('span'), 0);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
+//     // Collapse to the span inside the wrapper
+//     range.setStart(wrapper.querySelector('span'), 0);
+//     range.collapse(true);
+//     selection.removeAllRanges();
+//     selection.addRange(range);
 
-    saveToStorage(id);
-}
+//     saveToStorage(id);
+// }
 
-function addList(event, id, command) {
-    event.preventDefault();
-    const pad = document.getElementById(id);
-    pad.focus(); // Re-focus before running the command
-    document.execCommand(command, false, null);
-    pad.focus(); // Re-focus again after, just to be safe
-    saveToStorage(id);
-}
+// function addList(event, id, command) {
+//     event.preventDefault();
+//     const pad = document.getElementById(id);
+//     pad.focus(); // Re-focus before running the command
+//     document.execCommand(command, false, null);
+//     pad.focus(); // Re-focus again after, just to be safe
+//     saveToStorage(id);
+// }
 
-function addLink(event, id) {
-    event.preventDefault();
-    const pad = document.getElementById(id);
-    pad.focus(); // Focus before the prompt steals it
+// function addLink(event, id) {
+//     event.preventDefault();
+//     const pad = document.getElementById(id);
+//     pad.focus(); // Focus before the prompt steals it
     
-    let url = prompt("Enter the URL:");
-    if (!url) return;
+//     let url = prompt("Enter the URL:");
+//     if (!url) return;
     
-    if (!url.startsWith('http')) url = 'https://' + url;
+//     if (!url.startsWith('http')) url = 'https://' + url;
     
-    // Re-focus after the prompt closes
-    pad.focus(); 
+//     // Re-focus after the prompt closes
+//     pad.focus(); 
     
-    const selection = window.getSelection();
-    let selectedText = selection.toString();
+//     const selection = window.getSelection();
+//     let selectedText = selection.toString();
     
-    if (selectedText.length > 0) {
-        document.execCommand('createLink', false, url);
-    } else {
-        document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${url}</a>`);
-    }
-    saveToStorage(id);
-}
+//     if (selectedText.length > 0) {
+//         document.execCommand('createLink', false, url);
+//     } else {
+//         document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${url}</a>`);
+//     }
+//     saveToStorage(id);
+// }
 
 
 // Helper to save to the correct storage key
