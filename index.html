@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Control Center</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -56,11 +56,11 @@
             <h2>Scratchpad</h2>
             <div class="scratchpad-container">
                 <div class="scratchpad-toolbar">
-                    <button type="button" onclick="addLink(event, 'scratchpad')" title="Add Link">⚯</button>
-                    <button type="button" onclick="triggerImageUpload(event, 'scratchpad')" title="Attach Image">🗀</button>
-                    <button type="button" onclick="addCheckbox(event, 'scratchpad')" title="Add Checkbox">□</button>
-                    <button type="button" onclick="addList(event, 'scratchpad', 'insertUnorderedList')" title="Bullet List">•≡</button>
-                    <button type="button" onclick="addList(event, 'scratchpad', 'insertOrderedList')" title="Numbered List">1≡</button>
+                    <button type="button" onclick="addLink('scratchpad')" title="Add Link">⚯</button>
+                    <button type="button" onclick="triggerImageUpload('scratchpad')" title="Attach Image">🗀</button>
+                    <button type="button" onclick="addCheckbox('scratchpad')" title="Add Checkbox">□</button>
+                    <button type="button" onclick="addList('scratchpad', 'insertUnorderedList')" title="Bullet List">•≡</button>
+                    <button type="button" onclick="addList('scratchpad', 'insertOrderedList')" title="Numbered List">1≡</button>
                 </div>
                 <div id="scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes or paste images here..."></div>
                 <input type="file" id="file-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad')">
@@ -75,7 +75,7 @@
             </ul>
         </section>
     </main>
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
     <!-- Footer -->
     <footer>
         <p>&copy; 2026 My Control Center</p>

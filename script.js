@@ -82,7 +82,26 @@ async function loadLatestVideos() {
 
 loadLatestVideos();
 
-// --- Reusable Scratchpad Logic for Multiple Pads ---
+// ----- Helper: get a valid range inside a scratchpad (or collapse to end) -----
+function getSafeRange(pad) {
+    const sel = window.getSelection();
+    let range = null;
+    if (sel.rangeCount > 0) {
+        range = sel.getRangeAt(0);
+        // if the range is not inside this pad, discard it
+        if (!pad.contains(range.commonAncestorContainer)) {
+            range = null;
+        }
+    }
+    if (!range) {
+        range = document.createRange();
+        range.selectNodeContents(pad);
+        range.collapse(false); // to the end
+    }
+    return range;
+}
+
+// ----- Setup each scratchpad with persistence and event handlers -----
 setupScratchpad('scratchpad', 'myScratchpad');
 setupScratchpad('scratchpad2', 'myScratchpad2');
 
@@ -90,10 +109,10 @@ function setupScratchpad(id, storageKey) {
     const pad = document.getElementById(id);
     if (!pad) return;
 
-    // Load saved content on refresh
+    // Load saved content
     pad.innerHTML = localStorage.getItem(storageKey) || '';
 
-    // Save on input or checkbox change
+    // Save on any change
     pad.addEventListener('input', () => {
         localStorage.setItem(storageKey, pad.innerHTML);
     });
@@ -101,72 +120,79 @@ function setupScratchpad(id, storageKey) {
         localStorage.setItem(storageKey, pad.innerHTML);
     });
 
-    // Handle pasting images or links
+    // --- Make links inside the pad clickable (open in new tab) ---
+    pad.addEventListener('click', (e) => {
+        const anchor = e.target.closest('a');
+        if (anchor && anchor.href) {
+            e.preventDefault();
+            window.open(anchor.href, '_blank');
+        }
+    });
+
+    // --- Handle paste (images and URLs with display name prompt) ---
     pad.addEventListener('paste', (e) => {
         const clipboardData = e.clipboardData || window.clipboardData;
         if (!clipboardData) return;
 
-        // 1. Check if pasted content is an image file
+        // 1. Check for pasted image file
         const items = clipboardData.items;
         if (items) {
-            for (let index in items) {
-                let item = items[index];
-                if (item.kind === 'file') {
-                    let blob = item.getAsFile();
-                    if (blob && blob.type.startsWith('image/')) {
-                        e.preventDefault();
-                        insertImageBlob(pad, blob, storageKey);
-                        return;
-                    }
+            for (let item of items) {
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    e.preventDefault();
+                    const blob = item.getAsFile();
+                    insertImageBlob(pad, blob, storageKey);
+                    return;
                 }
             }
         }
 
-        // 2. Check if pasted content is a URL
+        // 2. Check for pasted URL
         const text = clipboardData.getData('text');
         if (text) {
-            let cleanText = text.trim();
-            // Simple check to see if text looks like a web link / domain
+            const cleanText = text.trim();
             const urlPattern = /^(https?:\/\/|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(\/[^\s]*)?$/i;
-            
             if (urlPattern.test(cleanText)) {
                 e.preventDefault();
 
-                // Ensure URL has a protocol for the href attribute
+                // Prompt for display name (default to the URL itself)
+                let displayText = prompt("Enter the display text for this link:", cleanText);
+                if (displayText === null) return; // cancelled
+                if (displayText.trim() === '') displayText = cleanText;
+
+                // Build the anchor
                 let href = cleanText;
                 if (!/^https?:\/\//i.test(href)) {
                     href = 'https://' + href;
                 }
-
-                // Create clickable link element
                 const a = document.createElement('a');
                 a.href = href;
-                a.textContent = cleanText;
+                a.textContent = displayText;
                 a.target = '_blank';
                 a.rel = 'noopener noreferrer';
 
-                let selection = window.getSelection();
-                if (selection.rangeCount) {
-                    let range = selection.getRangeAt(0);
-                    range.deleteContents();
-                    range.insertNode(a);
+                // Insert at current cursor position
+                const range = getSafeRange(pad);
+                pad.focus();
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                range.deleteContents();
+                range.insertNode(a);
 
-                    // Move cursor right after the link
-                    range.setStartAfter(a);
-                    range.setEndAfter(a);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                } else {
-                    pad.appendChild(a);
-                }
+                // Move cursor right after the link
+                range.setStartAfter(a);
+                range.setEndAfter(a);
+                sel.removeAllRanges();
+                sel.addRange(range);
 
                 localStorage.setItem(storageKey, pad.innerHTML);
-                return;
             }
         }
     });
 }
 
+// ----- Image upload from file input -----
 function triggerImageUpload(id) {
     document.getElementById('file-' + id).click();
 }
@@ -178,98 +204,119 @@ function handleFileSelect(event, id) {
         const storageKey = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
         insertImageBlob(pad, file, storageKey);
     }
-    event.target.value = ''; // Reset file input
+    event.target.value = ''; // reset
 }
 
 function insertImageBlob(pad, blob, storageKey) {
     pad.focus();
-    let reader = new FileReader();
-    reader.onload = function(event) {
-        let base64Image = event.target.result;
-        let img = document.createElement('img');
-        img.src = base64Image;
+    const range = getSafeRange(pad);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
 
-        let selection = window.getSelection();
-        if (selection.rangeCount) {
-            let range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(img);
-        } else {
-            pad.appendChild(img);
-        }
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = document.createElement('img');
+        img.src = event.target.result;
+        range.deleteContents();
+        range.insertNode(img);
+        // Move cursor after the image
+        range.setStartAfter(img);
+        range.setEndAfter(img);
+        sel.removeAllRanges();
+        sel.addRange(range);
         localStorage.setItem(storageKey, pad.innerHTML);
     };
     reader.readAsDataURL(blob);
 }
 
-// // --- Corrected Image Upload Logic ---
-// function triggerImageUpload(event, id) {
-//     event.preventDefault(); // Stop any unexpected behavior
-//     document.getElementById('file-' + id).click();
-// }
-
-// // --- Corrected Text Tool Functions ---
-// function addCheckbox(event, id) {
-//     event.preventDefault();
-//     const pad = document.getElementById(id);
-//     pad.focus(); // Explicitly focus the pad first
-
-//     const selection = window.getSelection();
-//     if (!selection.rangeCount) return;
-//     const range = selection.getRangeAt(0);
-
-//     const wrapper = document.createElement('div');
-//     wrapper.innerHTML = '<input type="checkbox"> <span contenteditable="true"> </span><br>';
-    
-//     range.deleteContents();
-//     range.insertNode(wrapper);
-    
-//     // Collapse to the span inside the wrapper
-//     range.setStart(wrapper.querySelector('span'), 0);
-//     range.collapse(true);
-//     selection.removeAllRanges();
-//     selection.addRange(range);
-
-//     saveToStorage(id);
-// }
-
-// function addList(event, id, command) {
-//     event.preventDefault();
-//     const pad = document.getElementById(id);
-//     pad.focus(); // Re-focus before running the command
-//     document.execCommand(command, false, null);
-//     pad.focus(); // Re-focus again after, just to be safe
-//     saveToStorage(id);
-// }
-
-// function addLink(event, id) {
-//     event.preventDefault();
-//     const pad = document.getElementById(id);
-//     pad.focus(); // Focus before the prompt steals it
-    
-//     let url = prompt("Enter the URL:");
-//     if (!url) return;
-    
-//     if (!url.startsWith('http')) url = 'https://' + url;
-    
-//     // Re-focus after the prompt closes
-//     pad.focus(); 
-    
-//     const selection = window.getSelection();
-//     let selectedText = selection.toString();
-    
-//     if (selectedText.length > 0) {
-//         document.execCommand('createLink', false, url);
-//     } else {
-//         document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${url}</a>`);
-//     }
-//     saveToStorage(id);
-// }
-
-
-// Helper to save to the correct storage key
-function saveToStorage(id) {
+// ----- Add a checkbox with editable text -----
+function addCheckbox(id) {
     const pad = document.getElementById(id);
-    const key = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
-    localStorage.setItem(key, pad.innerHTML);
+    const range = getSafeRange(pad);
+    pad.focus();
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    const wrapper = document.createElement('div');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    const textSpan = document.createElement('span');
+    textSpan.textContent = 'New Task';
+    wrapper.appendChild(checkbox);
+    wrapper.appendChild(document.createTextNode(' '));
+    wrapper.appendChild(textSpan);
+    wrapper.appendChild(document.createElement('br'));
+
+    range.deleteContents();
+    range.insertNode(wrapper);
+
+    // Place cursor inside the text span for immediate editing
+    const newRange = document.createRange();
+    newRange.selectNodeContents(textSpan);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+
+    const storageKey = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
+    localStorage.setItem(storageKey, pad.innerHTML);
+}
+
+// ----- Add a list (ordered/unordered) using execCommand -----
+function addList(id, command) {
+    const pad = document.getElementById(id);
+    const range = getSafeRange(pad);
+    pad.focus();
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    document.execCommand(command, false, null);
+
+    const storageKey = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
+    localStorage.setItem(storageKey, pad.innerHTML);
+}
+
+// ----- Add a link (with prompt for URL and display text) -----
+function addLink(id) {
+    const pad = document.getElementById(id);
+    const range = getSafeRange(pad);
+    pad.focus();
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    let url = prompt("Enter the URL (e.g., https://example.com):");
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) {
+        url = 'https://' + url;
+    }
+
+    const selectedText = sel.toString();
+    if (selectedText.length > 0) {
+        // If text is highlighted, turn it into a link
+        document.execCommand('createLink', false, url);
+    } else {
+        // No selection: ask for display text
+        let displayText = prompt("Enter the text to display for this link:", url);
+        if (displayText === null) return;
+        if (displayText.trim() === '') displayText = url;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.textContent = displayText;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+
+        range.deleteContents();
+        range.insertNode(a);
+        // Move cursor after the link
+        range.setStartAfter(a);
+        range.setEndAfter(a);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    const storageKey = id === 'scratchpad' ? 'myScratchpad' : 'myScratchpad2';
+    localStorage.setItem(storageKey, pad.innerHTML);
 }
