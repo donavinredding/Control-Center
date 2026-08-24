@@ -7,36 +7,43 @@ body {
     padding: 0;
 }
 
-
 header {
     background: #181c22;
-    /* background-image: url(./images/controlcentertopbackground.jpg);
-    background-position-y: 30%;
-    background-repeat: no-repeat;
-    background-attachment: fixed; */
-    /* background-size: cover; */
-    color: #e3e8ef;
+    color: #61afef;
+    border: 1px solid #61afef;
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 0.1rem auto;
+    margin: 0 auto;
+}
+
+#home-button {
+    border-radius: 8px;
+    padding: 5px 7%;
+    color: #222222;
+    background-color: #61afef;
+    border: 2px solid #61afef;
+    margin-bottom: 3px;
+    font-weight: bolder;
+}
+#home-button:hover {
+    background-color: #181c22;
+    color: #ffffff;
 }
 
 .hub-grid {
     display: grid;
-    /* Column 1 (Creators) is wide, Column 2 (Projects) is medium, Column 3 (Links) is narrow/small */
     grid-template-columns: 1fr 1.5fr 0.9fr;
     gap: 2rem;
     max-width: none;
     margin: 2rem auto;
     padding: 0 1rem;
+    align-items: start;
 }
-.hub-grid-addon{
-    display: grid;
-    /* Column 1 (Creators) is wide, Column 2 (Projects) is medium, Column 3 (Links) is narrow/small */
-    grid-template-columns: 2fr 0.5fr;
+
+.column-left, .column-center, .column-right {
+    display: flex;
+    flex-direction: column;
     gap: 2rem;
-    max-width: none;
-    margin: 2rem auto;
-    padding: 0 1rem;
 }
 
 .card {
@@ -51,11 +58,6 @@ header {
     color: #f0f4f8;
     border-bottom: 2px solid #3f4a5a;
     padding-bottom: 0.5rem;
-}
-
-
-.card youtube-section {
-    margin-top: 1rem;
 }
 
 .video iframe {
@@ -76,8 +78,8 @@ header {
 .project-image {
     display: block;
     width: 95%;
-    max-width: 700px; /* Control the maximum width of the image */
-    height: auto;    /* Automatically calculates height to preserve aspect ratio */
+    max-width: 700px;
+    height: auto;
     border-radius: 8px;
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s;
@@ -128,9 +130,9 @@ header {
 
 .video-button .video-date {
     display: block;
-    color: #9aa5b1; /* Softer readable muted gray */
+    color: #9aa5b1;
     font-size: 0.75rem;
-    padding: 0px 10px 5px 10px; /* Aligned with the name padding */
+    padding: 0px 10px 5px 10px;
     margin: 0;
 }
 
@@ -144,33 +146,11 @@ header {
     padding: 2px 10px 0px 10px;
     margin: 0;
     font-size: 0.85rem;
-    color: #cbd5e0; /* Slightly lighter gray than the main text */
-    white-space: nowrap;     /* Keeps the title on one line */
-    overflow: hidden;        /* Hides the overflow */
-    text-overflow: ellipsis; /* Adds the ... at the end */
-    max-width: 100%;
-}
-
-#home-button {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: #e3e8ef;
-    background-color: #5f708a;
-    border: 2px solid #3f4a5a;
-    border-radius: 8px;
+    color: #cbd5e0;
+    white-space: nowrap;
     overflow: hidden;
-    /* transition: transform 0.2s, border-color 0.2s; */
-    margin: 0 10px;
-    width: 90px;
-    height: 30px;
-    padding: 5px;
-}
-
-#home-button:hover {
-    border-color: #61afef;
-    background-color: #61afef;
-    color: #181c22;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 a {
@@ -180,26 +160,23 @@ a {
 textarea {
     width: 100%;
     height: 150px;
-    background: #272e38; /* Matches project-image background */
+    background: #272e38;
     color: #e3e8ef;
-    border: 1px solid #3f4a5a; /* Matches border colors */
+    border: 1px solid #3f4a5a;
     border-radius: 4px;
     padding: 10px;
     resize: vertical;
-    box-sizing: border-box; /* Ensures padding doesn't expand the element */
+    box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
 
 textarea:focus {
     outline: none;
-    border-color: #61afef; /* Highlight color on focus */
+    border-color: #61afef;
 }
 
 #scratchpad {
-    height: 100rem;
-}
-#scratchpad2 {
-    height: 50rem;
+    height: 35rem;
 }
 
 .scratchpad-container {
@@ -267,8 +244,6 @@ textarea:focus {
     cursor: pointer;
 }
 
-/* Style for links inside the scratchpad */
-/* Style for clickable links inside the scratchpad */
 .scratchpad-box a {
     color: #61afef;
     text-decoration: underline;
@@ -276,5 +251,292 @@ textarea:focus {
 }
 
 .scratchpad-box a:hover {
-    color: #98c379; /* Shifts to a soft green on hover */
+    color: #98c379;
+}
+
+/* Kanban Board Component Styles */
+.kanban-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.kanban-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.kanban-action-btn {
+    background: #272e38;
+    border: 1px solid #3f4a5a;
+    color: #e3e8ef;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.kanban-action-btn:hover {
+    background: #313d4f;
+    border-color: #61afef;
+}
+
+.task-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.task-form input[type="text"], 
+.task-form select {
+    background: #272e38;
+    border: 1px solid #3f4a5a;
+    color: #e3e8ef;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.task-form input[id="task-title"] {
+    flex: 2;
+    min-width: 120px;
+}
+
+.task-form select {
+    flex: 1;
+}
+
+#task-time {
+    flex: 0.8;
+    min-width: 60px;
+}
+
+#add-task-btn {
+    background: #61afef;
+    color: #181c22;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#add-task-btn:hover {
+    opacity: 0.9;
+}
+
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 900px) {
+    .kanban-board {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kanban-column {
+    background: #272e38;
+    border: 1px solid #3f4a5a;
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-column h3 {
+    margin-top: 0;
+    font-size: 0.9rem;
+    color: #abb2bf;
+    border-bottom: 1px solid #3f4a5a;
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+    min-height: 30px;
+}
+
+.task-card {
+    background: #313843;
+    border: 1px solid #3f4a5a;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.task-card:active {
+    cursor: grabbing;
+}
+
+.task-card.energy-low {
+    border-left: 4px solid #98c379;
+}
+
+.task-card.energy-medium {
+    border-left: 4px solid #e5c07b;
+}
+
+.task-card.energy-high {
+    border-left: 4px solid #e06c75;
+}
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.task-title-area {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    word-break: break-word;
+    flex-grow: 1;
+}
+
+.task-checkbox {
+    cursor: pointer;
+    accent-color: #61afef;
+    width: 14px;
+    height: 14px;
+}
+
+.task-title {
+    font-size: 0.85rem;
+    color: #e3e8ef;
+    margin: 0;
+}
+
+.task-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    color: #9aa5b1;
+    margin-top: 2px;
+}
+
+.task-tag {
+    background: #1e242d;
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 1px solid #3f4a5a;
+}
+
+.task-actions {
+    display: flex;
+    gap: 2px;
+}
+
+.task-move-btn, 
+.task-delete-btn {
+    background: none;
+    border: none;
+    color: #9aa5b1;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.task-move-btn:hover, 
+.task-delete-btn:hover {
+    color: #ffffff;
+    background: #3f4a5a;
+}
+
+/* Focus Mode */
+.kanban-card.focus-mode-active .kanban-column:not([data-column="inprogress"]) {
+    display: none;
+}
+
+.kanban-card.focus-mode-active .kanban-board {
+    grid-template-columns: 1fr;
+}
+
+.kanban-card.focus-mode-active #inprogress-list .task-card:nth-child(n+4) {
+    display: none;
+}
+
+/* Space News Grid Container */
+#space-news-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+/* Individual Compact Card */
+.space-news-card {
+    background-color: #1e2630; /* Matches your theme's card background */
+    border: 2px solid #3f4a5a;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.space-news-card:hover {
+    transform: scale(1.02);
+    border: solid 2px #61afef;
+}
+
+/* Shrunk Thumbnail */
+.space-news-card img {
+    width: 100%;
+    height: 100px; /* Smaller fixed height */
+    object-fit: cover;
+}
+
+/* Text Padding Area */
+.space-news-content {
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+/* Smaller Title */
+.space-news-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #e2e8f0;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    /* -webkit-line-clamp: 2; */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Date and Site metadata */
+.space-news-date {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.website-logo {
+    width: 4rem;
+    height: 4rem;
 }

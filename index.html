@@ -3,82 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Control Center</title>
+    <title>Donavin's Control Center</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
 </head>
 <body>
 
-    <!-- Header / Navigation -->
     <header>
-        <h1>My Control Center</h1>
-        <p>What's going on in my world right now.</p>
+        <h1>Donavin's Control Center</h1>
     </header>
 
     <!-- Main Content Grid -->
     <main class="hub-grid">
-        <!-- Replace your videos section with this -->
-        <section class="card youtube-section">
-            <h2>Latest From My Favorite Creators</h2>
-            <div id="youtube-feed-container" class="video-grid">
-                <!-- JS will inject the buttons here -->
-                <p>Loading latest videos...</p>
-            </div>
-        </section>
-        <!-- Life Updates Section -->
-        <section class="card">
-            <h2>Priorities Projects</h2>
-            <ol>
-                <li>
-                    <p>Learning JavaScript on Scrimba</p>
-                    <button class="project-button" onclick="window.location.href='https://scrimba.com/learn-javascript-c0v'">
-                        <img src="./images/scrimbacource.png" alt="Scrimba Logo" class="project-image">
-                    </button>
-                </li>
-                <li>
-                    <p>Elytra Models Project</p>
-                    <button class="project-button" onclick="window.location.href='./projectpages/addon.html'">
-                        <img src="./images/elytra-models.png" alt="Elytra Models Logo" class="project-image">
-                    </button>
-                </li>
-            </ol>
-            <!-- <ol>
-                <li>
-                    <p>Learning JavaScript on Scrimba</p>
-                    <button id="scrimba-button" class="project-button" onclick="window.open('https://scrimba.com/learn-javascript-c0v', '_blank')"></button>
-                </li>
-                <li>
-                    <p>Creating Elytra Models for CurseForge</p>
-                    <button id="elytra-button" class="project-button" onclick="window.location.href='./projectpages/addon.html'"></button>
-                </li>
-            </ol> -->
-        </section>
-        <section class="card">
-            <h2>Scratchpad</h2>
-            <div class="scratchpad-container">
-                <div class="scratchpad-toolbar">
-                    <button type="button" onclick="addLink('scratchpad')" title="Add Link">⚯</button>
-                    <button type="button" onclick="triggerImageUpload('scratchpad')" title="Attach Image">🗀</button>
-                    <button type="button" onclick="addCheckbox('scratchpad')" title="Add Checkbox">□</button>
-                    <button type="button" onclick="addList('scratchpad', 'insertUnorderedList')" title="Bullet List">•≡</button>
-                    <button type="button" onclick="addList('scratchpad', 'insertOrderedList')" title="Numbered List">1≡</button>
+        <!-- Left Column: YouTube + Links -->
+        <div class="column-left">
+            <section class="card youtube-section">
+                <h2>🟥Youtube</h2>
+                <div id="youtube-feed-container" class="video-grid"></div>
+            </section>
+            <section class="card links-section">
+                <h2>Quick Links</h2>
+                <ul>
+                    <li><a href="https://www.curseforge.com/members/dredding/projects" target="_blank">CurseForge</a></li>
+                    <li><a href="https://www.youtube.com/@dredding2000" target="_blank">YouTube</a></li>
+                    <li><a href="https://scrimba.com/learn-javascript-c0v" target="_blank">Scrimba</a></li>
+                </ul>
+            </section>
+        </div>
+
+        <!-- Middle Column: Projects & Fiverr -->
+        <div class="column-center">
+            <!-- Kanban Task Board Component -->
+            <section class="card kanban-card">
+                <div class="kanban-header">
+                    <h2>✅Focus Board</h2>
+                    <div class="kanban-controls">
+                        <button id="focus-mode-btn" class="kanban-action-btn" type="button">🎯 Focus Mode: Off</button>
+                        <button id="clear-done-btn" class="kanban-action-btn" type="button">🗑️ Clear Done</button>
+                    </div>
                 </div>
-                <div id="scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes or paste images here..."></div>
-                <input type="file" id="file-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad')">
-            </div>
-        </section>
-        <section class="card links-section">
-            <h2>Quick Links</h2>
-            <ul>
-                <li><a href="https://www.curseforge.com/members/dredding/projects" target="_blank">CurseForge</a></li>
-                <li><a href="https://www.youtube.com/@dredding2000" target="_blank">YouTube</a></li>
-                <li><a href="https://scrimba.com/learn-javascript-c0v" target="_blank">Scrimba</a></li>
-            </ul>
-        </section>
+
+                <form id="task-form" class="task-form">
+                    <input type="text" id="task-title" placeholder="Micro-step task (e.g., Do the Laundry)..." required autocomplete="off">
+                    <select id="task-energy">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Med</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                    <input type="text" id="task-time" placeholder="Time (e.g. 15m)" maxlength="6">
+                    <button type="submit" id="add-task-btn">Add</button>
+                </form>
+
+                <div class="kanban-board">
+                    <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>To Do</h3>
+                        <div class="task-list" id="todo-list"></div>
+                    </div>
+                    <div class="kanban-column" data-column="inprogress" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>In Progress</h3>
+                        <div class="task-list" id="inprogress-list"></div>
+                    </div>
+                    <div class="kanban-column" data-column="done" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>Done</h3>
+                        <div class="task-list" id="done-list"></div>
+                    </div>
+                </div>
+            </section>
+            <section class="card">
+                <h2>📋Projects</h2>
+                <ol>
+                    <li>
+                        <p>Learning JavaScript on Scrimba</p>
+                        <button class="project-button" onclick="window.location.href='https://scrimba.com/learn-javascript-c0v'">
+                            <img src="./images/scrimbacource.png" alt="Scrimba Logo" class="project-image">
+                        </button>
+                    </li>
+                    <li>
+                        <p>Elytra Models Project</p>
+                        <button class="project-button" onclick="window.location.href='./projectpages/addon.html'">
+                            <img src="./images/elytra-models.png" alt="Elytra Models Logo" class="project-image">
+                        </button>
+                    </li>
+                </ol>
+            </section>
+            
+            <section class="card">
+                <h2>Fiverr Studio</h2>
+                <p>Seller Dashboard</p>
+                <button class="project-button" onclick="window.location.href='https://www.fiverr.com/users/dreddingstudio/seller_dashboard'">
+                    <img src="https://fiverr-res.cloudinary.com/npm-assets/layout-service/fiverr-og-logo.5fd6463.png" alt="Fiverr Logo" class="project-image">
+                </button>
+            </section>
+        </div>
+
+        <!-- Right Column: Space News, Kanban Task Board, & Scratchpad -->
+        <div class="column-right">
+            <section class="card">
+                <h2>🔭Space News🛸</h2>
+                <div id="space-news-container" class="feed-grid">
+                    <!-- Space news cards will load here automatically -->
+                </div>
+            </section>
+            <section class="card">
+                <h2>📝Scratchpad</h2>
+                <div class="scratchpad-container">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('scratchpad')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('scratchpad')">📷 Add Image</button>
+                    </div>
+                    <div id="scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes or paste images here..."></div>
+                    <input type="file" id="file-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad')">
+                </div>
+            </section>
+        </div>
     </main>
-    <script src="script.js"></script>
+
     <!-- Footer -->
     <footer>
         <p>&copy; 2026 My Control Center</p>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>

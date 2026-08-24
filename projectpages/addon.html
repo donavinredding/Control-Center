@@ -3,52 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Control Center Addon Projects</title>
+    <title>Elytra Models - Focus Hub</title>
     <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
+    <style>
+        /* Centered Focus Hub Layout Styling */
+        body {
+            background-color: #15181e;
+            color: #e2e8f0;
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .addon-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: #1e222b;
+            border-bottom: 1px solid #323d4d;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .addon-header h1 {
+            font-size: 1.3rem;
+            color: #e2e8f0;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: #272e38;
+            color: #e2e8f0;
+            padding: 3px 10px;
+            border: 1px solid #3f4a5a;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .header-btn:hover {
+            background: #313d4f;
+            border-color: #61afef;
+        }
+
+        /* Centered Grid Container */
+        .addon-focus-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            max-width: 1350px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Responsive stack for smaller screens */
+        @media (max-width: 1100px) {
+            .addon-focus-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .column-left-wide, .column-right-narrow {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #8892b0;
+            font-size: 0.85rem;
+            border-top: 1px solid #323d4d;
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
-
-    <!-- Header / Navigation -->
-    <header>
-        <h1>Welcome to My Control Center</h1>
-        <p>What's going on in my world right now.</p>
-        <button id="home-button" class="project-button" onclick="window.location.href='../index.html'"> Home </button>
+    <!-- Clean Compact Header -->
+    <header class="addon-header">
+        <div class="header-brand">
+            <img src="../images/elytra-models.png" alt="Elytra Models Logo" class="header-logo">
+            <h1>Elytra Models Hub</h1>
+        </div>
+        <div class="header-actions">
+            <a href="https://www.curseforge.com/minecraft-bedrock/addons/elytra-models-5-2" target="_blank" class="header-btn">CurseForge↗</a>
+            <button id="home-button" class="header-btn" onclick="window.location.href='../index.html'">Home</button>
+        </div>
     </header>
 
-    <!-- Main Content Grid -->
-    <main class="hub-grid-addon">
-        <!-- Life Updates Section -->
-        <section class="card">
-            <h2>Current Top Priorities Projects & Status</h2>
-            <ol>
-                <li>
-                    <h3>Elytra Models Project for CurseForge</h3>
-                    <img src="../images/elytra-models.png" alt="Elytra Models Project" class="project-image">
-                    <h3>Project Status:</h3>
-                    <p>Updating old models and their textures to look better.
-                </li>
-            </ol>
-        </section>
-        <!-- Scratchpad 2 -->
-        <section class="card">
-            <h2>Project Scratchpad</h2>
-            <div class="scratchpad-container">
-                <div class="scratchpad-toolbar">
-                    <button type="button" onclick="addLink('scratchpad2')" title="Add Link">⚯</button>
-                    <button type="button" onclick="triggerImageUpload('scratchpad2')" title="Attach Image">🗀</button>
-                    <button type="button" onclick="addCheckbox('scratchpad2')" title="Add Checkbox">☑</button>
-                    <button type="button" onclick="addList('scratchpad2', 'insertUnorderedList')" title="Bullet List">•≡</button>
-                    <button type="button" onclick="addList('scratchpad2', 'insertOrderedList')" title="Numbered List">1≡</button>
+    <!-- Centered Main Content Grid -->
+    <main class="addon-focus-grid">
+        
+        <!-- Left Column: The Action Core (Focus Spotlight + Kanban) -->
+        <div class="column-left-wide">
+            
+            <!-- Hyperfocus Spotlight: Just ONE task at a time -->
+            <section class="card hyperfocus-spotlight-card">
+                <h2>⚡ Current Hyperfocus Anchor</h2>
+                <div id="active-spotlight" class="spotlight-box">
+                    <p class="spotlight-placeholder">Pick a task from "In Progress" below to lock in your focus here!</p>
                 </div>
-                <div id="scratchpad2" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes for this project..."></div>
-                <input type="file" id="file-scratchpad2" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad2')">
-            </div>
-        </section>
+            </section>
+
+            <!-- Kanban Task Board Component -->
+            <section class="card kanban-card" data-storage-key="elytra_kanban_tasks">
+                <div class="kanban-header">
+                    <h2>✅ Elytra Task Breakdown</h2>
+                    <div class="kanban-controls">
+                        <button id="focus-mode-btn" class="kanban-action-btn" type="button">🎯 Focus Mode: Off</button>
+                        <button id="clear-done-btn" class="kanban-action-btn" type="button">🗑️ Clear Done</button>
+                    </div>
+                </div>
+
+                <form id="task-form" class="task-form">
+                    <input type="text" id="task-title" placeholder="Micro-step task (e.g., Export JSON texture)..." required autocomplete="off">
+                    <select id="task-energy">
+                        <option value="low">🟢 Low Energy</option>
+                        <option value="medium" selected>🟡 Med Energy</option>
+                        <option value="high">🔴 High Energy</option>
+                    </select>
+                    <input type="text" id="task-time" placeholder="Time (e.g. 15m)" maxlength="6">
+                    <button type="submit" id="add-task-btn">Add</button>
+                </form>
+
+                <div class="kanban-board">
+                    <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>To Do</h3>
+                        <div class="task-list" id="todo-list"></div>
+                    </div>
+                    <div class="kanban-column" data-column="inprogress" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>In Progress</h3>
+                        <div class="task-list" id="inprogress-list"></div>
+                    </div>
+                    <div class="kanban-column" data-column="done" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>Done 🎉</h3>
+                        <div class="task-list" id="done-list"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Brain Dump & Quick Notes -->
+        <div class="column-right-narrow">
+            <section class="card scratchpad-card">
+                <h2>📝 Brain Dump Scratchpad</h2>
+                <p class="scratchpad-hint">Got a random idea or code snippet? Park it here so you don't lose focus.</p>
+                <div class="scratchpad-container">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('scratchpad')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('scratchpad')">📷 Add Image</button>
+                    </div>
+                    <div id="scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes or paste images here..."></div>
+                    <input type="file" id="file-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad')">
+                </div>
+            </section>
+        </div>
+
     </main>
+
+    <script>
+        const KANBAN_STORAGE_KEY = 'elytra_kanban_tasks';
+    </script>
     <script src="../script.js"></script>
+
     <!-- Footer -->
     <footer>
-        <p>&copy; 2026 My Control Center</p>
+        <p>&copy; 2026 My Control Center — Elytra Models Addon Tracker</p>
     </footer>
 </body>
 </html>
