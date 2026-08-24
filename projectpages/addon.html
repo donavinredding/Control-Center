@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elytra Models - Focus Hub</title>
     <link rel="stylesheet" href="../styles.css">
-    <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
+    <link rel="icon" type="image/svg+xml" href="../images/dcc_icon.svg">
     <style>
         /* Centered Focus Hub Layout Styling */
         body {
@@ -21,8 +21,6 @@
             align-items: center;
             padding: 15px 40px;
             background: #1e222b;
-            border-bottom: 1px solid #323d4d;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
         .header-brand {
@@ -146,6 +144,14 @@
                     <input type="text" id="task-time" placeholder="Time (e.g. 15m)" maxlength="6">
                     <button type="submit" id="add-task-btn">Add</button>
                 </form>
+
+                <!-- Energy Filter Pill Bar -->
+                <div class="energy-filters">
+                    <button type="button" class="filter-btn active" data-filter="all">All</button>
+                    <button type="button" class="filter-btn" data-filter="low">🟢 Low</button>
+                    <button type="button" class="filter-btn" data-filter="medium">🟡 Med</button>
+                    <button type="button" class="filter-btn" data-filter="high">🔴 High</button>
+                </div>
 
                 <div class="kanban-board">
                     <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">

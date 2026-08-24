@@ -12,8 +12,19 @@ header {
     color: #61afef;
     border: 1px solid #61afef;
     text-align: center;
-    padding: 0.1rem auto;
+    padding: 0.5rem 1rem;
     margin: 0 auto;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.site-icon {
+    object-fit: contain;
 }
 
 #home-button {
@@ -58,13 +69,6 @@ header {
     color: #f0f4f8;
     border-bottom: 2px solid #3f4a5a;
     padding-bottom: 0.5rem;
-}
-
-.video iframe {
-    width: 100%;
-    height: 200px;
-    border: none;
-    border-radius: 8px;
 }
 
 .project-button {
@@ -285,6 +289,39 @@ textarea:focus {
     border-color: #61afef;
 }
 
+/* Energy Filter Pill Bar Styles */
+.energy-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: #272e38;
+    color: #8892b0;
+    border: 1px solid #3f4a5a;
+    padding: 6px 14px;
+    border-radius: 20px; /* Pill shape */
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: #313d4f;
+    color: #e2e8f0;
+    border-color: #61afef;
+}
+
+.filter-btn.active {
+    background: #61afef;
+    color: #15181e;
+    font-weight: 600;
+    border-color: #61afef;
+    box-shadow: 0 0 10px rgba(97, 175, 239, 0.3);
+}
+
 .task-form {
     display: flex;
     gap: 8px;
@@ -463,7 +500,29 @@ textarea:focus {
     background: #3f4a5a;
 }
 
-/* Focus Mode */
+/* =========================================================================
+   Neon / Glow Effect for Hyperfocus Spotlight Mode
+   ========================================================================= */
+@keyframes neonPulse {
+    0% {
+        box-shadow: 0 0 12px rgba(97, 175, 239, 0.3), inset 0 0 10px rgba(97, 175, 239, 0.05);
+        border-color: #61afef;
+    }
+    50% {
+        box-shadow: 0 0 28px rgba(97, 175, 239, 0.75), inset 0 0 15px rgba(97, 175, 239, 0.2);
+        border-color: #98c379;
+    }
+    100% {
+        box-shadow: 0 0 12px rgba(97, 175, 239, 0.3), inset 0 0 10px rgba(97, 175, 239, 0.05);
+        border-color: #61afef;
+    }
+}
+
+.kanban-card.focus-mode-active {
+    animation: neonPulse 3s infinite ease-in-out;
+    border: 2px solid #61afef;
+}
+
 .kanban-card.focus-mode-active .kanban-column:not([data-column="inprogress"]) {
     display: none;
 }
@@ -486,7 +545,7 @@ textarea:focus {
 
 /* Individual Compact Card */
 .space-news-card {
-    background-color: #1e2630; /* Matches your theme's card background */
+    background-color: #1e2630;
     border: 2px solid #3f4a5a;
     border-radius: 8px;
     overflow: hidden;
@@ -501,14 +560,12 @@ textarea:focus {
     border: solid 2px #61afef;
 }
 
-/* Shrunk Thumbnail */
 .space-news-card img {
     width: 100%;
-    height: 100px; /* Smaller fixed height */
+    height: 100px;
     object-fit: cover;
 }
 
-/* Text Padding Area */
 .space-news-content {
     padding: 8px 10px;
     display: flex;
@@ -517,7 +574,6 @@ textarea:focus {
     flex-grow: 1;
 }
 
-/* Smaller Title */
 .space-news-title {
     font-size: 0.85rem;
     font-weight: 500;
@@ -525,18 +581,11 @@ textarea:focus {
     line-height: 1.2;
     margin-bottom: 6px;
     display: -webkit-box;
-    /* -webkit-line-clamp: 2; */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* Date and Site metadata */
 .space-news-date {
     font-size: 0.75rem;
     color: #94a3b8;
-}
-
-.website-logo {
-    width: 4rem;
-    height: 4rem;
 }

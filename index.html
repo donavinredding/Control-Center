@@ -10,7 +10,10 @@
 <body>
 
     <header>
-        <h1>Donavin's Control Center</h1>
+        <div class="header-brand">
+            <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon" style="width: 36px; height: 36px;">
+            <h1>Donavin's Control Center</h1>
+        </div>
     </header>
 
     <!-- Main Content Grid -->
@@ -54,6 +57,14 @@
                     <button type="submit" id="add-task-btn">Add</button>
                 </form>
 
+                <!-- Energy Filter Pill Bar -->
+                <div class="energy-filters">
+                    <button type="button" class="filter-btn active" data-filter="all">All</button>
+                    <button type="button" class="filter-btn" data-filter="low">🟢 Low</button>
+                    <button type="button" class="filter-btn" data-filter="medium">🟡 Med</button>
+                    <button type="button" class="filter-btn" data-filter="high">🔴 High</button>
+                </div>
+
                 <div class="kanban-board">
                     <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">
                         <h3>To Do</h3>
@@ -69,6 +80,7 @@
                     </div>
                 </div>
             </section>
+            
             <section class="card">
                 <h2>📋Projects</h2>
                 <ol>
@@ -96,13 +108,11 @@
             </section>
         </div>
 
-        <!-- Right Column: Space News, Kanban Task Board, & Scratchpad -->
+        <!-- Right Column: Space News & Scratchpad -->
         <div class="column-right">
             <section class="card">
                 <h2>🔭Space News🛸</h2>
-                <div id="space-news-container" class="feed-grid">
-                    <!-- Space news cards will load here automatically -->
-                </div>
+                <div id="space-news-container" class="feed-grid"></div>
             </section>
             <section class="card">
                 <h2>📝Scratchpad</h2>

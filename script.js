@@ -11,6 +11,7 @@ let tasks = JSON.parse(localStorage.getItem(kanbanStorageKey)) || [
 ];
 
 let focusModeActive = false;
+let currentEnergyFilter = 'all';
 
 function saveTasks() {
     localStorage.setItem(kanbanStorageKey, JSON.stringify(tasks));
@@ -27,7 +28,13 @@ function renderTasks() {
     inprogressList.innerHTML = '';
     doneList.innerHTML = '';
 
-    tasks.forEach(task => {
+    // Filter tasks based on selected energy filter pill
+    const visibleTasks = tasks.filter(task => {
+        if (currentEnergyFilter === 'all') return true;
+        return task.energy === currentEnergyFilter;
+    });
+
+    visibleTasks.forEach(task => {
         const card = document.createElement('div');
         card.className = `task-card energy-${task.energy}`;
         card.draggable = true;
@@ -118,7 +125,6 @@ function escapeHtml(text) {
    2. YOUTUBE FEED LOGIC (Sorted Newest First)
    ========================================================================= */
 const creators = [
-    // To get the channelId ("UC..."). On channel page press Ctrl+U and Ctrl+F then PASTE "channel_id"
     { name: "MrBeast", channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA" },
     { name: "Beast Gaming", channelId: "UCIPPMRA040LQr5QPyJEbmXA" },
     { name: "Beast Philanthropy", channelId: "UCAiLfjNXkNv24uhpzUgPa6A" },
@@ -127,17 +133,15 @@ const creators = [
     { name: "Mumbo Jumbo", channelId: "UChFur_NwVSbUozOcF_F2kMg" },
     { name: "Coridor Crew", channelId: "UCSpFnDQr88xCZ80N-X7t0nQ" },
     { name: "Dylan Page", channelId: "UCzPpbeK8ANcNKg5aoMB0miw" }
-    // { name: "Channel Name", channelId: "UC....." }
 ];
 
 async function loadLatestVideos() {
     const container = document.getElementById('youtube-feed-container');
-    if (!container) return; // Safely skip if page doesn't have this feed
+    if (!container) return;
 
     container.innerHTML = 'Loading YouTube feed...';
     let allVideos = [];
 
-    // 1. Fetch videos from all creators
     for (const creator of creators) {
         const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.youtube.com%2Ffeeds%2Fvideos.xml%3Fchannel_id%3D${creator.channelId}`;
         try {
@@ -155,13 +159,10 @@ async function loadLatestVideos() {
                 const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                 
                 let dateString = "";
-                if (diffDays === 0) {
-                    dateString = "Today";
-                } else if (diffDays === 1) {
-                    dateString = "Yesterday";
-                } else if (diffDays <= 29) {
-                    dateString = `${diffDays} days ago`;
-                } else if (diffDays < 365) {
+                if (diffDays === 0) dateString = "Today";
+                else if (diffDays === 1) dateString = "Yesterday";
+                else if (diffDays <= 29) dateString = `${diffDays} days ago`;
+                else if (diffDays < 365) {
                     const diffMonths = Math.floor(diffDays / 30);
                     dateString = diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
                 } else {
@@ -169,7 +170,6 @@ async function loadLatestVideos() {
                     dateString = diffYears === 1 ? "1 year ago" : `${diffYears} years ago`;
                 }
 
-                // Push object into our collection array
                 allVideos.push({
                     title: video.title,
                     link: video.link,
@@ -184,10 +184,7 @@ async function loadLatestVideos() {
         }
     }
 
-    // 2. Sort videos by date in descending order (newest first)
     allVideos.sort((a, b) => b.pubDate - a.pubDate);
-
-    // 3. Clear container and render the sorted list
     container.innerHTML = '';
     
     if (allVideos.length === 0) {
@@ -246,61 +243,11 @@ function handleFileSelect(event, id) {
 }
 
 /* =========================================================================
-   4. INIT
-   ========================================================================= */
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('task-form');
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const newTask = {
-                id: Date.now().toString(),
-                title: document.getElementById('task-title').value.trim(),
-                status: 'todo',
-                energy: document.getElementById('task-energy').value,
-                time: document.getElementById('task-time').value.trim()
-            };
-            if (newTask.title) {
-                tasks.push(newTask);
-                saveTasks();
-                renderTasks();
-                form.reset();
-            }
-        });
-    }
-
-    const focusBtn = document.getElementById('focus-mode-btn');
-    const kanbanCard = document.querySelector('.kanban-card');
-    if (focusBtn && kanbanCard) {
-        focusBtn.addEventListener('click', () => {
-            focusModeActive = !focusModeActive;
-            kanbanCard.classList.toggle('focus-mode-active', focusModeActive);
-            focusBtn.textContent = focusModeActive ? '🎯 Focus Mode: On' : '🎯 Focus Mode: Off';
-            focusBtn.style.background = focusModeActive ? '#313d4f' : '#272e38';
-        });
-    }
-
-    const clearDoneBtn = document.getElementById('clear-done-btn');
-    if (clearDoneBtn) {
-        clearDoneBtn.addEventListener('click', () => {
-            tasks = tasks.filter(t => t.status !== 'done');
-            saveTasks();
-            renderTasks();
-        });
-    }
-
-    loadLatestVideos();
-    loadSpaceNews();
-    setupScratchpad('scratchpad', scratchpadStorageKey);
-    renderTasks();
-});
-
-/* =========================================================================
-   5. SPACE NEWS
+   4. SPACE NEWS
    ========================================================================= */
 async function loadSpaceNews() {
     const container = document.getElementById('space-news-container');
-    if (!container) return; // Safely skip if page doesn't have space news
+    if (!container) return;
     
     container.innerHTML = 'Loading space news...';
 
@@ -335,3 +282,63 @@ async function loadSpaceNews() {
         container.innerHTML = '<p style="color: red;">Failed to load space news.</p>';
     }
 }
+
+/* =========================================================================
+   5. INIT & EVENT LISTENERS
+   ========================================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('task-form');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newTask = {
+                id: Date.now().toString(),
+                title: document.getElementById('task-title').value.trim(),
+                status: 'todo',
+                energy: document.getElementById('task-energy').value,
+                time: document.getElementById('task-time').value.trim()
+            };
+            if (newTask.title) {
+                tasks.push(newTask);
+                saveTasks();
+                renderTasks();
+                form.reset();
+            }
+        });
+    }
+
+    // Energy Filter Buttons Event Listeners
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentEnergyFilter = e.target.dataset.filter;
+            renderTasks();
+        });
+    });
+
+    const focusBtn = document.getElementById('focus-mode-btn');
+    const kanbanCard = document.querySelector('.kanban-card');
+    if (focusBtn && kanbanCard) {
+        focusBtn.addEventListener('click', () => {
+            focusModeActive = !focusModeActive;
+            kanbanCard.classList.toggle('focus-mode-active', focusModeActive);
+            focusBtn.textContent = focusModeActive ? '🎯 Focus Mode: On' : '🎯 Focus Mode: Off';
+            focusBtn.style.background = focusModeActive ? '#313d4f' : '#272e38';
+        });
+    }
+
+    const clearDoneBtn = document.getElementById('clear-done-btn');
+    if (clearDoneBtn) {
+        clearDoneBtn.addEventListener('click', () => {
+            tasks = tasks.filter(t => t.status !== 'done');
+            saveTasks();
+            renderTasks();
+        });
+    }
+
+    loadLatestVideos();
+    loadSpaceNews();
+    setupScratchpad('scratchpad', scratchpadStorageKey);
+    renderTasks();
+});
