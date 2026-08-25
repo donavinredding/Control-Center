@@ -41,6 +41,7 @@ header {
     color: #ffffff;
 }
 
+/* Main Grid Layout */
 .hub-grid {
     display: grid;
     grid-template-columns: 1fr 1.5fr 0.9fr;
@@ -374,12 +375,6 @@ textarea:focus {
     gap: 10px;
 }
 
-@media (max-width: 900px) {
-    .kanban-board {
-        grid-template-columns: 1fr;
-    }
-}
-
 .kanban-column {
     background: #272e38;
     border: 1px solid #3f4a5a;
@@ -588,4 +583,41 @@ textarea:focus {
 .space-news-date {
     font-size: 0.75rem;
     color: #94a3b8;
+}
+
+/* =========================================================================
+   MOBILE RESPONSIVENESS FIXES (Added Media Queries)
+   ========================================================================= */
+@media (max-width: 900px) {
+    /* Stack the 3-column hub grid into a single responsive column */
+    .hub-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+
+    /* Stack Kanban Board columns into a single column on phones */
+    .kanban-board {
+        grid-template-columns: 1fr;
+    }
+
+    /* Shrink header branding to prevent overflow on narrow screens */
+    header h1 {
+        font-size: 1.25rem;
+    }
+
+    header {
+        padding: 0.5rem;
+    }
+
+    /* Reduce card padding slightly for mobile screen space */
+    .card {
+        padding: 1rem;
+    }
+
+    /* Make scratchpad height more compact on small screens */
+    #scratchpad {
+        height: 20rem;
+    }
 }
