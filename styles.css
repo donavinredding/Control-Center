@@ -621,3 +621,30 @@ textarea:focus {
         height: 20rem;
     }
 }
+
+/* --- Global Site Navigation Bar --- */
+.site-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.site-nav a {
+    color: #b0c4de;
+    text-decoration: none;
+    padding: 6px 14px;
+    background: #272e38;
+    border: 1px solid #3f4a5a;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.site-nav a:hover, .site-nav a.active {
+    background: #61afef;
+    color: #181c22;
+    border-color: #61afef;
+}

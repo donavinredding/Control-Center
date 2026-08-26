@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideas Hub - My Control Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            align-items: start;
+        }
+
+        details.card summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            outline: none;
+        }
+
+        details.card summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.card summary h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        summary h2 {
+            cursor: pointer;
+        }
+
+        /* Dropdown arrow indicator */
+        details.card summary::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: #8892b0;
+            transition: transform 0.2s;
+        }
+
+        details.card[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        .idea-box {
+            min-height: 200px;
+            max-height: 450px;
+            margin-top: 12px;
+            cursor: default;
+        }
+
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header>
+        <h1>Ideas & Brainstorming</h1>
+        <p>A categorized parking lot for raw concepts, features, and future projects.</p>
+        <nav class="site-nav">
+            <a href="index.html">Home</a>
+            <a href="snippets.html">Snippets</a>
+            <a href="projects.html">Projects</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="inspiration.html">Inspiration</a>
+            <a href="ideas.html" class="active">Ideas</a>
+            <a href="finance.html">Finance</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="ideas-grid">
+        
+        <!-- 1. Video Game Concepts -->
+        <section class="card">
+            <details open>
+                <summary><h2>🎮 Video Game Concepts</h2></summary>
+                <div class="scratchpad-container" style="margin-top: 15px;">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('idea-games')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('idea-games')">📷 Add Image</button>
+                    </div>
+                    <div id="idea-games" class="scratchpad-box idea-box" contenteditable="true" placeholder="Jot down game mechanics, themes, or story ideas..."></div>
+                    <input type="file" id="file-idea-games" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'idea-games')">
+                </div>
+            </details>
+        </section>
+
+        <!-- 2. Minecraft Addons -->
+        <section class="card">
+            <details>
+                <summary><h2>⛏️ Minecraft Addons</h2></summary>
+                <div class="scratchpad-container" style="margin-top: 15px;">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('idea-minecraft')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('idea-minecraft')">📷 Add Image</button>
+                    </div>
+                    <div id="idea-minecraft" class="scratchpad-box idea-box" contenteditable="true" placeholder="Item concepts, textures, features to code..."></div>
+                    <input type="file" id="file-idea-minecraft" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'idea-minecraft')">
+                </div>
+            </details>
+        </section>
+
+        <!-- 3. Video & Content Projects -->
+        <section class="card">
+            <details>
+                <summary><h2>🎥 Video & Content</h2></summary>
+                <div class="scratchpad-container" style="margin-top: 15px;">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('idea-video')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('idea-video')">📷 Add Image</button>
+                    </div>
+                    <div id="idea-video" class="scratchpad-box idea-box" contenteditable="true" placeholder="Video topics, thumbnails, creator hub features..."></div>
+                    <input type="file" id="file-idea-video" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'idea-video')">
+                </div>
+            </details>
+        </section>
+
+        <!-- 4. Mobile Apps & Web Ideas -->
+        <section class="card">
+            <details>
+                <summary><h2>📱 Mobile Apps & Web</h2></summary>
+                <div class="scratchpad-container" style="margin-top: 15px;">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('idea-web')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('idea-web')">📷 Add Image</button>
+                    </div>
+                    <div id="idea-web" class="scratchpad-box idea-box" contenteditable="true" placeholder="App features, JavaScript tools to build, UI tweaks..."></div>
+                    <input type="file" id="file-idea-web" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'idea-web')">
+                </div>
+            </details>
+        </section>
+
+        <!-- 5. Financial & Business Ideas -->
+        <section class="card">
+            <details>
+                <summary><h2>💡 Financial & Business</h2></summary>
+                <div class="scratchpad-container" style="margin-top: 15px;">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('idea-business')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('idea-business')">📷 Add Image</button>
+                    </div>
+                    <div id="idea-business" class="scratchpad-box idea-box" contenteditable="true" placeholder="Fiverr gig expansions, side hustles, monetization..."></div>
+                    <input type="file" id="file-idea-business" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'idea-business')">
+                </div>
+            </details>
+        </section>
+
+    </main>
+
+    <!-- Script for local storage persistence -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const ideaKeys = ['idea-games', 'idea-minecraft', 'idea-video', 'idea-web', 'idea-business'];
+            ideaKeys.forEach(id => {
+                const pad = document.getElementById(id);
+                if (pad) {
+                    pad.innerHTML = localStorage.getItem(id) || '';
+                    pad.addEventListener('input', () => {
+                        localStorage.setItem(id, pad.innerHTML);
+                    });
+                }
+            });
+        });
+    </script>
+    <script src="script.js"></script>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 My Control Center</p>
+    </footer>
+</body>
+</html>

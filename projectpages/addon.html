@@ -3,68 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elytra Models - Focus Hub</title>
+    <title>Elytra Models Hub - My Control Center</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="icon" type="image/svg+xml" href="../images/dcc_icon.svg">
     <style>
-        /* Centered Focus Hub Layout Styling */
-        body {
-            background-color: #15181e;
-            color: #e2e8f0;
-            margin: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-
-        .addon-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 40px;
-            background: #1e222b;
-        }
-
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header-logo {
-            height: 40px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .addon-header h1 {
-            font-size: 1.3rem;
-            color: #e2e8f0;
-            margin: 0;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .header-btn {
-            background: #272e38;
-            color: #e2e8f0;
-            padding: 3px 10px;
-            border: 1px solid #3f4a5a;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
-        }
-
-        .header-btn:hover {
-            background: #313d4f;
-            border-color: #61afef;
-        }
-
-        /* Centered Grid Container */
+        /* Page-specific grid and layout adjustments */
         .addon-focus-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -72,9 +15,9 @@
             max-width: 1350px;
             margin: 30px auto;
             padding: 0 20px;
+            align-items: start;
         }
 
-        /* Responsive stack for smaller screens */
         @media (max-width: 1100px) {
             .addon-focus-grid {
                 grid-template-columns: 1fr;
@@ -87,27 +30,41 @@
             gap: 20px;
         }
 
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #8892b0;
-            font-size: 0.85rem;
-            border-top: 1px solid #323d4d;
-            margin-top: 40px;
+        .external-link-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #272e38;
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid #3f4a5a;
+        }
+
+        .external-link-banner a {
+            color: #61afef;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .external-link-banner a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <!-- Clean Compact Header -->
-    <header class="addon-header">
-        <div class="header-brand">
-            <img src="../images/elytra-models.png" alt="Elytra Models Logo" class="header-logo">
-            <h1>Elytra Models Hub</h1>
-        </div>
-        <div class="header-actions">
-            <a href="https://www.curseforge.com/minecraft-bedrock/addons/elytra-models-5-2" target="_blank" class="header-btn">CurseForge↗</a>
-            <button id="home-button" class="header-btn" onclick="window.location.href='../index.html'">Home</button>
-        </div>
+
+    <!-- Standardized Global Header & Navigation -->
+    <header>
+        <h1>Elytra Models Hub</h1>
+        <p>Custom models, workflow tracking, and focus tools for Minecraft Bedrock.</p>
+        <nav class="site-nav">
+            <a href="../index.html">Home</a>
+            <a href="../snippets.html">Snippets</a>
+            <a href="../projects.html" class="active">Projects</a>
+            <a href="../tasks.html">Tasks</a>
+            <a href="../inspiration.html">Inspiration</a>
+            <a href="../ideas.html">Ideas</a>
+        </nav>
     </header>
 
     <!-- Centered Main Content Grid -->
@@ -116,6 +73,12 @@
         <!-- Left Column: The Action Core (Focus Spotlight + Kanban) -->
         <div class="column-left-wide">
             
+            <!-- External Link Card / Banner -->
+            <div class="external-link-banner">
+                <span>📦 Official Addon Release</span>
+                <a href="https://www.curseforge.com/minecraft-bedrock/addons/elytra-models-5-2" target="_blank">View on CurseForge ↗</a>
+            </div>
+
             <!-- Hyperfocus Spotlight: Just ONE task at a time -->
             <section class="card hyperfocus-spotlight-card">
                 <h2>⚡ Current Hyperfocus Anchor</h2>
