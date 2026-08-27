@@ -6,12 +6,22 @@
     <title>Donavin's Control Center</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
-    <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Your existing script file -->
-    <script src="script.js" defer></script>
 </head>
 <body>
+    <div id="auth-container" style="display: none; text-align: center; padding: 20px;">
+        <h3>Control Center Login</h3>
+        <input type="email" id="auth-email" placeholder="Email" style="padding:8px; margin:5px;"><br>
+        <input type="password" id="auth-password" placeholder="Password" style="padding:8px; margin:5px;"><br>
+        <button onclick="handleLogin()" style="padding:8px 15px; background:#61afef; border:none; font-weight:bold; cursor:pointer;">Log In</button>
+        <button onclick="handleSignup()" style="padding:8px 15px; background:#313d4f; color:#fff; border:none; cursor:pointer;">Sign Up</button>
+        <p id="auth-error" style="color: #e06c75;"></p>
+    </div>
+
+    <div id="logout-container" style="display: none; float: right; padding: 10px;">
+        <span id="user-display" style="margin-right: 10px; font-size: 0.85rem;"></span>
+        <button onclick="handleLogout()" class="kanban-action-btn">Log Out</button>
+    </div>
     <header>
         <div class="header-brand">
             <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon" style="width: 36px; height: 36px;">
