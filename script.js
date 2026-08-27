@@ -1,5 +1,86 @@
 /* =========================================================================
-   1. KANBAN TASK BOARD LOGIC (Page-Aware Storage)
+   0. SUPABASE CLOUD SYNC & AUTHENTICATION CONFIGURATION
+   ========================================================================= */
+const SUPABASE_URL = 'https://supabase.com/dashboard/project/gxlpmwepweujpbumyqvb';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+
+// Handle user login / session check
+async function checkAuthAndLoadData() {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+        currentUser = session.user;
+        showAppInterface();
+        await loadCloudData();
+    } else {
+        // If not logged in, prompt user to log in or sign up inline
+        showLoginScreen();
+    }
+
+    // Listen for auth state changes (e.g., logging in or out)
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+            currentUser = session.user;
+            showAppInterface();
+            await loadCloudData();
+        } else {
+            currentUser = null;
+            showLoginScreen();
+        }
+    });
+}
+
+function showLoginScreen() {
+    // Creates a lightweight login overlay if no user is authenticated
+    let overlay = document.getElementById('auth-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'auth-overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(24,28,34,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e3e8ef;font-family:Arial,sans-serif;';
+        overlay.innerHTML = `
+            <div style="background:#313843;padding:2rem;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.5);width:300px;text-align:center;">
+                <h2>Control Center Login</h2>
+                <p style="font-size:0.85rem;color:#9aa5b1;">Log in to sync your tasks and notes across phone & PC.</p>
+                <input type="email" id="auth-email" placeholder="Email" style="width:100%;padding:8px;margin-bottom:10px;background:#272e38;border:1px solid #3f4a5a;color:#fff;border-radius:4px;box-sizing:border-box;">
+                <input type="password" id="auth-password" placeholder="Password" style="width:100%;padding:8px;margin-bottom:15px;background:#272e38;border:1px solid #3f4a5a;color:#fff;border-radius:4px;box-sizing:border-box;">
+                <button id="login-btn" style="width:100%;padding:8px;background:#61afef;border:none;color:#181c22;font-weight:bold;border-radius:4px;cursor:pointer;margin-bottom:8px;">Log In</button>
+                <button id="signup-btn" style="width:100%;padding:8px;background:none;border:1px solid #61afef;color:#61afef;border-radius:4px;cursor:pointer;">Sign Up</button>
+                <p id="auth-msg" style="font-size:0.8rem;margin-top:10px;color:#e06c75;"></p>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) document.getElementById('auth-msg').textContent = error.message;
+        });
+
+        document.getElementById('signup-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+                document.getElementById('auth-msg').textContent = error.message;
+            } else {
+                alert('Sign up successful! Check your email or log in if confirmation is disabled.');
+            }
+        });
+    }
+    overlay.style.display = 'flex';
+}
+
+function showAppInterface() {
+    const overlay = document.getElementById('auth-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+/* =========================================================================
+   1. KANBAN TASK BOARD LOGIC (Cloud-Synced Storage)
    ========================================================================= */
 const isAddonPage = window.location.pathname.includes('addon.html');
 const kanbanStorageKey = isAddonPage ? 'kanban_tasks_addon' : 'kanban_tasks';
@@ -13,8 +94,47 @@ let tasks = JSON.parse(localStorage.getItem(kanbanStorageKey)) || [
 let focusModeActive = false;
 let currentEnergyFilter = 'all';
 
-function saveTasks() {
+async function saveTasksAndCloud() {
+    // Save to localStorage as instant offline backup
     localStorage.setItem(kanbanStorageKey, JSON.stringify(tasks));
+    
+    // Sync to Supabase cloud database if user is logged in
+    if (currentUser) {
+        const scratchpadEl = document.getElementById('scratchpad');
+        const scratchpadContent = scratchpadEl ? scratchpadEl.innerHTML : '';
+
+        await supabase.from('user_data').upsert({
+            user_id: currentUser.id,
+            tasks: tasks,
+            scratchpad: scratchpadContent,
+            updated_at: new Date()
+        });
+    }
+}
+
+async function loadCloudData() {
+    if (!currentUser) return;
+
+    const { data, error } = await supabase
+        .from('user_data')
+        .select('tasks, scratchpad')
+        .eq('user_id', currentUser.id)
+        .single();
+
+    if (data) {
+        if (data.tasks) {
+            tasks = data.tasks;
+            localStorage.setItem(kanbanStorageKey, JSON.stringify(tasks));
+            renderTasks();
+        }
+        if (data.scratchpad) {
+            const pad = document.getElementById('scratchpad');
+            if (pad) {
+                pad.innerHTML = data.scratchpad;
+                localStorage.setItem(scratchpadStorageKey, data.scratchpad);
+            }
+        }
+    }
 }
 
 function renderTasks() {
@@ -28,7 +148,6 @@ function renderTasks() {
     inprogressList.innerHTML = '';
     doneList.innerHTML = '';
 
-    // Filter tasks based on selected energy filter pill
     const visibleTasks = tasks.filter(task => {
         if (currentEnergyFilter === 'all') return true;
         return task.energy === currentEnergyFilter;
@@ -96,7 +215,7 @@ function moveTask(id, newStatus) {
     const task = tasks.find(t => t.id === id);
     if (task) {
         task.status = newStatus;
-        saveTasks();
+        saveTasksAndCloud();
         renderTasks();
     }
 }
@@ -105,14 +224,14 @@ function toggleTaskComplete(id) {
     const task = tasks.find(t => t.id === id);
     if (task) {
         task.status = task.status === 'done' ? 'todo' : 'done';
-        saveTasks();
+        saveTasksAndCloud();
         renderTasks();
     }
 }
 
 function deleteTask(id) {
     tasks = tasks.filter(t => t.id !== id);
-    saveTasks();
+    saveTasksAndCloud();
     renderTasks();
 }
 
@@ -185,7 +304,6 @@ async function loadLatestVideos() {
             console.error("Failed to load:", creator.name, error); 
         }
 
-        // Add a 300ms delay between requests to prevent triggering rate limits
         await new Promise(resolve => setTimeout(resolve, 300));
     }
 
@@ -210,13 +328,25 @@ async function loadLatestVideos() {
 }
 
 /* =========================================================================
-   3. SCRATCHPAD LOGIC
+   3. SCRATCHPAD LOGIC (Cloud-Synced)
    ========================================================================= */
 function setupScratchpad(id, storageKey) {
     const pad = document.getElementById(id);
     if (!pad) return;
+    
     pad.innerHTML = localStorage.getItem(storageKey) || '';
-    pad.addEventListener('input', () => localStorage.setItem(storageKey, pad.innerHTML));
+    
+    let saveTimeout;
+    pad.addEventListener('input', () => {
+        localStorage.setItem(storageKey, pad.innerHTML);
+        
+        // Debounce cloud saving so it doesn't spam requests on every single keystroke
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            saveTasksAndCloud();
+        }, 1000);
+    });
+
     pad.addEventListener('click', (e) => {
         const anchor = e.target.closest('a');
         if (anchor && anchor.href) { e.preventDefault(); window.open(anchor.href, '_blank'); }
@@ -229,7 +359,7 @@ function addLink(id) {
     if (!url) return;
     const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
     document.execCommand('insertHTML', false, `<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>`);
-    localStorage.setItem(scratchpadStorageKey, pad.innerHTML);
+    saveTasksAndCloud();
 }
 
 function triggerImageUpload(id) { document.getElementById('file-' + id).click(); }
@@ -240,7 +370,7 @@ function handleFileSelect(event, id) {
         const reader = new FileReader();
         reader.onload = function(e) {
             document.execCommand('insertImage', false, e.target.result);
-            localStorage.setItem(scratchpadStorageKey, document.getElementById(id).innerHTML);
+            saveTasksAndCloud();
         };
         reader.readAsDataURL(file);
     }
@@ -292,6 +422,9 @@ async function loadSpaceNews() {
    5. INIT & EVENT LISTENERS
    ========================================================================= */
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Cloud Authentication and Data Sync
+    checkAuthAndLoadData();
+
     const form = document.getElementById('task-form');
     if (form) {
         form.addEventListener('submit', (e) => {
@@ -305,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             if (newTask.title) {
                 tasks.push(newTask);
-                saveTasks();
+                saveTasksAndCloud();
                 renderTasks();
                 form.reset();
             }
@@ -337,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (clearDoneBtn) {
         clearDoneBtn.addEventListener('click', () => {
             tasks = tasks.filter(t => t.status !== 'done');
-            saveTasks();
+            saveTasksAndCloud();
             renderTasks();
         });
     }
