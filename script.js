@@ -147,48 +147,53 @@ async function loadLatestVideos() {
         try {
             const response = await fetch(apiUrl);
             const data = await response.json();
-            if (data.status === 'ok' && data.items.length > 0) {
+            
+            if (data.status === 'ok' && data.items && data.items.length > 0) {
                 const video = data.items.find(item => !item.link.includes('/shorts/'));
-                if (!video) continue;
-                const videoId = video.guid.split(':')[2];
-                const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                
-                const videoDate = new Date(video.pubDate);
-                const today = new Date();
-                const diffTime = today - videoDate;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                let dateString = "";
-                if (diffDays === 0) dateString = "Today";
-                else if (diffDays === 1) dateString = "Yesterday";
-                else if (diffDays <= 29) dateString = `${diffDays} days ago`;
-                else if (diffDays < 365) {
-                    const diffMonths = Math.floor(diffDays / 30);
-                    dateString = diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
-                } else {
-                    const diffYears = Math.floor(diffDays / 365);
-                    dateString = diffYears === 1 ? "1 year ago" : `${diffYears} years ago`;
-                }
+                if (video) {
+                    const videoId = video.guid.split(':')[2];
+                    const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                    
+                    const videoDate = new Date(video.pubDate);
+                    const today = new Date();
+                    const diffTime = today - videoDate;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    let dateString = "";
+                    if (diffDays === 0) dateString = "Today";
+                    else if (diffDays === 1) dateString = "Yesterday";
+                    else if (diffDays <= 29) dateString = `${diffDays} days ago`;
+                    else if (diffDays < 365) {
+                        const diffMonths = Math.floor(diffDays / 30);
+                        dateString = diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
+                    } else {
+                        const diffYears = Math.floor(diffDays / 365);
+                        dateString = diffYears === 1 ? "1 year ago" : `${diffYears} years ago`;
+                    }
 
-                allVideos.push({
-                    title: video.title,
-                    link: video.link,
-                    thumbUrl: thumbUrl,
-                    pubDate: videoDate,
-                    dateString: dateString,
-                    creatorName: creator.name
-                });
+                    allVideos.push({
+                        title: video.title,
+                        link: video.link,
+                        thumbUrl: thumbUrl,
+                        pubDate: videoDate,
+                        dateString: dateString,
+                        creatorName: creator.name
+                    });
+                }
             }
         } catch (error) { 
-            console.error("Failed to load:", creator.name); 
+            console.error("Failed to load:", creator.name, error); 
         }
+
+        // Add a 300ms delay between requests to prevent triggering rate limits
+        await new Promise(resolve => setTimeout(resolve, 300));
     }
 
     allVideos.sort((a, b) => b.pubDate - a.pubDate);
     container.innerHTML = '';
     
     if (allVideos.length === 0) {
-        container.innerHTML = '<p>No videos found.</p>';
+        container.innerHTML = '<p>No videos found or rate limit reached. Please try again later.</p>';
         return;
     }
 

@@ -7,106 +7,54 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         .finance-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 2rem;
             max-width: 1400px;
             margin: 2rem auto;
             padding: 0 1rem;
-            align-items: start;
-        }
-
-        @media (max-width: 900px) {
-            .finance-grid {
-                grid-template-columns: 1fr;
-            }
+            box-sizing: border-box;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         .full-width-card {
-            grid-column: 1 / -1;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        /* Isolated Google Sheet Container to stop page scrolling */
+        /* Scaled and Isolated Google Sheet Container */
         .sheet-container {
             background: #1e242d;
             border-radius: 6px;
             overflow: hidden;
             border: 1px solid #3f4a5a;
-            overscroll-behavior: contain; /* Traps scroll inside the sheet */
+            overscroll-behavior: contain;
+            height: 750px;
+            position: relative;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        /* Affordability Widget Styles */
-        .afford-box {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .afford-inputs {
-            display: flex;
-            gap: 10px;
-        }
-
-        .afford-inputs input {
-            flex: 1;
-            background: #1e242d;
-            border: 1px solid #3f4a5a;
-            border-radius: 6px;
-            color: #e2e8f0;
-            padding: 10px;
-            font-size: 1rem;
-        }
-
-        .afford-btn {
-            background: #61afef;
-            color: #181c22;
+        .sheet-container iframe {
+            width: 133.33%;
+            height: 1000px;
+            transform: scale(0.75);
+            transform-origin: top left;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s;
+            display: block;
         }
 
-        .afford-btn:hover {
-            opacity: 0.9;
-        }
-
-        .afford-result {
-            background: #1e242d;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid #61afef;
-            font-size: 0.95rem;
-        }
-
-        /* PDF Dropzone Styles */
-        .pdf-dropzone {
-            border: 2px dashed #3f4a5a;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            background: #1e242d;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
-            margin-top: 15px;
-        }
-
-        .pdf-dropzone:hover {
-            border-color: #61afef;
-            background: #232b36;
-        }
-
-        .pdf-dropzone p {
-            margin: 0;
-            color: #8892b0;
-        }
-
-        .file-list {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #61afef;
+        /* Mobile Responsive Fixes for Finance Page */
+        @media (max-width: 768px) {
+            .sheet-container {
+                height: 500px; /* Adjust height for smaller screens */
+            }
+            .sheet-container iframe {
+                width: 100%;
+                height: 100%;
+                transform: none; /* Remove zoom scale on mobile so it fits naturally */
+            }
         }
     </style>
 </head>
@@ -115,7 +63,7 @@
     <!-- Header / Global Navigation -->
     <header>
         <h1>Financial Control Hub</h1>
-        <p>Track spending, check affordability, and manage budgets.</p>
+        <p>Track budgets, manage spreadsheets, and log financial ideas.</p>
         <nav class="site-nav">
             <a href="index.html">Home</a>
             <a href="snippets.html">Snippets</a>
@@ -127,64 +75,26 @@
         </nav>
     </header>
 
-    <!-- Main Grid -->
+    <!-- Main Stack -->
     <main class="finance-grid">
         
-        <!-- 1. Master Google Sheet Workspace (Top & Larger with Scroll Lock) -->
+        <!-- 1. Master Google Sheet Workspace (Zoomed to 75% & Scroll-Locked) -->
         <section class="card full-width-card">
             <h2>📊 Master Budget & Sheet Workspace</h2>
-            <p>Embed or view your live Google Sheets budget tracker below. Scrolling here stays locked to the sheet.</p>
+            <p>Live Google Sheet view (scaled to 75% zoom).</p>
             
             <div style="margin: 15px 0; display: flex; gap: 10px;">
                 <a href="https://sheets.google.com" target="_blank" class="scratchpad-tool-btn" style="text-decoration: none; padding: 6px 14px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 4px; color: #61afef; font-weight: bold;">↗ Open Google Sheets in New Tab</a>
             </div>
 
-            <!-- Google Sheet Container with scroll containment -->
+            <!-- Sheet container applying 75% scale zoom -->
             <div class="sheet-container">
-                <iframe src="https://docs.google.com/spreadsheets/d/1UGOXi0p10Pzu176-ss3THw_V9m4BCA0B8rZsHKAQSGo/edit?gid=1117687077#gid=1117687077" 
-                        width="100%" 
-                        height="750px" 
-                        style="border: none; display: block;">
+                <iframe src="https://docs.google.com/spreadsheets/d/1UGOXi0p10Pzu176-ss3THw_V9m4BCA0B8rZsHKAQSGo/edit?gid=1117687077#gid=1117687077">
                 </iframe>
             </div>
         </section>
 
-        <!-- 2. Affordability Checker -->
-        <section class="card">
-            <h2>🎯 "Can I Afford This?" Calculator</h2>
-            <p>Quickly test an upcoming purchase against your monthly buffer.</p>
-            <div class="afford-box">
-                <div class="afford-inputs">
-                    <input type="number" id="item-cost" placeholder="Item Cost ($)" min="0" step="0.01">
-                    <input type="number" id="monthly-buffer" placeholder="Current Free Buffer ($)" min="0" step="0.01">
-                    <button type="button" class="afford-btn" onclick="checkAffordability()">Check</button>
-                </div>
-                <div id="afford-result" class="afford-result">
-                    Enter an item price and your current available funds to see the breakdown.
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. SoFi Statement Upload & Spending Analysis -->
-        <section class="card">
-            <h2>🏦 SoFi Statement & Spending Analysis</h2>
-            <p>Upload your last month's SoFi bank statement PDF to review spending and find where to cut.</p>
-            
-            <div class="pdf-dropzone" onclick="document.getElementById('sofi-file-input').click()">
-                <p>📄 Click or drag SoFi PDF statement here</p>
-                <input type="file" id="sofi-file-input" accept=".pdf" style="display: none;" onchange="handleSoFiUpload(event)">
-                <div id="sofi-file-name" class="file-list"></div>
-            </div>
-
-            <div style="margin-top: 15px;">
-                <p style="font-size: 0.85rem; color: #8892b0; margin-bottom: 5px;">Spending Highlights & Cut Targets (Notes):</p>
-                <div class="scratchpad-container">
-                    <div id="sofi-notes" class="scratchpad-box" contenteditable="true" placeholder="Jot down major spending categories from the statement, subscriptions to cancel, etc..."></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. Financial Ideas & Goals Scratchpad -->
+        <!-- 2. Financial Goals & Ideas Scratchpad -->
         <section class="card full-width-card">
             <h2>💡 Financial Goals & Ideas Scratchpad</h2>
             <div class="scratchpad-container">
@@ -192,60 +102,23 @@
                     <button type="button" class="scratchpad-tool-btn" onclick="addLink('finance-ideas')">🔗 Add Link</button>
                     <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('finance-ideas')">📷 Add Image</button>
                 </div>
-                <div id="finance-ideas" class="scratchpad-box" contenteditable="true" placeholder="Jot down savings targets, new income streams, or budget structure ideas..."></div>
+                <div id="finance-ideas" class="scratchpad-box" contenteditable="true" placeholder="Jot down savings targets, subscription cut lists, new income streams, or budget structure ideas..."></div>
                 <input type="file" id="file-finance-ideas" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'finance-ideas')">
             </div>
         </section>
 
     </main>
 
-    <!-- JavaScript for Calculators and Storage -->
+    <!-- JavaScript for Local Storage Persistence -->
     <script>
-        // Affordability Logic
-        function checkAffordability() {
-            const cost = parseFloat(document.getElementById('item-cost').value);
-            const buffer = parseFloat(document.getElementById('monthly-buffer').value);
-            const resultBox = document.getElementById('afford-result');
-
-            if (isNaN(cost) || isNaN(buffer)) {
-                resultBox.innerHTML = "⚠️ Please enter valid numbers for both fields.";
-                return;
-            }
-
-            const remainder = buffer - cost;
-            if (remainder < 0) {
-                resultBox.style.borderLeftColor = "#e06c75";
-                resultBox.innerHTML = `❌ <strong>Tight Spot:</strong> This item exceeds your current buffer by <strong>$${Math.abs(remainder).toFixed(2)}</strong>. You cannot comfortably afford this right now without dipping into savings. Look at cutting discretionary spending first!`;
-            } else if (remainder < (buffer * 0.2)) {
-                resultBox.style.borderLeftColor = "#e5c07b";
-                resultBox.innerHTML = `⚠️ <strong>Caution:</strong> You can afford it ($${remainder.toFixed(2)} left over), but it will wipe out most of your safety buffer for the month.`;
-            } else {
-                resultBox.style.borderLeftColor = "#98c379";
-                resultBox.innerHTML = `✅ <strong>Clear to Buy:</strong> You have plenty of breathing room! You'll still have <strong>$${remainder.toFixed(2)}</strong> left in your buffer after this purchase.`;
-            }
-        }
-
-        // SoFi Statement File Display Handler
-        function handleSoFiUpload(event) {
-            const file = event.target.files[0];
-            const fileNameContainer = document.getElementById('sofi-file-name');
-            if (file) {
-                fileNameContainer.innerHTML = `📁 Loaded Statement: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
-            }
-        }
-
-        // Local Storage Persistence for Finance Notes
         document.addEventListener("DOMContentLoaded", () => {
-            const storageKeys = ['sofi-notes', 'finance-ideas'];
-            storageKeys.forEach(id => {
-                const pad = document.getElementById(id);
-                if (pad) {
-                    pad.innerHTML = localStorage.getItem(id) || '';
-                    pad.addEventListener('input', () => {
-                        localStorage.setItem(id, pad.innerHTML);
-                    });
-                }
-            });
+            const pad = document.getElementById('finance-ideas');
+            if (pad) {
+                pad.innerHTML = localStorage.getItem('finance-ideas') || '';
+                pad.addEventListener('input', () => {
+                    localStorage.setItem('finance-ideas', pad.innerHTML);
+                });
+            }
         });
     </script>
     <script src="script.js"></script>

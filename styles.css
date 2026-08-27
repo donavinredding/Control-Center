@@ -1,10 +1,11 @@
 body {
     font-family: Arial, sans-serif;
-    background-image: linear-gradient(#515e74, #353e4d);
-    background-attachment: fixed;
+    background: linear-gradient(#515e74, #353e4d);
+    background-color: #353e4d; /* Solid fallback */
     color: #e3e8ef;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
 }
 
 header {
