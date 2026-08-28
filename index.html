@@ -9,38 +9,47 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div id="auth-container" style="display: none; text-align: center; padding: 20px;">
-        <h3>Control Center Login</h3>
-        <input type="email" id="auth-email" placeholder="Email" style="padding:8px; margin:5px;"><br>
-        <input type="password" id="auth-password" placeholder="Password" style="padding:8px; margin:5px;"><br>
-        <button onclick="handleLogin()" style="padding:8px 15px; background:#61afef; border:none; font-weight:bold; cursor:pointer;">Log In</button>
-        <button onclick="handleSignup()" style="padding:8px 15px; background:#313d4f; color:#fff; border:none; cursor:pointer;">Sign Up</button>
-        <p id="auth-error" style="color: #e06c75;"></p>
-    </div>
-
-    <div id="logout-container" style="display: none; float: right; padding: 10px;">
-        <span id="user-display" style="margin-right: 10px; font-size: 0.85rem;"></span>
-        <button onclick="handleLogout()" class="kanban-action-btn">Log Out</button>
-    </div>
     <header>
         <div class="header-brand">
             <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon" style="width: 36px; height: 36px;">
             <h1>Donavin's Control Center</h1>
         </div>
         <nav class="site-nav">
-                <a href="index.html" class="active">Home</a>
-                <a href="snippets.html">Snippets</a>
-                <a href="projects.html">Projects</a>
-                <a href="tasks.html">Tasks</a>
-                <a href="inspiration.html">Inspiration</a>
-                <a href="ideas.html">Ideas</a>
-                <a href="finance.html">Finance</a>
-            </nav>
+            <a href="index.html" class="active">Home</a>
+            <a href="snippets.html">Snippets</a>
+            <a href="projects.html">Projects</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="inspiration.html">Inspiration</a>
+            <a href="ideas.html">Ideas</a>
+            <a href="finance.html">Finance</a>
+        </nav>
+        
+        <!-- Reusable Header User Widget (Paste into all tabs) -->
+        <div id="logout-container" class="header-user-widget" style="display: none;">
+            <span id="user-display" class="user-email"></span>
+            <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
+        </div>
     </header>
 
-    <!-- Main Content Grid -->
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container-wrapper" style="display: none;">
+        <section class="card auth-card-box">
+            <h2>🔐 Control Center Access</h2>
+            <p class="auth-subtitle">Sign in or create your account to load your dashboard.</p>
+            <div class="auth-form-group">
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email address..." required autocomplete="email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password..." required autocomplete="current-password">
+                <div class="auth-buttons-row">
+                    <button type="button" class="auth-btn login-btn" onclick="handleLogin()">Login</button>
+                    <button type="button" class="auth-btn signup-btn" onclick="handleSignup()">Sign Up</button>
+                </div>
+                <div id="auth-error" class="auth-error-msg"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Main Dashboard Grid -->
     <main class="hub-grid">
-        <!-- Left Column: YouTube + Links -->
         <div class="column-left">
             <section class="card youtube-section">
                 <h2>🟥Youtube</h2>
@@ -56,9 +65,7 @@
             </section>
         </div>
 
-        <!-- Middle Column: Projects & Fiverr -->
         <div class="column-center">
-            <!-- Kanban Task Board Component -->
             <section class="card kanban-card">
                 <div class="kanban-header">
                     <h2>✅Focus Board</h2>
@@ -79,7 +86,6 @@
                     <button type="submit" id="add-task-btn">Add</button>
                 </form>
 
-                <!-- Energy Filter Pill Bar -->
                 <div class="energy-filters">
                     <button type="button" class="filter-btn active" data-filter="all">All</button>
                     <button type="button" class="filter-btn" data-filter="low">🟢 Low</button>
@@ -103,7 +109,7 @@
                 </div>
             </section>
             
-            <section class="card">
+            <section class="card projects-section">
                 <h2>📋Projects</h2>
                 <ol>
                     <li>
@@ -121,7 +127,7 @@
                 </ol>
             </section>
             
-            <section class="card">
+            <section class="card fiverr-section">
                 <h2>Fiverr Studio</h2>
                 <p>Seller Dashboard</p>
                 <button class="project-button" onclick="window.location.href='https://www.fiverr.com/users/dreddingstudio/seller_dashboard'">
@@ -130,13 +136,12 @@
             </section>
         </div>
 
-        <!-- Right Column: Space News & Scratchpad -->
         <div class="column-right">
-            <section class="card">
+            <section class="card space-news-section">
                 <h2>🔭Space News🛸</h2>
                 <div id="space-news-container" class="feed-grid"></div>
             </section>
-            <section class="card">
+            <section class="card scratchpad-section">
                 <h2>📝Scratchpad</h2>
                 <div class="scratchpad-container">
                     <div class="scratchpad-toolbar">
@@ -150,11 +155,10 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer>
         <p>&copy; 2026 My Control Center</p>
     </footer>
 
     <script src="script.js"></script>
 </body>
-</html>>
+</html>

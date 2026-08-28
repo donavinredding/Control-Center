@@ -1,9 +1,10 @@
 /* =========================================================================
    SUPABASE INITIALIZATION
    ========================================================================= */
-const SUPABASE_URL = 'https://supabase.com/dashboard/project/gxlpmwepweujpbumyqvb/settings/api-keys';
+// FIX 1: Use the correct Supabase API URL format instead of the dashboard URL
+const SUPABASE_URL = 'https://gxlpmwepweujpbumyqvb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 const isAddonPage = window.location.pathname.includes('addon.html');
@@ -12,13 +13,15 @@ let tasks = [];
 let focusModeActive = false;
 let currentEnergyFilter = 'all';
 
+
 // Check auth state on page load
 document.addEventListener('DOMContentLoaded', async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     
     if (!session) {
         document.getElementById('auth-container').style.display = 'block';
         document.querySelector('.hub-grid').style.display = 'none'; // Hide dashboard until login
+        document.querySelector('.site-nav').style.display = 'none'; // 👈 Hide navigation tabs on login screen
     } else {
         currentUser = session.user;
         initDashboard();
@@ -30,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function handleLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
     
     if (error) {
         document.getElementById('auth-error').textContent = error.message;
@@ -42,7 +45,7 @@ async function handleLogin() {
 async function handleSignup() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
     
     if (error) {
         document.getElementById('auth-error').textContent = error.message;
@@ -52,7 +55,7 @@ async function handleSignup() {
 }
 
 async function handleLogout() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     location.reload();
 }
 
@@ -66,6 +69,7 @@ function setupAuthUIEvents() {
 async function initDashboard() {
     document.getElementById('auth-container').style.display = 'none';
     document.querySelector('.hub-grid').style.display = 'grid';
+    document.querySelector('.site-nav').style.display = ''; // 👈 Reset style so it reappears using your stylesheet default
     document.getElementById('logout-container').style.display = 'block';
     document.getElementById('user-display').textContent = currentUser.email;
 
@@ -75,11 +79,13 @@ async function initDashboard() {
     setupScratchpadCloud('scratchpad');
 }
 
+
 /* =========================================================================
    1. KANBAN TASK BOARD LOGIC (Cloud Synchronized)
    ========================================================================= */
 async function fetchTasksFromCloud() {
-    const { data, error } = await supabase
+    // FIX 2: Changed 'supabase' to 'supabaseClient'
+    const { data, error } = await supabaseClient
         .from('tasks')
         .select('*')
         .eq('user_id', currentUser.id);
@@ -99,7 +105,7 @@ async function fetchTasksFromCloud() {
         ];
         // Save initial tasks to cloud
         for (let t of tasks) {
-            await supabase.from('tasks').upsert(t);
+            await supabaseClient.from('tasks').upsert(t);
         }
     }
     renderTasks();
@@ -107,11 +113,11 @@ async function fetchTasksFromCloud() {
 
 async function saveTaskToCloud(task) {
     task.user_id = currentUser.id;
-    await supabase.from('tasks').upsert(task);
+    await supabaseClient.from('tasks').upsert(task); // FIX 2
 }
 
 async function deleteTaskFromCloud(id) {
-    await supabase.from('tasks').delete().eq('id', id).eq('user_id', currentUser.id);
+    await supabaseClient.from('tasks').delete().eq('id', id).eq('user_id', currentUser.id); // FIX 2
 }
 
 function renderTasks() {
@@ -292,7 +298,8 @@ async function setupScratchpadCloud(id) {
     if (!pad) return;
 
     // Fetch from Supabase
-    const { data, error } = await supabase
+    // FIX 2: Changed 'supabase' to 'supabaseClient'
+    const { data, error } = await supabaseClient
         .from('scratchpad')
         .select('content')
         .eq('user_id', currentUser.id)
@@ -307,7 +314,7 @@ async function setupScratchpadCloud(id) {
     pad.addEventListener('input', () => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(async () => {
-            await supabase.from('scratchpad').upsert({
+            await supabaseClient.from('scratchpad').upsert({ // FIX 2
                 user_id: currentUser.id,
                 content: pad.innerHTML
             });

@@ -1,20 +1,32 @@
+
+/* =========================================================================
+   GLOBAL STYLES
+   ========================================================================= */
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(#515e74, #353e4d);
-    background-color: #353e4d; /* Solid fallback */
+    background-color: #353e4d;
     color: #e3e8ef;
     margin: 0;
     padding: 0;
     min-height: 100vh;
 }
 
+a {
+    color: #61afef;
+}
+
+/* =========================================================================
+   HEADER & USER WIDGET LAYOUT (Centered Brand/Nav, Right-Aligned Logout)
+   ========================================================================= */
 header {
     background: #181c22;
     color: #61afef;
     border: 1px solid #61afef;
     text-align: center;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     margin: 0 auto;
+    position: relative;
 }
 
 .header-brand {
@@ -28,21 +40,229 @@ header {
     object-fit: contain;
 }
 
-#home-button {
-    border-radius: 8px;
-    padding: 5px 7%;
-    color: #222222;
-    background-color: #61afef;
-    border: 2px solid #61afef;
-    margin-bottom: 3px;
-    font-weight: bolder;
-}
-#home-button:hover {
-    background-color: #181c22;
-    color: #ffffff;
+.site-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
 }
 
-/* Main Grid Layout */
+.site-nav a {
+    color: #b0c4de;
+    text-decoration: none;
+    padding: 6px 14px;
+    background: #272e38;
+    border: 1px solid #3f4a5a;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.site-nav a:hover, .site-nav a.active {
+    background: #61afef;
+    color: #181c22;
+    border-color: #61afef;
+}
+
+.header-user-widget {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.user-email {
+    color: #e3e8ef;
+    opacity: 0.85;
+}
+
+.logout-action-btn {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.logout-action-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+/* =========================================================================
+   MOBILE RESPONSIVENESS & CUSTOM LAYOUT ORDER
+   ========================================================================= */
+@media (max-width: 900px) {
+    .hub-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+
+    /* Unpack columns so their inner cards break free into the main flex sequence */
+    .hub-grid > div {
+        display: contents;
+    }
+
+    /* Assign exact custom order matching your 1-7 list */
+    .kanban-card {
+        order: 1; /* 1. Focus Board */
+    }
+
+    /* Target Scratchpad (second card inside column-right) */
+    .column-right .card:nth-child(2) {
+        order: 2; /* 2. Scratchpad */
+    }
+
+    .youtube-section {
+        order: 3; /* 3. YouTube */
+    }
+
+    /* Target Space News (first card inside column-right) */
+    .column-right .card:nth-child(1) {
+        order: 4; /* 4. Space News */
+    }
+
+    /* Target Projects (first card inside column-center after Kanban) */
+    .column-center .card:nth-child(2) {
+        order: 5; /* 5. Projects */
+    }
+
+    /* Target Fiverr Studio (second card inside column-center after Kanban) */
+    .column-center .card:nth-child(3) {
+        order: 6; /* 6. Fiverr */
+    }
+
+    .links-section {
+        order: 7; /* 7. Quick Links */
+    }
+
+    .kanban-board {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 1.25rem;
+    }
+
+    header {
+        padding: 0.5rem;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+
+    #scratchpad {
+        height: 20rem;
+    }
+}
+
+/* =========================================================================
+   AUTHENTICATION STYLES (Centered Layout)
+   ========================================================================= */
+.auth-container-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: calc(100vh - 140px); /* Centers it nicely vertically below the header */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.auth-card-box {
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.auth-card-box h2 {
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.auth-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.auth-input:focus {
+    border-color: #61afef;
+}
+
+.auth-buttons-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.auth-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.auth-btn:hover {
+    opacity: 0.9;
+}
+
+.login-btn {
+    background: #4f46e5;
+    color: white;
+}
+
+.signup-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-error-msg {
+    color: #ef4444;
+    font-size: 0.85rem;
+    min-height: 20px;
+}
+
+/* =========================================================================
+   MAIN GRID & CARDS LAYOUT
+   ========================================================================= */
 .hub-grid {
     display: grid;
     grid-template-columns: 1fr 1.5fr 0.9fr;
@@ -73,6 +293,9 @@ header {
     padding-bottom: 0.5rem;
 }
 
+/* =========================================================================
+   PROJECTS & IMAGES
+   ========================================================================= */
 .project-button {
     background: none;
     border: none;
@@ -99,6 +322,9 @@ header {
     border: solid 2px #61afef;
 }
 
+/* =========================================================================
+   YOUTUBE FEED
+   ========================================================================= */
 .video-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -159,10 +385,9 @@ header {
     max-width: 100%;
 }
 
-a {
-    color: #61afef;
-}
-
+/* =========================================================================
+   SCRATCHPAD
+   ========================================================================= */
 textarea {
     width: 100%;
     height: 150px;
@@ -260,7 +485,9 @@ textarea:focus {
     color: #98c379;
 }
 
-/* Kanban Board Component Styles */
+/* =========================================================================
+   KANBAN BOARD COMPONENT
+   ========================================================================= */
 .kanban-header {
     display: flex;
     justify-content: space-between;
@@ -291,7 +518,6 @@ textarea:focus {
     border-color: #61afef;
 }
 
-/* Energy Filter Pill Bar Styles */
 .energy-filters {
     display: flex;
     gap: 8px;
@@ -304,7 +530,7 @@ textarea:focus {
     color: #8892b0;
     border: 1px solid #3f4a5a;
     padding: 6px 14px;
-    border-radius: 20px; /* Pill shape */
+    border-radius: 20px;
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -497,7 +723,7 @@ textarea:focus {
 }
 
 /* =========================================================================
-   Neon / Glow Effect for Hyperfocus Spotlight Mode
+   NEON / GLOW EFFECT FOR HYPERFOCUS SPOTLIGHT MODE
    ========================================================================= */
 @keyframes neonPulse {
     0% {
@@ -531,7 +757,9 @@ textarea:focus {
     display: none;
 }
 
-/* Space News Grid Container */
+/* =========================================================================
+   SPACE NEWS GRID
+   ========================================================================= */
 #space-news-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -539,7 +767,6 @@ textarea:focus {
     margin-top: 10px;
 }
 
-/* Individual Compact Card */
 .space-news-card {
     background-color: #1e2630;
     border: 2px solid #3f4a5a;
@@ -587,10 +814,9 @@ textarea:focus {
 }
 
 /* =========================================================================
-   MOBILE RESPONSIVENESS FIXES (Added Media Queries)
+   MOBILE RESPONSIVENESS FIXES
    ========================================================================= */
 @media (max-width: 900px) {
-    /* Stack the 3-column hub grid into a single responsive column */
     .hub-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
@@ -598,12 +824,10 @@ textarea:focus {
         padding: 0 0.5rem;
     }
 
-    /* Stack Kanban Board columns into a single column on phones */
     .kanban-board {
         grid-template-columns: 1fr;
     }
 
-    /* Shrink header branding to prevent overflow on narrow screens */
     header h1 {
         font-size: 1.25rem;
     }
@@ -612,40 +836,25 @@ textarea:focus {
         padding: 0.5rem;
     }
 
-    /* Reduce card padding slightly for mobile screen space */
     .card {
         padding: 1rem;
     }
 
-    /* Make scratchpad height more compact on small screens */
     #scratchpad {
         height: 20rem;
     }
 }
 
-/* --- Global Site Navigation Bar --- */
-.site-nav {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.site-nav a {
-    color: #b0c4de;
-    text-decoration: none;
-    padding: 6px 14px;
-    background: #272e38;
-    border: 1px solid #3f4a5a;
-    border-radius: 4px;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
-.site-nav a:hover, .site-nav a.active {
-    background: #61afef;
-    color: #181c22;
-    border-color: #61afef;
+@media (max-width: 768px) {
+    header {
+        padding-top: 3rem;
+    }
+    .header-user-widget {
+        top: 10px;
+        transform: none;
+        right: 0.5rem;
+    }
+    .user-email {
+        display: none;
+    }
 }
