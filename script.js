@@ -291,7 +291,7 @@ async function loadLatestVideos() {
 }
 
 /* =========================================================================
-   3. SCRATCHPAD LOGIC (Cloud Synchronized)
+   3. SCRATCHPAD LOGIC (Cloud Synchronized with Auto-Link & Robust Insertion)
    ========================================================================= */
 async function setupScratchpadCloud(id) {
     const pad = document.getElementById(id);
@@ -308,7 +308,7 @@ async function setupScratchpadCloud(id) {
         pad.innerHTML = data.content || '';
     }
 
-    // Save to Supabase on input (with a basic debounce to avoid spamming database)
+    // Save to Supabase on input (with debounce)
     let timeoutId;
     pad.addEventListener('input', () => {
         clearTimeout(timeoutId);
@@ -320,42 +320,109 @@ async function setupScratchpadCloud(id) {
         }, 800);
     });
 
+    // Handle clicks on links to open in a new tab
     pad.addEventListener('click', (e) => {
         const anchor = e.target.closest('a');
-        if (anchor && anchor.href) { e.preventDefault(); window.open(anchor.href, '_blank'); }
+        if (anchor && anchor.href) { 
+            e.preventDefault(); 
+            window.open(anchor.href, '_blank'); 
+        }
     });
+
+    // Auto-link on Paste
+    pad.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text/plain');
+        const urlRegex = /^(https?:\/\/[^\s]+|[a-zA-Z0-9][-a-zA-Z0-90-9]*\.[a-zA-Z]{2,}[^\s]*)$/;
+        
+        if (urlRegex.test(text.trim())) {
+            const cleanUrl = text.trim().startsWith('http') ? text.trim() : 'https://' + text.trim();
+            insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
+        } else {
+            insertHtmlAtCursor(text);
+        }
+        pad.dispatchEvent(new Event('input'));
+    });
+
+    // Auto-link when typing a URL followed by Space or Enter
+    pad.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                const node = range.startContainer;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    const words = text.split(/\s+/);
+                    const lastWord = words[words.length - 1];
+                    
+                    if (lastWord && (lastWord.startsWith('http://') || lastWord.startsWith('https://') || (lastWord.includes('.') && !lastWord.endsWith('.')))) {
+                        const cleanUrl = lastWord.startsWith('http') ? lastWord : 'https://' + lastWord;
+                        const leadingText = text.substring(0, text.length - lastWord.length);
+                        
+                        const span = document.createElement('span');
+                        span.textContent = leadingText;
+                        
+                        const a = document.createElement('a');
+                        a.href = cleanUrl;
+                        a.textContent = lastWord;
+                        a.target = '_blank';
+                        
+                        const parent = node.parentNode;
+                        parent.insertBefore(span, node);
+                        parent.insertBefore(a, node);
+                        
+                        const spaceNode = document.createTextNode(e.key === ' ' ? ' ' : '\n');
+                        parent.insertBefore(spaceNode, node);
+                        parent.removeChild(node);
+                        
+                        range.setStartAfter(spaceNode);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        
+                        e.preventDefault();
+                        pad.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Robust helper to insert HTML/nodes at the current cursor position
+function insertHtmlAtCursor(html) {
+    const sel = window.getSelection();
+    if (sel.getRangeAt && sel.rangeCount) {
+        let range = sel.getRangeAt(0);
+        range.deleteContents();
+        let el = document.createElement("div");
+        el.innerHTML = html;
+        let frag = document.createDocumentFragment(), node, lastNode;
+        while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+        }
+        range.insertNode(frag);
+        if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
 }
 
 function addLink(id) {
     const pad = document.getElementById(id);
+    if (!pad) return;
+    pad.focus(); // Ensure scratchpad maintains focus
+    
     const url = prompt("Enter URL:");
     if (!url) return;
     const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
     
-    // Refocus scratchpad and insert link safely using Range API
-    pad.focus();
-    const html = `<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`;
-    
-    const sel = window.getSelection();
-    if (sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        if (pad.contains(range.commonAncestorContainer)) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const frag = document.createDocumentFragment();
-            let node;
-            while ((node = tempDiv.firstChild)) {
-                frag.appendChild(node);
-            }
-            range.deleteContents();
-            range.insertNode(frag);
-        } else {
-            pad.insertAdjacentHTML('beforeend', html);
-        }
-    } else {
-        pad.insertAdjacentHTML('beforeend', html);
-    }
-    
+    insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
     pad.dispatchEvent(new Event('input')); // trigger auto-save
 }
 
@@ -364,36 +431,16 @@ function triggerImageUpload(id) {
 }
 
 function handleFileSelect(event, id) {
+    const pad = document.getElementById(id);
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const pad = document.getElementById(id);
-            pad.focus();
-            const html = `<img src="${e.target.result}" alt="Uploaded Image"><p><br></p>`;
-            
-            // Insert image safely using Range API
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0) {
-                const range = sel.getRangeAt(0);
-                if (pad.contains(range.commonAncestorContainer)) {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-                    const frag = document.createDocumentFragment();
-                    let node;
-                    while ((node = tempDiv.firstChild)) {
-                        frag.appendChild(node);
-                    }
-                    range.deleteContents();
-                    range.insertNode(frag);
-                } else {
-                    pad.insertAdjacentHTML('beforeend', html);
-                }
-            } else {
-                pad.insertAdjacentHTML('beforeend', html);
+            if (pad) {
+                pad.focus(); // Restore focus to scratchpad
+                insertHtmlAtCursor(`<img src="${e.target.result}" alt="Uploaded Image">`);
+                pad.dispatchEvent(new Event('input')); // trigger auto-save
             }
-            
-            pad.dispatchEvent(new Event('input')); // trigger auto-save
         };
         reader.readAsDataURL(file);
     }
