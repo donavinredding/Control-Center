@@ -1,13 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Rounded Card Background matching your site cards -->
-  <rect x="4" y="4" width="56" height="56" rx="14" fill="#1e222b" stroke="#3f4a5a" stroke-width="3"/>
-  
-  <!-- Tech Control Center Ring -->
-  <circle cx="32" cy="32" r="18" fill="none" stroke="#61afef" stroke-width="2" stroke-opacity="0.4" stroke-dasharray="5 3"/>
-  
-  <!-- Monogram 'D' for Donavin -->
-  <text x="32" y="42" font-family="system-ui, -apple-system, sans-serif" font-size="30" font-weight="800" fill="#e2e8f0" text-anchor="middle">D</text>
-  
-  <!-- Active Tech Status Dot -->
-  <circle cx="46" cy="18" r="4" fill="#61afef"/>
-</svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg width="100%" height="100%" viewBox="0 0 267 267" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;"><path d="M250,75l0,116.667c0,32.195 -26.138,58.333 -58.333,58.333l-116.667,0c-32.195,0 -58.333,-26.138 -58.333,-58.333l-0,-116.667c0,-32.195 26.138,-58.333 58.333,-58.333l116.667,-0c32.195,0 58.333,26.138 58.333,58.333Z" style="fill:#1e222b;stroke:#3f4a5a;stroke-width:12.5px;"/><circle cx="133.333" cy="133.333" r="75" style="fill:none;stroke:#61afef;stroke-opacity:0.4;stroke-width:8.33px;stroke-dasharray:20.833,12.5;"/><path d="M97.231,85.522l33.02,0c7.446,0 13.123,0.57 17.029,1.709c5.249,1.546 9.745,4.293 13.489,8.24c3.743,3.947 6.592,8.779 8.545,14.496c1.953,5.717 2.93,12.767 2.93,21.149c0,7.365 -0.916,13.713 -2.747,19.043c-2.238,6.51 -5.432,11.78 -9.583,15.808c-3.133,3.052 -7.365,5.432 -12.695,7.141c-3.988,1.261 -9.318,1.892 -15.991,1.892l-33.997,0l0,-89.478Zm18.066,15.137l0,59.265l13.489,0c5.046,0 8.687,-0.285 10.925,-0.854c2.93,-0.732 5.361,-1.973 7.294,-3.723c1.933,-1.75 3.51,-4.628 4.73,-8.636c1.221,-4.008 1.831,-9.471 1.831,-16.388c0,-6.917 -0.61,-12.227 -1.831,-15.93c-1.221,-3.703 -2.93,-6.592 -5.127,-8.667c-2.197,-2.075 -4.985,-3.479 -8.362,-4.211c-2.523,-0.57 -7.467,-0.854 -14.832,-0.854l-8.118,0Z" style="fill:#e2e8f0;fill-rule:nonzero;"/><circle cx="191.667" cy="75" r="16.667" style="fill:#61afef;"/></svg>

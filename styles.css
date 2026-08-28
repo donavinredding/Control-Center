@@ -1,4 +1,3 @@
-
 /* =========================================================================
    GLOBAL STYLES
    ========================================================================= */
@@ -110,42 +109,36 @@ header {
         padding: 0 0.5rem;
     }
 
-    /* Unpack columns so their inner cards break free into the main flex sequence */
     .hub-grid > div {
         display: contents;
     }
 
-    /* Assign exact custom order matching your 1-7 list */
     .kanban-card {
-        order: 1; /* 1. Focus Board */
+        order: 1;
     }
 
-    /* Target Scratchpad (second card inside column-right) */
     .column-right .card:nth-child(2) {
-        order: 2; /* 2. Scratchpad */
+        order: 2;
     }
 
     .youtube-section {
-        order: 3; /* 3. YouTube */
+        order: 3;
     }
 
-    /* Target Space News (first card inside column-right) */
     .column-right .card:nth-child(1) {
-        order: 4; /* 4. Space News */
+        order: 4;
     }
 
-    /* Target Projects (first card inside column-center after Kanban) */
     .column-center .card:nth-child(2) {
-        order: 5; /* 5. Projects */
+        order: 5;
     }
 
-    /* Target Fiverr Studio (second card inside column-center after Kanban) */
     .column-center .card:nth-child(3) {
-        order: 6; /* 6. Fiverr */
+        order: 6;
     }
 
     .links-section {
-        order: 7; /* 7. Quick Links */
+        order: 7;
     }
 
     .kanban-board {
@@ -178,9 +171,9 @@ header {
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: calc(100vh - 140px); /* Centers it nicely vertically below the header */
+    min-height: calc(100vh - 140px);
     padding: 20px;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Fixed horizontal overflow */
 }
 
 .auth-card-box {
@@ -188,6 +181,7 @@ header {
     max-width: 420px;
     text-align: center;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .auth-card-box h2 {
@@ -856,5 +850,9 @@ textarea:focus {
     }
     .user-email {
         display: none;
+    }
+    .auth-container-wrapper {
+        min-height: auto; /* Fixes vertical clipping on small mobile viewports */
+        padding: 15px 10px;
     }
 }
