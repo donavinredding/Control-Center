@@ -298,7 +298,6 @@ async function setupScratchpadCloud(id) {
     if (!pad) return;
 
     // Fetch from Supabase
-    // FIX 2: Changed 'supabase' to 'supabaseClient'
     const { data, error } = await supabaseClient
         .from('scratchpad')
         .select('content')
@@ -314,7 +313,7 @@ async function setupScratchpadCloud(id) {
     pad.addEventListener('input', () => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(async () => {
-            await supabaseClient.from('scratchpad').upsert({ // FIX 2
+            await supabaseClient.from('scratchpad').upsert({
                 user_id: currentUser.id,
                 content: pad.innerHTML
             });
@@ -332,19 +331,69 @@ function addLink(id) {
     const url = prompt("Enter URL:");
     if (!url) return;
     const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
-    document.execCommand('insertHTML', false, `<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>`);
+    
+    // Refocus scratchpad and insert link safely using Range API
+    pad.focus();
+    const html = `<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`;
+    
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        if (pad.contains(range.commonAncestorContainer)) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const frag = document.createDocumentFragment();
+            let node;
+            while ((node = tempDiv.firstChild)) {
+                frag.appendChild(node);
+            }
+            range.deleteContents();
+            range.insertNode(frag);
+        } else {
+            pad.insertAdjacentHTML('beforeend', html);
+        }
+    } else {
+        pad.insertAdjacentHTML('beforeend', html);
+    }
+    
     pad.dispatchEvent(new Event('input')); // trigger auto-save
 }
 
-function triggerImageUpload(id) { document.getElementById('file-' + id).click(); }
+function triggerImageUpload(id) { 
+    document.getElementById('file-' + id).click(); 
+}
 
 function handleFileSelect(event, id) {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.execCommand('insertImage', false, e.target.result);
-            document.getElementById(id).dispatchEvent(new Event('input')); // trigger auto-save
+            const pad = document.getElementById(id);
+            pad.focus();
+            const html = `<img src="${e.target.result}" alt="Uploaded Image"><p><br></p>`;
+            
+            // Insert image safely using Range API
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                if (pad.contains(range.commonAncestorContainer)) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    const frag = document.createDocumentFragment();
+                    let node;
+                    while ((node = tempDiv.firstChild)) {
+                        frag.appendChild(node);
+                    }
+                    range.deleteContents();
+                    range.insertNode(frag);
+                } else {
+                    pad.insertAdjacentHTML('beforeend', html);
+                }
+            } else {
+                pad.insertAdjacentHTML('beforeend', html);
+            }
+            
+            pad.dispatchEvent(new Event('input')); // trigger auto-save
         };
         reader.readAsDataURL(file);
     }
