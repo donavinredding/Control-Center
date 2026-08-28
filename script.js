@@ -99,10 +99,10 @@ async function fetchTasksFromCloud() {
         tasks = data;
     } else {
         // Default seed tasks if database is empty for this user
-        tasks = [
-            { id: '1', user_id: currentUser.id, title: 'Review JavaScript logic', status: 'todo', energy: 'medium', time: '20m' },
-            { id: '2', user_id: currentUser.id, title: 'Refactor Control Center Grid layout', status: 'inprogress', energy: 'high', time: '30m' }
-        ];
+        // tasks = [
+        //     { id: '1', user_id: currentUser.id, title: 'Review JavaScript logic', status: 'todo', energy: 'medium', time: '20m' },
+        //     { id: '2', user_id: currentUser.id, title: 'Refactor Control Center Grid layout', status: 'inprogress', energy: 'high', time: '30m' }
+        // ];
         // Save initial tasks to cloud
         for (let t of tasks) {
             await supabaseClient.from('tasks').upsert(t);
