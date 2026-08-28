@@ -42,17 +42,17 @@ async function handleLogin() {
     }
 }
 
-async function handleSignup() {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+// async function handleSignup() {
+//     const email = document.getElementById('auth-email').value;
+//     const password = document.getElementById('auth-password').value;
+//     const { data, error } = await supabaseClient.auth.signUp({ email, password });
     
-    if (error) {
-        document.getElementById('auth-error').textContent = error.message;
-    } else {
-        alert('Signup successful! Check your email if confirmation is required, or try logging in.');
-    }
-}
+//     if (error) {
+//         document.getElementById('auth-error').textContent = error.message;
+//     } else {
+//         alert('Signup successful! Check your email if confirmation is required, or try logging in.');
+//     }
+// }
 
 async function handleLogout() {
     await supabaseClient.auth.signOut();
