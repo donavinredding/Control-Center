@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Planner & AI Prompt Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Additional mobile-friendly fine-tuning for the planner page */
+        .planner-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .planner-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .planner-form-group label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #e3e8ef;
+        }
+
+        .planner-form-group small {
+            font-size: 0.75rem;
+            color: #9aa5b1;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 1rem;
+            }
+
+            header h1 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-brand">
+            <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon"
+                style="width: 36px; height: 36px;">
+            <h1>Website Planner & Prompt Generator</h1>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html">Home</a>
+            <a href="snippets.html">Snippets</a>
+            <a href="projects.html">Projects</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="inspiration.html">Inspiration</a>
+            <a href="ideas.html">Ideas</a>
+            <a href="finance.html">Finance</a>
+            <a href="planner.html" class="active">Planner</a>
+        </nav>
+
+        <div id="logout-container" class="header-user-widget" style="display: none;">
+            <span id="user-display" class="user-email"></span>
+            <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <main class="planner-container" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <!-- Questionnaire Section -->
+        <section class="card" style="margin-bottom: 2rem;">
+            <h2>🧭 In-Depth Website Blueprint</h2>
+            <p style="opacity: 0.8; font-size: 0.85rem; margin-bottom: 20px;">
+                Answer these comprehensive questions to build a thorough layout spec. Your inputs will dynamically
+                generate an expert AI coding prompt below.
+            </p>
+
+            <form id="planner-form">
+
+                <!-- 1. Project Name -->
+                <div class="planner-form-group">
+                    <label for="q-name">1. What is the name or title of your website project?</label>
+                    <input type="text" id="q-name" class="auth-input" placeholder="e.g., Donavin's Control Center"
+                        autocomplete="off">
+                </div>
+
+                <!-- 2. Primary Purpose -->
+                <div class="planner-form-group">
+                    <label for="q-purpose">2. What is the primary purpose of the website?</label>
+                    <select id="q-purpose" class="auth-input">
+                        <option value="Personal Dashboard / Productivity Hub">Personal Dashboard / Productivity Hub
+                        </option>
+                        <option value="Portfolio / Project Showcase">Portfolio / Project Showcase</option>
+                        <option value="E-Commerce / Online Store">E-Commerce / Online Store</option>
+                        <option value="Blog / Content Aggregator">Blog / Content Aggregator</option>
+                        <option value="Landing Page / Business Site">Landing Page / Business Site</option>
+                    </select>
+                </div>
+
+                <!-- 3. Target Audience -->
+                <div class="planner-form-group">
+                    <label for="q-audience">3. Who is your target audience?</label>
+                    <input type="text" id="q-audience" class="auth-input"
+                        placeholder="e.g., Gamers, developers, clients, general public" autocomplete="off">
+                </div>
+
+                <!-- 4. Key Sections & Features -->
+                <div class="planner-form-group">
+                    <label for="q-features">4. What key sections or interactive features do you need?</label>
+                    <input type="text" id="q-features" class="auth-input"
+                        placeholder="e.g., Kanban board, YouTube feed, scratchpad, login system" autocomplete="off">
+                </div>
+
+                <!-- 5. Design Style / Vibe -->
+                <div class="planner-form-group">
+                    <label for="q-design">5. What design style or vibe are you aiming for?</label>
+                    <select id="q-design" class="auth-input">
+                        <option value="Dark Mode, Sleek, Tech / Cyber vibe">Dark Mode, Sleek, Tech / Cyber vibe</option>
+                        <option value="Minimalist and Clean">Minimalist and Clean</option>
+                        <option value="Vibrant, Colorful, and Energetic">Vibrant, Colorful, and Energetic</option>
+                        <option value="Corporate, Professional, and Structured">Corporate, Professional, and Structured
+                        </option>
+                        <option value="Retro / Vintage Aesthetic">Retro / Vintage Aesthetic</option>
+                    </select>
+                </div>
+
+                <!-- 6. Color Palette Preferences -->
+                <div class="planner-form-group">
+                    <label for="q-colors">6. Do you have specific color or styling preferences?</label>
+                    <input type="text" id="q-colors" class="auth-input"
+                        placeholder="e.g., Dark gray backgrounds with neon blue (#61afef) accents" autocomplete="off">
+                </div>
+
+                <!-- 7. Optional Reference URL -->
+                <div class="planner-form-group">
+                    <label for="q-reference">7. Website Reference / Inspiration URL (Optional)</label>
+                    <small>Provide a link to a site whose layout or style you want to replicate or draw inspiration
+                        from.</small>
+                    <input type="url" id="q-reference" class="auth-input" placeholder="https://example.com"
+                        autocomplete="off">
+                </div>
+
+                <!-- 8. Hosting Platform -->
+                <div class="planner-form-group">
+                    <label for="q-hosting">8. Where do you plan to host and deploy the site?</label>
+                    <select id="q-hosting" class="auth-input">
+                        <option value="GitHub Pages">GitHub Pages</option>
+                        <option value="Netlify">Netlify</option>
+                        <option value="Vercel">Vercel</option>
+                        <option value="Custom Server / Other">Custom Server / Other</option>
+                    </select>
+                </div>
+
+                <!-- 9. Extra Description / Details Text Area -->
+                <div class="planner-form-group">
+                    <label for="q-details">9. Extra Description, Specific Logic, or Special Requirements</label>
+                    <small>Type any specific layout rules, backend needs, or extra notes you want included in the
+                        blueprint.</small>
+                    <textarea id="q-details" class="auth-input" style="height: 100px; resize: vertical;"
+                        placeholder="Type any extra notes, custom behaviors, or unique constraints here..."></textarea>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- AI Prompt Output Section -->
+        <section class="card">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #3f4a5a; padding-bottom: 0.5rem; flex-wrap: wrap; gap: 10px;">
+                <h2 style="margin: 0; border: none; padding: 0;">🤖 Generated AI Prompt</h2>
+                <button type="button" id="copy-prompt-btn" class="kanban-action-btn"
+                    onclick="copyPromptToClipboard()">📋 Copy Prompt</button>
+            </div>
+            <p style="opacity: 0.8; font-size: 0.85rem; margin-bottom: 10px;">
+                Copy and paste this formatted text directly into your AI chat to generate your exact website build:
+            </p>
+
+            <div class="scratchpad-container" style="background: #1e242d; padding: 15px;">
+                <pre id="ai-prompt-output"
+                    style="white-space: pre-wrap; word-break: break-word; font-family: monospace; font-size: 0.85rem; color: #e3e8ef; margin: 0;"></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 My Control Center</p>
+    </footer>
+
+    <!-- Script to handle prompt generation and copying safely -->
+    <script>
+        const SUPABASE_URL = 'https://gxlpmwepweujpbumyqvb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
+
+        let supabaseClient = null;
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Safely initialize Supabase client after DOM loads
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        currentUser = session.user;
+                        document.getElementById('logout-container').style.display = 'block';
+                        document.getElementById('user-display').textContent = currentUser.email;
+                    }
+                } catch (e) {
+                    console.error('Auth session error:', e);
+                }
+            }
+
+            // Bind input changes to update prompt generator dynamically
+            const formElements = document.querySelectorAll('#planner-form input, #planner-form select, #planner-form textarea');
+            formElements.forEach(element => {
+                element.addEventListener('input', updateAiPrompt);
+                element.addEventListener('change', updateAiPrompt);
+            });
+
+            // Run immediately to populate default text
+            updateAiPrompt();
+        });
+
+        async function handleLogout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            location.href = 'index.html';
+        }
+
+        function updateAiPrompt() {
+            const projectName = document.getElementById('q-name').value.trim() || '[Your Project Name]';
+            const purpose = document.getElementById('q-purpose').value;
+            const audience = document.getElementById('q-audience').value.trim() || '[Your Target Audience]';
+            const features = document.getElementById('q-features').value.trim() || '[Key Features]';
+            const designStyle = document.getElementById('q-design').value;
+            const colors = document.getElementById('q-colors').value.trim() || '[Color Preferences]';
+            const reference = document.getElementById('q-reference').value.trim();
+            const hostingPlatform = document.getElementById('q-hosting').value;
+            const details = document.getElementById('q-details').value.trim() || 'None specified.';
+
+            let promptString = `Act as an expert front-end web developer and UI/UX designer. Please build a fully functional, mobile-friendly website based on the following detailed specifications:
+
+- Project Name: ${projectName}
+- Primary Purpose: ${purpose}
+- Target Audience: ${audience}
+- Key Sections & Features: ${features}
+- Design Vibe / Style: ${designStyle}
+- Color Palette / Styling: ${colors}`;
+
+            if (reference) {
+                promptString += `\n- Layout / Inspiration Reference URL: ${reference}`;
+            }
+
+            promptString += `
+- Hosting & Deployment Platform: ${hostingPlatform}
+- Additional Details / Special Requirements:
+${details}
+
+Please provide clean, semantic HTML, modern responsive CSS (ensuring it fits all mobile viewports cleanly), and any necessary JavaScript logic structured logically to bring this project to life.`;
+
+            const outputEl = document.getElementById('ai-prompt-output');
+            if (outputEl) {
+                outputEl.textContent = promptString;
+            }
+        }
+
+        function copyPromptToClipboard() {
+            const promptText = document.getElementById('ai-prompt-output').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = document.getElementById('copy-prompt-btn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Prompt';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
