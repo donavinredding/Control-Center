@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="browser-title">Project Hub - My Control Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .addon-focus-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            max-width: 1350px;
+            margin: 30px auto;
+            padding: 0 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .addon-focus-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .column-left-wide, .column-right-narrow {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .external-link-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #272e38;
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid #3f4a5a;
+        }
+
+        .external-link-banner a {
+            color: #61afef;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .external-link-banner a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-brand">
+            <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon" style="width: 36px; height: 36px;">
+            <h1 id="project-header-title">Loading Project...</h1>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html">Home</a>
+            <a href="snippets.html">Snippets</a>
+            <a href="projects.html" class="active">Projects</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="inspiration.html">Inspiration</a>
+            <a href="ideas.html">Ideas</a>
+            <a href="finance.html">Finance</a>
+            <a href="planner.html">Web Planner</a>
+        </nav>
+        
+        <div id="logout-container" class="header-user-widget" style="display: none;">
+            <span id="user-display" class="user-email"></span>
+            <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container-wrapper" style="display: none;">
+        <section class="card auth-card-box">
+            <h2>🔐 Control Center Access</h2>
+            <div class="auth-form-group">
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email address..." required autocomplete="email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password..." required autocomplete="current-password">
+                <div class="auth-buttons-row">
+                    <button type="button" class="auth-btn login-btn" onclick="handleLogin()">Login</button>
+                </div>
+                <div id="auth-error" class="auth-error-msg"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="addon-focus-grid">
+        
+        <!-- Left Column: Action Core -->
+        <div class="column-left-wide">
+            
+            <!-- External Link Banner (Hidden if no link provided) -->
+            <div id="external-banner-wrapper" class="external-link-banner" style="display: none;">
+                <span id="external-banner-label">📦 Official Release</span>
+                <a id="external-banner-link" href="#" target="_blank">View External Page ↗</a>
+            </div>
+
+            <!-- Project Description Card -->
+            <section class="card">
+                <h2 id="project-card-title">Overview</h2>
+                <p id="project-description" style="color: #9aa5b1; margin: 0;">Loading description...</p>
+            </section>
+
+            <!-- Kanban Task Board Component -->
+            <section class="card kanban-card" id="project-kanban-section">
+                <div class="kanban-header">
+                    <h2>✅ Task Breakdown</h2>
+                    <div class="kanban-controls">
+                        <button id="focus-mode-btn" class="kanban-action-btn" type="button">🎯 Focus Mode: Off</button>
+                        <button id="clear-done-btn" class="kanban-action-btn" type="button">🗑️ Clear Done</button>
+                    </div>
+                </div>
+
+                <form id="task-form" class="task-form">
+                    <input type="text" id="task-title" placeholder="Micro-step task..." required autocomplete="off">
+                    <select id="task-energy">
+                        <option value="low">🟢 Low Energy</option>
+                        <option value="medium" selected>🟡 Med Energy</option>
+                        <option value="high">🔴 High Energy</option>
+                    </select>
+                    <input type="text" id="task-time" placeholder="Time (e.g. 15m)" maxlength="6">
+                    <button type="submit" id="add-task-btn">Add</button>
+                </form>
+
+                <div class="energy-filters">
+                    <button type="button" class="filter-btn active" data-filter="all">All</button>
+                    <button type="button" class="filter-btn" data-filter="low">🟢 Low</button>
+                    <button type="button" class="filter-btn" data-filter="medium">🟡 Med</button>
+                    <button type="button" class="filter-btn" data-filter="high">🔴 High</button>
+                </div>
+
+                <div class="kanban-board">
+                    <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>To Do</h3>
+                        <div class="task-list" id="todo-list"></div>
+                    </div>
+                    <div class="kanban-column" data-column="inprogress" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>In Progress</h3>
+                        <div class="task-list" id="inprogress-list"></div>
+                    </div>
+                    <div class="kanban-column" data-column="done" ondragover="allowDrop(event)" ondrop="drop(event)">
+                        <h3>Done 🎉</h3>
+                        <div class="task-list" id="done-list"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Brain Dump -->
+        <div class="column-right-narrow">
+            <section class="card scratchpad-card">
+                <h2>📝 Brain Dump Scratchpad</h2>
+                <p class="scratchpad-hint">Park random ideas or notes here so you don't lose focus.</p>
+                <div class="scratchpad-container">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('project-scratchpad')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('project-scratchpad')">📷 Add Image</button>
+                    </div>
+                    <div id="project-scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes here..."></div>
+                    <input type="file" id="file-project-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'project-scratchpad')">
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 My Control Center</p>
+    </footer>
+
+    <!-- Dynamic Loader Script -->
+    <script>
+        let KANBAN_STORAGE_KEY = 'default_kanban_tasks';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id');
+
+            if (!projectId) {
+                alert('No project specified!');
+                window.location.href = 'projects.html';
+                return;
+            }
+
+            // Set unique storage keys for this specific project's board & scratchpad
+            KANBAN_STORAGE_KEY = `project_kanban_${projectId}`;
+            const kanbanSection = document.getElementById('project-kanban-section');
+            if (kanbanSection) kanbanSection.setAttribute('data-storage-key', KANBAN_STORAGE_KEY);
+
+            // Fetch project details from Supabase
+            const { data: project, error } = await supabaseClient
+                .from('projects')
+                .select('*')
+                .eq('id', projectId)
+                .single();
+
+            if (error || !project) {
+                console.error('Error fetching project:', error);
+                document.getElementById('project-header-title').textContent = 'Project Not Found';
+                return;
+            }
+
+            // Populate the page with project data
+            document.getElementById('browser-title').textContent = `${project.title} - My Control Center`;
+            document.getElementById('project-header-title').textContent = project.title;
+            document.getElementById('project-card-title').textContent = project.title;
+            document.getElementById('project-description').textContent = project.description || 'No description provided.';
+
+            // Handle optional external link banner
+            if (project.external_link) {
+                const banner = document.getElementById('external-banner-wrapper');
+                const linkEl = document.getElementById('external-banner-link');
+                linkEl.href = project.external_link;
+                banner.style.display = 'flex';
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

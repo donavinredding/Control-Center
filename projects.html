@@ -25,14 +25,12 @@
             <a href="planner.html">Web Planner</a>
         </nav>
 
-        <!-- Reusable Header User Widget -->
         <div id="logout-container" class="header-user-widget" style="display: none;">
             <span id="user-display" class="user-email"></span>
             <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
         </div>
     </header>
 
-    <!-- Authentication Container -->
     <div id="auth-container" class="auth-container-wrapper" style="display: none;">
         <section class="card auth-card-box">
             <h2>🔐 Control Center Access</h2>
@@ -48,11 +46,35 @@
     </div>
 
     <main style="max-width: 900px; margin: 2rem auto; padding: 0 1rem;">
-        <section class="card">
-            <h2>Elytra Models Add-on</h2>
-            <p>Custom models and textures for Minecraft.</p>
-            <a href="./projectpages/addon.html" style="color: #61afef;">View Add-on Page &rarr;</a>
+        
+        <!-- Add New Project Collapsible Dropdown Card -->
+        <section class="card" style="margin-bottom: 2rem;">
+            <div onclick="toggleAddProjectForm()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
+                <h2 style="margin: 0; color: #e3e8ef; font-size: 1.25rem;">➕ Add New Project</h2>
+                <button type="button" id="form-toggle-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #61afef; cursor: pointer; font-size: 0.85rem; padding: 6px 14px; border-radius: 6px; font-weight: 500; pointer-events: none;">▼ Open</button>
+            </div>
+            
+            <form id="add-project-form" onsubmit="handleAddProject(event)" style="display: none; flex-direction: column; gap: 12px; margin-top: 1.2rem; border-top: 1px solid #3f4a5a; padding-top: 1.2rem;">
+                <input type="text" id="proj-title" class="auth-input" placeholder="Project Title (e.g., Elytra Models Add-on)" required autocomplete="off">
+                <textarea id="proj-desc" class="auth-input" placeholder="Short description..." style="height: 80px; resize: vertical;" autocomplete="off"></textarea>
+                <input type="url" id="proj-link" class="auth-input" placeholder="External Link URL (Optional - e.g., CurseForge page)" autocomplete="off">
+                
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 0.85rem; color: #9aa5b1;">Project Image:</label>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <input type="file" id="proj-image-file" accept="image/*" style="display: none;" onchange="updateFileName(this, 'proj-file-name')">
+                        <label for="proj-image-file" style="background: #272e38; border: 1px solid #3f4a5a; color: #61afef; cursor: pointer; font-size: 0.85rem; padding: 8px 16px; border-radius: 6px; font-weight: 500; display: inline-block; transition: background 0.2s;">📁 Choose Image</label>
+                        <span id="proj-file-name" style="font-size: 0.85rem; color: #9aa5b1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No file chosen</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn login-btn" style="align-self: flex-start; padding: 0.6rem 1.5rem; margin-top: 0.5rem;">Create Project Page</button>
+            </form>
         </section>
+
+        <!-- Dynamic Projects List Container -->
+        <div id="projects-list-container" style="display: flex; flex-direction: column; gap: 1.5rem;"></div>
+
     </main>
 
     <footer>
@@ -60,6 +82,278 @@
     </footer>
 
     <script src="script.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                fetchProjects();
+            }
+        });
+
+        // Toggle Add Project Form Dropdown
+        function toggleAddProjectForm() {
+            const form = document.getElementById('add-project-form');
+            const btn = document.getElementById('form-toggle-btn');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'flex';
+                btn.textContent = '▲ Close';
+            } else {
+                form.style.display = 'none';
+                btn.textContent = '▼ Open';
+            }
+        }
+
+        async function fetchProjects() {
+            const container = document.getElementById('projects-list-container');
+            container.innerHTML = '<p style="opacity: 0.7; text-align: center;">Loading projects...</p>';
+            
+            const { data, error } = await supabaseClient
+                .from('projects')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching projects:', error.message);
+                container.innerHTML = '<p style="color: #e06c75; text-align: center;">Failed to load projects.</p>';
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p style="opacity: 0.7; text-align: center;">No projects added yet. Use the dropdown above to create one!</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            data.forEach(proj => {
+                const card = document.createElement('section');
+                card.className = 'card';
+                
+                // Rectangular, non-cropped thumbnail with a sleek dark background fallback
+                const imageThumbnail = proj.image_url 
+                    ? `<img src="${proj.image_url}" alt="Project Image" style="width: 110px; height: 70px; object-fit: contain; background: #151a21; border-radius: 8px; border: 1px solid #3f4a5a; flex-shrink: 0;">` 
+                    : '';
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 1rem; align-items: flex-start; flex: 1; min-width: 250px;">
+                            ${imageThumbnail}
+                            <div>
+                                <h2 style="margin-top: 0; margin-bottom: 0.5rem; color: #e3e8ef;">${escapeHtml(proj.title)}</h2>
+                                <p style="margin-bottom: 1rem; opacity: 0.85; color: #9aa5b1;">${escapeHtml(proj.description || '')}</p>
+                                <a href="project.html?id=${proj.id}" style="color: #61afef; text-decoration: none; font-weight: 500;">Open Project Hub &rarr;</a>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button type="button" onclick="openEditModal('${proj.id}', '${escapeAttr(proj.title)}', '${escapeAttr(proj.description || '')}', '${escapeAttr(proj.external_link || '')}', '${escapeAttr(proj.image_url || '')}')" style="background: #272e38; border: 1px solid #3f4a5a; color: #61afef; cursor: pointer; font-size: 0.85rem; padding: 8px 14px; border-radius: 6px; font-weight: 500;" title="Edit Project">✏️ Edit</button>
+                            <button type="button" onclick="openDeleteModal('${proj.id}')" style="background: #272e38; border: 1px solid #3f4a5a; color: #e06c75; cursor: pointer; font-size: 0.85rem; padding: 8px 14px; border-radius: 6px; font-weight: 500;" title="Delete Project">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Helper to update displayed filename when file is picked
+        function updateFileName(input, targetId) {
+            const span = document.getElementById(targetId);
+            if (input.files && input.files.length > 0) {
+                span.textContent = input.files[0].name;
+                span.style.color = '#e3e8ef';
+            } else {
+                span.textContent = 'No file chosen';
+                span.style.color = '#9aa5b1';
+            }
+        }
+
+        // Helper to convert a file input to Base64 string
+        function convertFileToBase64(fileInput) {
+            return new Promise((resolve, reject) => {
+                const file = fileInput.files[0];
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleAddProject(event) {
+            event.preventDefault();
+            const title = document.getElementById('proj-title').value.trim();
+            const description = document.getElementById('proj-desc').value.trim();
+            const external_link = document.getElementById('proj-link').value.trim();
+            const fileInput = document.getElementById('proj-image-file');
+
+            if (!title) {
+                alert('Please provide a project title.');
+                return;
+            }
+
+            try {
+                const image_url = await convertFileToBase64(fileInput);
+
+                const { error } = await supabaseClient
+                    .from('projects')
+                    .insert([{ title, description, external_link, image_url }]);
+
+                if (error) {
+                    console.error('Error adding project:', error.message);
+                    alert('Failed to add project: ' + error.message);
+                } else {
+                    document.getElementById('add-project-form').reset();
+                    document.getElementById('proj-file-name').textContent = 'No file chosen';
+                    document.getElementById('proj-file-name').style.color = '#9aa5b1';
+                    toggleAddProjectForm(); // Close form after successful creation
+                    fetchProjects();
+                }
+            } catch (err) {
+                console.error('Image processing error:', err);
+                alert('Failed to process image file.');
+            }
+        }
+
+        // Edit Modal Controls
+        function openEditModal(id, title, desc, link, imageUrl) {
+            document.getElementById('edit-proj-id').value = id;
+            document.getElementById('edit-proj-title').value = title;
+            document.getElementById('edit-proj-desc').value = desc;
+            document.getElementById('edit-proj-link').value = link;
+            document.getElementById('existing-edit-image').value = imageUrl;
+            document.getElementById('edit-proj-image-file').value = '';
+            document.getElementById('edit-file-name').textContent = 'No file chosen';
+            document.getElementById('edit-file-name').style.color = '#9aa5b1';
+            
+            const previewImg = document.getElementById('edit-img-preview');
+            if (imageUrl) {
+                previewImg.src = imageUrl;
+                previewImg.style.display = 'block';
+            } else {
+                previewImg.style.display = 'none';
+                previewImg.src = '';
+            }
+
+            document.getElementById('edit-project-modal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-project-modal').style.display = 'none';
+        }
+
+        async function handleUpdateProject(event) {
+            event.preventDefault();
+            const id = document.getElementById('edit-proj-id').value;
+            const title = document.getElementById('edit-proj-title').value.trim();
+            const description = document.getElementById('edit-proj-desc').value.trim();
+            const external_link = document.getElementById('edit-proj-link').value.trim();
+            const existingImage = document.getElementById('existing-edit-image').value;
+            const fileInput = document.getElementById('edit-proj-image-file');
+
+            try {
+                let image_url = await convertFileToBase64(fileInput);
+                if (!image_url) {
+                    image_url = existingImage;
+                }
+
+                const { error } = await supabaseClient
+                    .from('projects')
+                    .update({ title, description, external_link, image_url })
+                    .eq('id', id);
+
+                if (error) {
+                    console.error('Error updating project:', error.message);
+                    alert('Failed to update project: ' + error.message);
+                } else {
+                    closeEditModal();
+                    fetchProjects();
+                }
+            } catch (err) {
+                console.error('Image processing error:', err);
+                alert('Failed to process image file.');
+            }
+        }
+
+        // Mobile-Friendly Delete Modal Controls
+        function openDeleteModal(id) {
+            document.getElementById('delete-proj-id').value = id;
+            document.getElementById('delete-project-modal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-project-modal').style.display = 'none';
+        }
+
+        async function confirmDeleteProject() {
+            const id = document.getElementById('delete-proj-id').value;
+            const { error } = await supabaseClient
+                .from('projects')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                console.error('Error deleting project:', error.message);
+                alert('Failed to delete project.');
+            } else {
+                closeDeleteModal();
+                fetchProjects();
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function escapeAttr(str) {
+            return str.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+        }
+    </script>
+
+    <!-- Edit Project Modal -->
+    <div id="edit-project-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
+        <div class="card" style="max-width: 450px; width: 100%; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto;">
+            <h3 style="margin-top: 0; color: #e3e8ef; margin-bottom: 1rem;">Edit Project</h3>
+            <form id="edit-project-form" onsubmit="handleUpdateProject(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="hidden" id="edit-proj-id">
+                <input type="hidden" id="existing-edit-image">
+                <input type="text" id="edit-proj-title" class="auth-input" placeholder="Project Title" required autocomplete="off">
+                <textarea id="edit-proj-desc" class="auth-input" placeholder="Short description..." style="height: 80px; resize: vertical;" autocomplete="off"></textarea>
+                <input type="url" id="edit-proj-link" class="auth-input" placeholder="External Link URL" autocomplete="off">
+                
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 0.85rem; color: #9aa5b1;">Project Image:</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                        <img id="edit-img-preview" src="" alt="Preview" style="width: 80px; height: 55px; object-fit: contain; background: #151a21; border-radius: 6px; border: 1px solid #3f4a5a; display: none;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <input type="file" id="edit-proj-image-file" accept="image/*" style="display: none;" onchange="updateFileName(this, 'edit-file-name')">
+                        <label for="edit-proj-image-file" style="background: #272e38; border: 1px solid #3f4a5a; color: #61afef; cursor: pointer; font-size: 0.85rem; padding: 8px 16px; border-radius: 6px; font-weight: 500; display: inline-block;">📁 Choose Image</label>
+                        <span id="edit-file-name" style="font-size: 0.85rem; color: #9aa5b1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No file chosen</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 0.5rem;">
+                    <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; flex: 1;" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="auth-btn login-btn" style="flex: 1; background: #61afef; color: #fff;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal (Mobile-Friendly) -->
+    <div id="delete-project-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
+        <div class="card" style="max-width: 400px; width: 100%; text-align: center; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+            <h3 style="margin-top: 0; color: #e3e8ef;">Delete Project</h3>
+            <p style="color: #9aa5b1; font-size: 0.9rem; margin-bottom: 1.5rem;">Are you sure you want to delete this project card?</p>
+            <input type="hidden" id="delete-proj-id">
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; flex: 1;" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="auth-btn login-btn" style="flex: 1; background: #e06c75;" onclick="confirmDeleteProject()">Delete</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Custom Logout Confirmation Modal -->
     <div id="logout-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
