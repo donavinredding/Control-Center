@@ -170,80 +170,95 @@ Copy and paste this formatted text directly into your AI chat to generate your e
 <p>© 2026 My Control Center</p>
 </footer>
 
-<!-- Script to handle prompt generation and copying -->
-<script>
-const SUPABASE_URL = 'https://gxlpmwepweujpbumyqvb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-let currentUser = null;
+    <!-- Script to handle prompt generation and copying safely -->
+    <script>
+        const SUPABASE_URL = 'https://gxlpmwepweujpbumyqvb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
+        
+        let supabaseClient = null;
+        let currentUser = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
-const { data: { session } } = await supabaseClient.auth.getSession();
-if (session) {
-currentUser = session.user;
-document.getElementById('logout-container').style.display = 'block';
-document.getElementById('user-display').textContent = currentUser.email;
-}
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Safely initialize Supabase client after DOM loads
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) {
+                        currentUser = session.user;
+                        document.getElementById('logout-container').style.display = 'block';
+                        document.getElementById('user-display').textContent = currentUser.email;
+                    }
+                } catch (e) {
+                    console.error('Auth session error:', e);
+                }
+            }
 
-// Bind input changes to update prompt generator dynamically
-const formElements = document.querySelectorAll('#planner-form input, #planner-form select, #planner-form textarea');
-formElements.forEach(element => {
-element.addEventListener('input', updateAiPrompt);
-element.addEventListener('change', updateAiPrompt);
-});
+            // Bind input changes to update prompt generator dynamically
+            const formElements = document.querySelectorAll('#planner-form input, #planner-form select, #planner-form textarea');
+            formElements.forEach(element => {
+                element.addEventListener('input', updateAiPrompt);
+                element.addEventListener('change', updateAiPrompt);
+            });
 
-updateAiPrompt();
-});
+            // Run immediately to populate default text
+            updateAiPrompt();
+        });
 
-async function handleLogout() {
-await supabaseClient.auth.signOut();
-location.href = 'index.html';
-}
+        async function handleLogout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            location.href = 'index.html';
+        }
 
-function updateAiPrompt() {
-const projectName = document.getElementById('q-name').value.trim() || '[Your Project Name]';
-const purpose = document.getElementById('q-purpose').value;
-const audience = document.getElementById('q-audience').value.trim() || '[Your Target Audience]';
-const features = document.getElementById('q-features').value.trim() || '[Key Features]';
-const designStyle = document.getElementById('q-design').value;
-const colors = document.getElementById('q-colors').value.trim() || '[Color Preferences]';
-const reference = document.getElementById('q-reference').value.trim();
-const hostingPlatform = document.getElementById('q-hosting').value;
-const details = document.getElementById('q-details').value.trim() || 'None specified.';
+        function updateAiPrompt() {
+            const projectName = document.getElementById('q-name').value.trim() || '[Your Project Name]';
+            const purpose = document.getElementById('q-purpose').value;
+            const audience = document.getElementById('q-audience').value.trim() || '[Your Target Audience]';
+            const features = document.getElementById('q-features').value.trim() || '[Key Features]';
+            const designStyle = document.getElementById('q-design').value;
+            const colors = document.getElementById('q-colors').value.trim() || '[Color Preferences]';
+            const reference = document.getElementById('q-reference').value.trim();
+            const hostingPlatform = document.getElementById('q-hosting').value;
+            const details = document.getElementById('q-details').value.trim() || 'None specified.';
 
-let promptString = `Act as an expert front-end web developer and UI/UX designer. Please build a fully functional, mobile-friendly website based on the following detailed specifications:
+            let promptString = `Act as an expert front-end web developer and UI/UX designer. Please build a fully functional, mobile-friendly website based on the following detailed specifications:
 
-• Project Name: $`{projectName}
-• Primary Purpose: `${purpose}
-• Target Audience: $`{audience}
-• Key Sections & Features: `${features}
-• Design Vibe / Style: $`{designStyle}
-• Color Palette / Styling: ${colors};
+- Project Name: ${projectName}
+- Primary Purpose: ${purpose}
+- Target Audience: ${audience}
+- Key Sections & Features: ${features}
+- Design Vibe / Style: ${designStyle}
+- Color Palette / Styling: ${colors}`;
 
-if (reference) {
-promptString += \n- Layout / Inspiration Reference URL: ${reference}`;
-}
+            if (reference) {
+                promptString += `\n- Layout / Inspiration Reference URL: ${reference}`;
+            }
 
-promptString += `
-• Hosting & Deployment Platform: `${hostingPlatform}
-• Additional Details / Special Requirements:
+            promptString += `
+- Hosting & Deployment Platform: ${hostingPlatform}
+- Additional Details / Special Requirements:
 ${details}
 
 Please provide clean, semantic HTML, modern responsive CSS (ensuring it fits all mobile viewports cleanly), and any necessary JavaScript logic structured logically to bring this project to life.`;
 
-document.getElementById('ai-prompt-output').textContent = promptString;
-}
+            const outputEl = document.getElementById('ai-prompt-output');
+            if (outputEl) {
+                outputEl.textContent = promptString;
+            }
+        }
 
-function copyPromptToClipboard() {
-const promptText = document.getElementById('ai-prompt-output').textContent;
-navigator.clipboard.writeText(promptText).then(() => {
-const btn = document.getElementById('copy-prompt-btn');
-btn.textContent = '✅ Copied!';
-setTimeout(() => {
-btn.textContent = '📋 Copy Prompt';
-}, 2000);
-});
-}
-</script>
+        function copyPromptToClipboard() {
+            const promptText = document.getElementById('ai-prompt-output').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btn = document.getElementById('copy-prompt-btn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy Prompt';
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
