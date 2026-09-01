@@ -51,20 +51,20 @@ async function handleLogout() {
     location.reload();
 }
 async function handleLogout() {
-    // Prompt the user for confirmation before signing out
-    const isConfirmed = window.confirm("Are you sure you want to logout?");
+    // Mobile-friendly native confirmation popup
+    const isConfirmed = window.confirm("Are you sure you want to log out?");
     
     if (!isConfirmed) {
-        return; // Cancel logout if they click "Cancel"
+        return; // Stops execution if the user taps "Cancel"
     }
 
-    // Your existing Supabase logout code goes here...
+    // Your existing Supabase logout code (keep whatever you currently have here)
     try {
-        const { error } = await supabaseClient.auth.signOut();
+        const { error } = await supabase.auth.signOut();
         if (error) throw error;
         
-        // Redirect or update UI state after successful logout
-        window.location.reload(); 
+        // Refresh or redirect to trigger the login screen
+        window.location.reload();
     } catch (error) {
         console.error("Error logging out:", error.message);
     }
