@@ -6,6 +6,7 @@
     <title>Finance Hub - My Control Center</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .finance-grid {
             display: flex;
@@ -63,8 +64,10 @@
 
     <!-- Header / Global Navigation -->
     <header>
-        <h1>Financial Control Hub</h1>
-        <p>Track budgets, manage spreadsheets, and log financial ideas.</p>
+        <div class="header-brand">
+            <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon" style="width: 36px; height: 36px;">
+            <h1>Financial Control Hub</h1>
+        </div>
         <nav class="site-nav">
             <a href="index.html">Home</a>
             <a href="snippets.html">Snippets</a>
@@ -73,14 +76,29 @@
             <a href="inspiration.html">Inspiration</a>
             <a href="ideas.html">Ideas</a>
             <a href="finance.html" class="active">Finance</a>
-            <a href="planner.html">Planner</a>
+            <a href="planner.html">Web Planner</a>
         </nav>
-        <!-- Reusable Header User Widget (Paste into all tabs) -->
+        <!-- Reusable Header User Widget -->
         <div id="logout-container" class="header-user-widget" style="display: none;">
             <span id="user-display" class="user-email"></span>
             <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
         </div>
     </header>
+
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container-wrapper" style="display: none;">
+        <section class="card auth-card-box">
+            <h2>🔐 Control Center Access</h2>
+            <div class="auth-form-group">
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email address..." required autocomplete="email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password..." required autocomplete="current-password">
+                <div class="auth-buttons-row">
+                    <button type="button" class="auth-btn login-btn" onclick="handleLogin()">Login</button>
+                </div>
+                <div id="auth-error" class="auth-error-msg"></div>
+            </div>
+        </section>
+    </div>
 
     <!-- Main Stack -->
     <main class="finance-grid">

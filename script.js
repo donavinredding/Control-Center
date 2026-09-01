@@ -1,7 +1,6 @@
 /* =========================================================================
    SUPABASE INITIALIZATION
    ========================================================================= */
-// FIX 1: Use the correct Supabase API URL format instead of the dashboard URL
 const SUPABASE_URL = 'https://gxlpmwepweujpbumyqvb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -14,20 +13,25 @@ let focusModeActive = false;
 let currentEnergyFilter = 'all';
 
 
-// Check auth state on page load
+/* =========================================================================
+   AUTHENTICATION & INITIALIZATION
+   ========================================================================= */
 document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await supabaseClient.auth.getSession();
     
     if (!session) {
         document.getElementById('auth-container').style.display = 'block';
-        document.querySelector('.hub-grid').style.display = 'none'; // Hide dashboard until login
-        document.querySelector('.site-nav').style.display = 'none'; // 👈 Hide navigation tabs on login screen
+        const hubGrid = document.querySelector('.hub-grid');
+        if (hubGrid) hubGrid.style.display = 'none';
+        const siteNav = document.querySelector('.site-nav');
+        if (siteNav) siteNav.style.display = 'none';
     } else {
         currentUser = session.user;
         initDashboard();
     }
 
     setupAuthUIEvents();
+    initEventListeners();
 });
 
 async function handleLogin() {
@@ -42,36 +46,50 @@ async function handleLogin() {
     }
 }
 
-// async function handleSignup() {
-//     const email = document.getElementById('auth-email').value;
-//     const password = document.getElementById('auth-password').value;
-//     const { data, error } = await supabaseClient.auth.signUp({ email, password });
-    
-//     if (error) {
-//         document.getElementById('auth-error').textContent = error.message;
-//     } else {
-//         alert('Signup successful! Check your email if confirmation is required, or try logging in.');
-//     }
-// }
-
 async function handleLogout() {
     await supabaseClient.auth.signOut();
     location.reload();
 }
+async function handleLogout() {
+    // Prompt the user for confirmation before signing out
+    const isConfirmed = window.confirm("Are you sure you want to logout?");
+    
+    if (!isConfirmed) {
+        return; // Cancel logout if they click "Cancel"
+    }
+
+    // Your existing Supabase logout code goes here...
+    try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+        
+        // Redirect or update UI state after successful logout
+        window.location.reload(); 
+    } catch (error) {
+        console.error("Error logging out:", error.message);
+    }
+}
 
 function setupAuthUIEvents() {
     if (currentUser) {
-        document.getElementById('logout-container').style.display = 'block';
-        document.getElementById('user-display').textContent = currentUser.email;
+        const logoutContainer = document.getElementById('logout-container');
+        const userDisplay = document.getElementById('user-display');
+        if (logoutContainer) logoutContainer.style.display = 'block';
+        if (userDisplay) userDisplay.textContent = currentUser.email;
     }
 }
 
 async function initDashboard() {
     document.getElementById('auth-container').style.display = 'none';
-    document.querySelector('.hub-grid').style.display = 'grid';
-    document.querySelector('.site-nav').style.display = ''; // 👈 Reset style so it reappears using your stylesheet default
-    document.getElementById('logout-container').style.display = 'block';
-    document.getElementById('user-display').textContent = currentUser.email;
+    const hubGrid = document.querySelector('.hub-grid');
+    const siteNav = document.querySelector('.site-nav');
+    const logoutContainer = document.getElementById('logout-container');
+    const userDisplay = document.getElementById('user-display');
+
+    if (hubGrid) hubGrid.style.display = 'grid';
+    if (siteNav) siteNav.style.display = ''; 
+    if (logoutContainer) logoutContainer.style.display = 'block';
+    if (userDisplay) userDisplay.textContent = currentUser.email;
 
     await fetchTasksFromCloud();
     loadLatestVideos();
@@ -84,7 +102,6 @@ async function initDashboard() {
    1. KANBAN TASK BOARD LOGIC (Cloud Synchronized)
    ========================================================================= */
 async function fetchTasksFromCloud() {
-    // FIX 2: Changed 'supabase' to 'supabaseClient'
     const { data, error } = await supabaseClient
         .from('tasks')
         .select('*')
@@ -97,27 +114,17 @@ async function fetchTasksFromCloud() {
 
     if (data && data.length > 0) {
         tasks = data;
-    } else {
-        // Default seed tasks if database is empty for this user
-        // tasks = [
-        //     { id: '1', user_id: currentUser.id, title: 'Review JavaScript logic', status: 'todo', energy: 'medium', time: '20m' },
-        //     { id: '2', user_id: currentUser.id, title: 'Refactor Control Center Grid layout', status: 'inprogress', energy: 'high', time: '30m' }
-        // ];
-        // Save initial tasks to cloud
-        for (let t of tasks) {
-            await supabaseClient.from('tasks').upsert(t);
-        }
     }
     renderTasks();
 }
 
 async function saveTaskToCloud(task) {
     task.user_id = currentUser.id;
-    await supabaseClient.from('tasks').upsert(task); // FIX 2
+    await supabaseClient.from('tasks').upsert(task);
 }
 
 async function deleteTaskFromCloud(id) {
-    await supabaseClient.from('tasks').delete().eq('id', id).eq('user_id', currentUser.id); // FIX 2
+    await supabaseClient.from('tasks').delete().eq('id', id).eq('user_id', currentUser.id);
 }
 
 function renderTasks() {
@@ -223,8 +230,9 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => map[m]);
 }
 
+
 /* =========================================================================
-   2. YOUTUBE FEED LOGIC (Unchanged)
+   2. YOUTUBE FEED LOGIC
    ========================================================================= */
 const creators = [
     { name: "MrBeast", channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA" },
@@ -290,15 +298,15 @@ async function loadLatestVideos() {
     });
 }
 
+
 /* =========================================================================
-   3. SCRATCHPAD LOGIC (Cloud Synchronized with Auto-Link & Robust Insertion)
+   3. SCRATCHPAD LOGIC
    ========================================================================= */
 async function setupScratchpadCloud(id) {
     const pad = document.getElementById(id);
     if (!pad) return;
 
-    // Fetch from Supabase
-    const { data, error } = await supabaseClient
+    const { data } = await supabaseClient
         .from('scratchpad')
         .select('content')
         .eq('user_id', currentUser.id)
@@ -308,7 +316,6 @@ async function setupScratchpadCloud(id) {
         pad.innerHTML = data.content || '';
     }
 
-    // Save to Supabase on input (with debounce)
     let timeoutId;
     pad.addEventListener('input', () => {
         clearTimeout(timeoutId);
@@ -320,7 +327,6 @@ async function setupScratchpadCloud(id) {
         }, 800);
     });
 
-    // Handle clicks on links to open in a new tab
     pad.addEventListener('click', (e) => {
         const anchor = e.target.closest('a');
         if (anchor && anchor.href) { 
@@ -329,7 +335,6 @@ async function setupScratchpadCloud(id) {
         }
     });
 
-    // Auto-link on Paste
     pad.addEventListener('paste', (e) => {
         e.preventDefault();
         const text = e.clipboardData.getData('text/plain');
@@ -344,7 +349,6 @@ async function setupScratchpadCloud(id) {
         pad.dispatchEvent(new Event('input'));
     });
 
-    // Auto-link when typing a URL followed by Space or Enter
     pad.addEventListener('keydown', (e) => {
         if (e.key === ' ' || e.key === 'Enter') {
             const sel = window.getSelection();
@@ -390,7 +394,6 @@ async function setupScratchpadCloud(id) {
     });
 }
 
-// Robust helper to insert HTML/nodes at the current cursor position
 function insertHtmlAtCursor(html) {
     const sel = window.getSelection();
     if (sel.getRangeAt && sel.rangeCount) {
@@ -416,14 +419,14 @@ function insertHtmlAtCursor(html) {
 function addLink(id) {
     const pad = document.getElementById(id);
     if (!pad) return;
-    pad.focus(); // Ensure scratchpad maintains focus
+    pad.focus(); 
     
     const url = prompt("Enter URL:");
     if (!url) return;
     const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
     
     insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
-    pad.dispatchEvent(new Event('input')); // trigger auto-save
+    pad.dispatchEvent(new Event('input')); 
 }
 
 function triggerImageUpload(id) { 
@@ -437,9 +440,9 @@ function handleFileSelect(event, id) {
         const reader = new FileReader();
         reader.onload = function(e) {
             if (pad) {
-                pad.focus(); // Restore focus to scratchpad
+                pad.focus(); 
                 insertHtmlAtCursor(`<img src="${e.target.result}" alt="Uploaded Image">`);
-                pad.dispatchEvent(new Event('input')); // trigger auto-save
+                pad.dispatchEvent(new Event('input')); 
             }
         };
         reader.readAsDataURL(file);
@@ -447,8 +450,9 @@ function handleFileSelect(event, id) {
     event.target.value = '';
 }
 
+
 /* =========================================================================
-   4. SPACE NEWS (Unchanged)
+   4. SPACE NEWS LOGIC
    ========================================================================= */
 async function loadSpaceNews() {
     const container = document.getElementById('space-news-container');
@@ -477,10 +481,11 @@ async function loadSpaceNews() {
     }
 }
 
+
 /* =========================================================================
-   5. INIT EVENT LISTENERS
+   5. UI EVENT LISTENERS INITIALIZATION
    ========================================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+function initEventListeners() {
     const form = document.getElementById('task-form');
     if (form) {
         form.addEventListener('submit', async (e) => {
@@ -532,4 +537,4 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTasks();
         });
     }
-});
+}

@@ -6,6 +6,7 @@
     <title>Elytra Models Hub - My Control Center</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="icon" type="image/svg+xml" href="../images/dcc_icon.svg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Page-specific grid and layout adjustments */
         .addon-focus-grid {
@@ -56,7 +57,6 @@
     <!-- Standardized Global Header & Navigation -->
     <header>
         <h1>Elytra Models Hub</h1>
-        <p>Custom models, workflow tracking, and focus tools for Minecraft Bedrock.</p>
         <nav class="site-nav">
             <a href="../index.html">Home</a>
             <a href="../snippets.html">Snippets</a>
@@ -65,6 +65,12 @@
             <a href="../inspiration.html">Inspiration</a>
             <a href="../ideas.html">Ideas</a>
         </nav>
+        
+        <!-- Reusable Header User Widget (Paste into all tabs) -->
+        <div id="logout-container" class="header-user-widget" style="display: none;">
+            <span id="user-display" class="user-email"></span>
+            <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
+        </div>
     </header>
 
     <!-- Centered Main Content Grid -->

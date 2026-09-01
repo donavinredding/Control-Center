@@ -63,7 +63,7 @@
             <a href="inspiration.html">Inspiration</a>
             <a href="ideas.html">Ideas</a>
             <a href="finance.html">Finance</a>
-            <a href="planner.html" class="active">Planner</a>
+            <a href="planner.html" class="active">Web Planner</a>
         </nav>
 
         <div id="logout-container" class="header-user-widget" style="display: none;">
@@ -71,6 +71,21 @@
             <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
         </div>
     </header>
+
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container-wrapper" style="display: none;">
+        <section class="card auth-card-box">
+            <h2>🔐 Control Center Access</h2>
+            <div class="auth-form-group">
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email address..." required autocomplete="email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password..." required autocomplete="current-password">
+                <div class="auth-buttons-row">
+                    <button type="button" class="auth-btn login-btn" onclick="handleLogin()">Login</button>
+                </div>
+                <div id="auth-error" class="auth-error-msg"></div>
+            </div>
+        </section>
+    </div>
 
     <main class="planner-container" style="margin-top: 2rem; margin-bottom: 2rem;">
         <!-- Questionnaire Section -->
@@ -189,50 +204,20 @@
     </main>
 
     <footer>
-        <p>© 2026 My Control Center</p>
+        <p>&copy; 2026 My Control Center</p>
     </footer>
 
-    <!-- Script to handle prompt generation and copying safely -->
+    <!-- Script to handle planner prompt generation and copying -->
     <script>
-        const SUPABASE_URL = 'https://gxlpmwepweujpbumyqvb.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
-
-        let supabaseClient = null;
-        let currentUser = null;
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Safely initialize Supabase client after DOM loads
-            if (window.supabase) {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                try {
-                    const { data: { session } } = await supabaseClient.auth.getSession();
-                    if (session) {
-                        currentUser = session.user;
-                        document.getElementById('logout-container').style.display = 'block';
-                        document.getElementById('user-display').textContent = currentUser.email;
-                    }
-                } catch (e) {
-                    console.error('Auth session error:', e);
-                }
-            }
-
-            // Bind input changes to update prompt generator dynamically
+        document.addEventListener('DOMContentLoaded', () => {
             const formElements = document.querySelectorAll('#planner-form input, #planner-form select, #planner-form textarea');
             formElements.forEach(element => {
                 element.addEventListener('input', updateAiPrompt);
                 element.addEventListener('change', updateAiPrompt);
             });
 
-            // Run immediately to populate default text
             updateAiPrompt();
         });
-
-        async function handleLogout() {
-            if (supabaseClient) {
-                await supabaseClient.auth.signOut();
-            }
-            location.href = 'index.html';
-        }
 
         function updateAiPrompt() {
             const projectName = document.getElementById('q-name').value.trim() || '[Your Project Name]';
@@ -282,6 +267,7 @@ Please provide clean, semantic HTML, modern responsive CSS (ensuring it fits all
             });
         }
     </script>
+    <script src="script.js"></script>
 </body>
 
 </html>
