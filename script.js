@@ -51,22 +51,21 @@ async function handleLogout() {
     location.reload();
 }
 async function handleLogout() {
-    // Mobile-friendly native confirmation popup
-    const isConfirmed = window.confirm("Are you sure you want to log out?");
+    // Triggers a native confirmation prompt across both browsers and APK WebViews
+    const isConfirmed = window.confirm("Are you sure you want to log out of your Control Center?");
     
-    if (!isConfirmed) {
-        return; // Stops execution if the user taps "Cancel"
-    }
-
-    // Your existing Supabase logout code (keep whatever you currently have here)
-    try {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-        
-        // Refresh or redirect to trigger the login screen
-        window.location.reload();
-    } catch (error) {
-        console.error("Error logging out:", error.message);
+    if (isConfirmed) {
+        try {
+            // Supabase sign-out call
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            
+            // Reload the page to clear state and reveal the login screen
+            window.location.reload();
+        } catch (error) {
+            console.error("Error logging out:", error.message);
+            alert("Failed to log out. Please check your connection and try again.");
+        }
     }
 }
 
