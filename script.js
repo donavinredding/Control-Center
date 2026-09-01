@@ -20,11 +20,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: { session } } = await supabaseClient.auth.getSession();
     
     if (!session) {
-        document.getElementById('auth-container').style.display = 'block';
-        const hubGrid = document.querySelector('.hub-grid');
-        if (hubGrid) hubGrid.style.display = 'none';
+        // Show login container
+        const authContainer = document.getElementById('auth-container');
+        if (authContainer) authContainer.style.display = 'block';
+        
+        // Universally hide the main content across all pages
+        const mainContent = document.querySelector('main');
+        if (mainContent) mainContent.style.display = 'none';
+        
+        // Hide navigation and logout widget
         const siteNav = document.querySelector('.site-nav');
         if (siteNav) siteNav.style.display = 'none';
+        
+        const logoutContainer = document.getElementById('logout-container');
+        if (logoutContainer) logoutContainer.style.display = 'none';
     } else {
         currentUser = session.user;
         initDashboard();
@@ -46,26 +55,35 @@ async function handleLogin() {
     }
 }
 
-async function handleLogout() {
-    await supabaseClient.auth.signOut();
-    location.reload();
-}
-async function handleLogout() {
-    // Triggers a native confirmation prompt across both browsers and APK WebViews
-    const isConfirmed = window.confirm("Are you sure you want to log out of your Control Center?");
-    
-    if (isConfirmed) {
-        try {
-            // Supabase sign-out call
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-            
-            // Reload the page to clear state and reveal the login screen
-            window.location.reload();
-        } catch (error) {
-            console.error("Error logging out:", error.message);
-            alert("Failed to log out. Please check your connection and try again.");
+// Opens the custom logout confirmation modal (APK friendly)
+function handleLogout() {
+    const modal = document.getElementById('logout-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        if (window.confirm("Are you sure you want to log out of your Control Center?")) {
+            confirmLogout();
         }
+    }
+}
+
+// Closes the custom logout modal
+function closeLogoutModal() {
+    const modal = document.getElementById('logout-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Executes the actual Supabase sign-out
+async function confirmLogout() {
+    try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+        window.location.reload();
+    } catch (error) {
+        console.error("Error logging out:", error.message);
+        alert("Failed to log out. Please check your connection and try again.");
     }
 }
 
@@ -79,21 +97,30 @@ function setupAuthUIEvents() {
 }
 
 async function initDashboard() {
-    document.getElementById('auth-container').style.display = 'none';
+    const authContainer = document.getElementById('auth-container');
+    if (authContainer) authContainer.style.display = 'none';
+
+    // Show main content and layouts when logged in
+    const mainContent = document.querySelector('main');
+    if (mainContent) mainContent.style.display = ''; // resets to default CSS display
+
     const hubGrid = document.querySelector('.hub-grid');
-    const siteNav = document.querySelector('.site-nav');
-    const logoutContainer = document.getElementById('logout-container');
-    const userDisplay = document.getElementById('user-display');
-
     if (hubGrid) hubGrid.style.display = 'grid';
-    if (siteNav) siteNav.style.display = ''; 
-    if (logoutContainer) logoutContainer.style.display = 'block';
-    if (userDisplay) userDisplay.textContent = currentUser.email;
 
-    await fetchTasksFromCloud();
-    loadLatestVideos();
-    loadSpaceNews();
-    setupScratchpadCloud('scratchpad');
+    const siteNav = document.querySelector('.site-nav');
+    if (siteNav) siteNav.style.display = ''; 
+
+    const logoutContainer = document.getElementById('logout-container');
+    if (logoutContainer) logoutContainer.style.display = 'block';
+    
+    const userDisplay = document.getElementById('user-display');
+    if (userDisplay && currentUser) userDisplay.textContent = currentUser.email;
+
+    // Optional safe calls if functions exist on the current page
+    if (typeof fetchTasksFromCloud === 'function') await fetchTasksFromCloud();
+    if (typeof loadLatestVideos === 'function') loadLatestVideos();
+    if (typeof loadSpaceNews === 'function') loadSpaceNews();
+    if (typeof setupScratchpadCloud === 'function') setupScratchpadCloud('scratchpad');
 }
 
 
