@@ -439,10 +439,10 @@ if (video) {
 const videoId = video.guid.split(':')[2];
 
 const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-
 const videoDate = new Date(video.pubDate);
 
-const diffDays = Math.floor((new Date() - videoDate) / (1000 * 60 * 60 * 24));
+// FIX APPLIED HERE: Math.max(0, ...) prevents negative day differences
+const diffDays = Math.max(0, Math.floor((new Date() - videoDate) / (1000 * 60 * 60 * 24)));
 
 
 let dateString = diffDays === 0 ? "Today" : diffDays === 1 ? "Yesterday" : `${diffDays} days ago`;
@@ -975,5 +975,4 @@ renderTasks();
 
 }
 
-} 
-
+}
