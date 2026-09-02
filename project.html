@@ -108,6 +108,22 @@
                 <p id="project-description" style="color: #9aa5b1; margin: 0;">Loading description...</p>
             </section>
 
+        <!-- Brain Dump -->
+        <div class="column-right-narrow">
+            <section class="card scratchpad-card">
+                <h2>📝 Brain Dump Scratchpad</h2>
+                <p class="scratchpad-hint">Park random ideas or notes here so you don't lose focus.</p>
+                <div class="scratchpad-container">
+                    <div class="scratchpad-toolbar">
+                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('project-scratchpad')">🔗 Add Link</button>
+                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('project-scratchpad')">📷 Add Image</button>
+                    </div>
+                    <div id="project-scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes here..."></div>
+                    <input type="file" id="file-project-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'project-scratchpad')">
+                </div>
+            </section>
+        </div>
+
             <!-- Kanban Task Board Component -->
             <section class="card kanban-card" id="project-kanban-section">
                 <div class="kanban-header">
@@ -149,22 +165,6 @@
                         <h3>Done 🎉</h3>
                         <div class="task-list" id="done-list"></div>
                     </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Right Column: Brain Dump -->
-        <div class="column-right-narrow">
-            <section class="card scratchpad-card">
-                <h2>📝 Brain Dump Scratchpad</h2>
-                <p class="scratchpad-hint">Park random ideas or notes here so you don't lose focus.</p>
-                <div class="scratchpad-container">
-                    <div class="scratchpad-toolbar">
-                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('project-scratchpad')">🔗 Add Link</button>
-                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('project-scratchpad')">📷 Add Image</button>
-                    </div>
-                    <div id="project-scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes here..."></div>
-                    <input type="file" id="file-project-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'project-scratchpad')">
                 </div>
             </section>
         </div>
