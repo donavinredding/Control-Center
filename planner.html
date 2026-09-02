@@ -230,7 +230,7 @@
             const hostingPlatform = document.getElementById('q-hosting').value;
             const details = document.getElementById('q-details').value.trim() || 'None specified.';
 
-            let promptString = `Act as an expert front-end web developer and UI/UX designer. Please build a fully functional, mobile-friendly website based on the following detailed specifications:
+            let promptString = `Act as an expert front-end web developer and UI/UX designer. Please build a fully responsive, mobile-first, and highly optimized mobile-friendly website based on the following detailed specifications:
 
 - Project Name: ${projectName}
 - Primary Purpose: ${purpose}
@@ -248,7 +248,12 @@
 - Additional Details / Special Requirements:
 ${details}
 
-Please provide clean, semantic HTML, modern responsive CSS (ensuring it fits all mobile viewports cleanly), and any necessary JavaScript logic structured logically to bring this project to life.`;
+CRITICAL MOBILE-FRIENDLY & RESPONSIVE DESIGN REQUIREMENTS:
+1. Must look and function exceptionally well on mobile phones, tablets, and desktop screens.
+2. Implement flexible layouts (using CSS Grid / Flexbox with relative units) and responsive CSS media queries.
+3. Ensure comfortable touch targets for buttons and interactive elements, proper text scaling on small viewports, and zero horizontal overflow or scrolling issues.
+
+Please provide clean, semantic HTML, modern responsive CSS, and any necessary JavaScript logic structured logically to bring this project to life.`;
 
             const outputEl = document.getElementById('ai-prompt-output');
             if (outputEl) {
