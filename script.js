@@ -301,14 +301,14 @@ function renderTasks() {
 
         let moveButtonsHtml = '';
         if (task.status === 'todo') {
-            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')" title="Move to In Progress">➔</button>`;
+            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')" title="Move to In Progress">→ In Progress</button>`;
         } else if (task.status === 'inprogress') {
             moveButtonsHtml = `
-                <button class="task-move-btn" onclick="moveTask('${task.id}', 'todo')" title="Move to To Do">⬅</button>
-                <button class="task-move-btn" onclick="moveTask('${task.id}', 'done')" title="Move to Done">➔</button>
+                <button class="task-move-btn" onclick="moveTask('${task.id}', 'todo')" title="Move to To Do">← To Do</button>
+                <button class="task-move-btn" onclick="moveTask('${task.id}', 'done')" title="Move to Done">→ Done</button>
             `;
         } else if (task.status === 'done') {
-            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')" title="Move to In Progress">⬅</button>`;
+            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')" title="Move to In Progress">← In Progress</button>`;
         }
 
         const isDone = task.status === 'done';
@@ -323,11 +323,11 @@ function renderTasks() {
             <div class="task-meta">
                 <span class="task-tag">${task.energy.toUpperCase()}</span>
                 ${task.time ? `<span class="task-tag">⏱️ ${escapeHtml(task.time)}</span>` : '<span></span>'}
-                <div class="task-actions" style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-left: auto;">
-                    <div class="task-move-group" style="display: flex; gap: 4px;">
+                <div class="task-actions" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px; gap: 8px;">
+                    <div class="task-move-group" style="display: flex; gap: 6px;">
                         ${moveButtonsHtml}
                     </div>
-                    <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; border-radius: 4px; padding: 3px 7px; cursor: pointer;">🗑️</button>
+                    <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255, 77, 77, 0.1); border: 1px solid rgba(255, 77, 77, 0.3); color: #ff4d4d; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.8rem; font-weight: 500;">🗑️ Delete</button>
                 </div>
             </div>
         `;
