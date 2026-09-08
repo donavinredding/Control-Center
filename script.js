@@ -367,11 +367,43 @@ async function toggleTaskComplete(id) {
     }
 }
 
-async function deleteTask(id) {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-        tasks = tasks.filter(t => t.id !== id);
-        await deleteTaskFromCloud(id);
-        renderTasks();
+let taskToDeleteId = null;
+
+function deleteTask(id) {
+    taskToDeleteId = id;
+    let modal = document.getElementById('delete-confirm-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'delete-confirm-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
+        modal.innerHTML = `
+            <div style="background: #1e2530; border: 1px solid rgba(255,255,255,0.1); padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem;">Delete Task?</h3>
+                <p style="color: #a0aec0; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to delete this task?</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="cancel-delete-btn" style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
+                    <button id="confirm-delete-btn" style="background: #ff4d4d; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Delete</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            modal.style.display = 'none';
+            taskToDeleteId = null;
+        });
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (taskToDeleteId) {
+                tasks = tasks.filter(t => t.id !== taskToDeleteId);
+                await deleteTaskFromCloud(taskToDeleteId);
+                renderTasks();
+            }
+            modal.style.display = 'none';
+            taskToDeleteId = null;
+        });
+    } else {
+        modal.style.display = 'flex';
     }
 }
 
