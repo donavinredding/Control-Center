@@ -368,9 +368,11 @@ async function toggleTaskComplete(id) {
 }
 
 async function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    await deleteTaskFromCloud(id);
-    renderTasks();
+    if (window.confirm("Are you sure you want to delete this task?")) {
+        tasks = tasks.filter(t => t.id !== id);
+        await deleteTaskFromCloud(id);
+        renderTasks();
+    }
 }
 
 function escapeHtml(text) {
@@ -959,7 +961,9 @@ const clearDoneBtn = document.getElementById('clear-done-btn');
 
 if (clearDoneBtn) {
 
-clearDoneBtn.addEventListener('clear', async () => {
+clearDoneBtn.addEventListener('click', async () => {
+
+if (window.confirm("Are you sure you want to clear all completed tasks?")) {
 
 const doneTasks = tasks.filter(t => t.status === 'done');
 
@@ -972,6 +976,8 @@ await deleteTaskFromCloud(t.id);
 tasks = tasks.filter(t => t.status !== 'done');
 
 renderTasks();
+
+}
 
 });
 
