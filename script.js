@@ -320,17 +320,15 @@ function renderTasks() {
                     <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${escapeHtml(task.title)}</p>
                 </div>
             </div>
-            <div class="task-meta" style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
-                <div class="task-tags-group" style="display: flex; align-items: center; gap: 10px;">
+            <div class="task-meta" style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="task-tag">${task.energy.toUpperCase()}</span>
                     ${task.time ? `<span class="task-tag">⏱️ ${escapeHtml(task.time)}</span>` : ''}
-                </div>
-                <div class="task-actions" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <div class="task-move-group" style="display: flex; gap: 8px;">
+                    <div style="display: flex; gap: 4px;">
                         ${moveButtonsHtml}
                     </div>
-                    <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255, 77, 77, 0.12); border: 1px solid rgba(255, 77, 77, 0.35); color: #ff4d4d; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.85rem;">🗑️ Delete</button>
                 </div>
+                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255, 77, 77, 0.12); border: 1px solid rgba(255, 77, 77, 0.35); color: #ff4d4d; border-radius: 4px; padding: 3px 8px; cursor: pointer; font-size: 0.85rem; white-space: nowrap;">🗑️ Delete</button>
             </div>
         `;
 
