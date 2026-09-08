@@ -314,14 +314,14 @@ function renderTasks() {
         const isDone = task.status === 'done';
 
         card.innerHTML = `
-            <div class="task-card-header">
-                <div class="task-title-area">
+            <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                <div class="task-title-area" style="display: flex; align-items: center; gap: 8px; flex: 1;">
                     <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskComplete('${task.id}')">
-                    <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${escapeHtml(task.title)}</p>
+                    <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}; margin: 0;">${escapeHtml(task.title)}</p>
                 </div>
+                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: none; border: none; cursor: pointer; opacity: 0.6; font-size: 0.85rem; padding: 0; line-height: 1;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">🗑️</button>
             </div>
-            <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task">🗑️</button>
+            <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px;">
                 <div class="task-info-center" style="display: flex; gap: 6px; align-items: center;">
                     <span class="task-tag">${task.energy.toUpperCase()}</span>
                     ${task.time ? `<span class="task-tag">⏱️ ${escapeHtml(task.time)}</span>` : ''}
@@ -959,7 +959,7 @@ const clearDoneBtn = document.getElementById('clear-done-btn');
 
 if (clearDoneBtn) {
 
-clearDoneBtn.addEventListener('click', async () => {
+clearDoneBtn.addEventListener('clear', async () => {
 
 const doneTasks = tasks.filter(t => t.status === 'done');
 
