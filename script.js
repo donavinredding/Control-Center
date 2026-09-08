@@ -963,8 +963,6 @@ if (clearDoneBtn) {
 
 clearDoneBtn.addEventListener('click', async () => {
 
-if (window.confirm("Are you sure you want to clear all completed tasks?")) {
-
 const doneTasks = tasks.filter(t => t.status === 'done');
 
 for (let t of doneTasks) {
@@ -976,8 +974,6 @@ await deleteTaskFromCloud(t.id);
 tasks = tasks.filter(t => t.status !== 'done');
 
 renderTasks();
-
-}
 
 });
 
