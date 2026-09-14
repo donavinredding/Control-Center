@@ -301,31 +301,33 @@ function renderTasks() {
 
         let moveButtonsHtml = '';
         if (task.status === 'todo') {
-            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')">➔</button>`;
+            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')">➡️</button>`;
         } else if (task.status === 'inprogress') {
             moveButtonsHtml = `
-                <button class="task-move-btn" onclick="moveTask('${task.id}', 'todo')">⬅</button>
-                <button class="task-move-btn" onclick="moveTask('${task.id}', 'done')">➔</button>
+                <button class="task-move-btn" onclick="moveTask('${task.id}', 'todo')">⬅️</button>
+                <button class="task-move-btn" onclick="moveTask('${task.id}', 'done')">➡️</button>
             `;
         } else if (task.status === 'done') {
-            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')">⬅</button>`;
+            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')">⬅️</button>`;
         }
 
         const isDone = task.status === 'done';
 
         card.innerHTML = `
-            <div class="task-card-header">
-                <div class="task-title-area">
+            <div class="task-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                <div class="task-title-area" style="display: flex; align-items: center; gap: 8px; flex: 1;">
                     <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskComplete('${task.id}')">
-                    <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${escapeHtml(task.title)}</p>
+                    <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}; margin: 0;">${escapeHtml(task.title)}</p>
                 </div>
+                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: none; border: none; cursor: pointer; opacity: 0.6; font-size: 0.85rem; padding: 0; line-height: 1;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">🗑️</button>
             </div>
-            <div class="task-meta">
-                <span class="task-tag">${task.energy.toUpperCase()}</span>
-                ${task.time ? `<span class="task-tag">⏱️ ${escapeHtml(task.time)}</span>` : '<span></span>'}
-                <div class="task-actions">
+            <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px;">
+                <div class="task-info-center" style="display: flex; gap: 6px; align-items: center;">
+                    <span class="task-tag">${task.energy.toUpperCase()}</span>
+                    ${task.time ? `<span class="task-tag">⏱️ ${escapeHtml(task.time)}</span>` : ''}
+                </div>
+                <div class="task-actions" style="display: flex; gap: 4px;">
                     ${moveButtonsHtml}
-                    <button class="task-delete-btn" onclick="deleteTask('${task.id}')">🗑️</button>
                 </div>
             </div>
         `;
@@ -365,10 +367,44 @@ async function toggleTaskComplete(id) {
     }
 }
 
-async function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    await deleteTaskFromCloud(id);
-    renderTasks();
+let taskToDeleteId = null;
+
+function deleteTask(id) {
+    taskToDeleteId = id;
+    let modal = document.getElementById('delete-confirm-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'delete-confirm-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
+        modal.innerHTML = `
+            <div style="background: #1e2530; border: 1px solid rgba(255,255,255,0.1); padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem;">Delete Task?</h3>
+                <p style="color: #a0aec0; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to delete this task?</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="cancel-delete-btn" style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
+                    <button id="confirm-delete-btn" style="background: #ff4d4d; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Delete</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            modal.style.display = 'none';
+            taskToDeleteId = null;
+        });
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (taskToDeleteId) {
+                tasks = tasks.filter(t => t.id !== taskToDeleteId);
+                await deleteTaskFromCloud(taskToDeleteId);
+                renderTasks();
+            }
+            modal.style.display = 'none';
+            taskToDeleteId = null;
+        });
+    } else {
+        modal.style.display = 'flex';
+    }
 }
 
 function escapeHtml(text) {
