@@ -798,11 +798,29 @@ pad.dispatchEvent(new Event('input'));
 
 function triggerImageUpload(id) {
     const fileInput = document.getElementById('file-' + id);
+    
+    // Check if the file input exists and we are not in a restricted mobile app environment
     if (fileInput) {
-        fileInput.click();
+        try {
+            fileInput.click();
+        } catch (err) {
+            // Fallback for mobile apps where file input is blocked
+            openImagePrompt(id);
+        }
     } else {
-        console.error("Missing hidden file input element: file-" + id);
-        alert("Error: Could not find file input element with ID 'file-" + id + "'. Make sure it exists in your HTML.");
+        openImagePrompt(id);
+    }
+}
+
+function openImagePrompt(id) {
+    const imageUrl = prompt("Enter Image URL (or local file path):");
+    if (imageUrl && imageUrl.trim() !== "") {
+        const pad = document.getElementById(id);
+        if (pad) {
+            pad.focus();
+            insertHtmlAtCursor(`<img src="${imageUrl.trim()} " alt="Uploaded Image" style="max-width: 100%; height: auto;">`);
+            pad.dispatchEvent(new Event('input'));
+        }
     }
 }
 
