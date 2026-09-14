@@ -761,9 +761,13 @@ pad.dispatchEvent(new Event('input'));
 
 
 function triggerImageUpload(id) {
-
-document.getElementById('file-' + id).click();
-
+    const fileInput = document.getElementById('file-' + id);
+    if (fileInput) {
+        fileInput.click();
+    } else {
+        console.error("Missing hidden file input element: file-" + id);
+        alert("Error: Could not find file input element with ID 'file-" + id + "'. Make sure it exists in your HTML.");
+    }
 }
 
 
