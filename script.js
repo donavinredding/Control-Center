@@ -209,7 +209,7 @@ function renderTasks() {
                 </div>
                 <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2); border-radius: 6px; color: #ff4d4d; cursor: pointer; font-size: 0.85rem; padding: 5px 8px; line-height: 1;" onmouseover="this.style.background='rgba(255,77,77,0.2)'" onmouseout="this.style.background='rgba(255,77,77,0.1)'">🗑️</button>
             </div>
-            <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 12px;">
+            <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 2px;">
                 <div class="task-info-center" style="display: flex; gap: 6px; align-items: center;">
                     <span class="task-tag">${task.energy.toUpperCase()}</span>
                     ${task.time ? `<span class="task-tag">⏱️ ${escapeHtml(task.time)}</span>` : ''}
