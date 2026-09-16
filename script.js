@@ -1,272 +1,156 @@
 /* =========================================================================
-
-SUPABASE INITIALIZATION
-
-========================================================================= */
+   SUPABASE INITIALIZATION
+   ========================================================================= */
 
 const SUPABASE_URL = 'https://gxlpmwepweujpbumyqvb.supabase.co';
-
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bHBtd2Vwd2V1anBidW15cXZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4NDQ0MTQsImV4cCI6MjEwMzQyMDQxNH0.adwwoQTQ4B1iSUJeTpP1D3FPee0yRdCx_vlwqDGwim0';
-
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-
-
 let currentUser = null;
-
-const isAddonPage = window.location.pathname.includes('addon.html');
-
-
-
 let tasks = [];
-
 let focusModeActive = false;
-
 let currentEnergyFilter = 'all';
 
-
-
-
-
 /* =========================================================================
-
-AUTHENTICATION & INITIALIZATION
-
-========================================================================= */
-
-document.addEventListener('DOMContentLoaded', async () => {
-
-const { data: { session } } = await supabaseClient.auth.getSession();
-
-
-if (!session) {
-
-// Show login container
-
-const authContainer = document.getElementById('auth-container');
-
-if (authContainer) authContainer.style.display = 'block';
-
-
-// Universally hide the main content across all pages
-
-const mainContent = document.querySelector('main');
-
-if (mainContent) mainContent.style.display = 'none';
-
-
-// Hide navigation and logout widget
-
-const siteNav = document.querySelector('.site-nav');
-
-if (siteNav) siteNav.style.display = 'none';
-
-
-const logoutContainer = document.getElementById('logout-container');
-
-if (logoutContainer) logoutContainer.style.display = 'none';
-
-} else {
-
-currentUser = session.user;
-
-initDashboard();
-
+   HELPER: Get Unique Project ID based on current HTML filename
+   ========================================================================= */
+function getCurrentProjectId() {
+    const path = window.location.pathname;
+    const filename = path.substring(path.lastIndexOf('/') + 1);
+    if (!filename || filename === '' || filename === 'index.html') {
+        return 'main';
+    }
+    return filename.replace('.html', '');
 }
 
 
+/* =========================================================================
+   AUTHENTICATION & INITIALIZATION
+   ========================================================================= */
+document.addEventListener('DOMContentLoaded', async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
 
-setupAuthUIEvents();
+    if (!session) {
+        const authContainer = document.getElementById('auth-container');
+        if (authContainer) authContainer.style.display = 'block';
 
-initEventListeners();
+        const mainContent = document.querySelector('main');
+        if (mainContent) mainContent.style.display = 'none';
 
+        const siteNav = document.querySelector('.site-nav');
+        if (siteNav) siteNav.style.display = 'none';
+
+        const logoutContainer = document.getElementById('logout-container');
+        if (logoutContainer) logoutContainer.style.display = 'none';
+    } else {
+        currentUser = session.user;
+        initDashboard();
+    }
+
+    setupAuthUIEvents();
+    initEventListeners();
 });
 
-
-
 async function handleLogin() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-const email = document.getElementById('auth-email').value;
-
-const password = document.getElementById('auth-password').value;
-
-const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-
-if (error) {
-
-document.getElementById('auth-error').textContent = error.message;
-
-} else {
-
-location.reload();
-
+    if (error) {
+        document.getElementById('auth-error').textContent = error.message;
+    } else {
+        location.reload();
+    }
 }
-
-}
-
-
-
-// Opens the custom logout confirmation modal (APK friendly)
 
 function handleLogout() {
-
-const modal = document.getElementById('logout-modal');
-
-if (modal) {
-
-modal.style.display = 'flex';
-
-} else {
-
-if (window.confirm("Are you sure you want to log out of your Control Center?")) {
-
-confirmLogout();
-
+    const modal = document.getElementById('logout-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        if (window.confirm("Are you sure you want to log out of your Control Center?")) {
+            confirmLogout();
+        }
+    }
 }
-
-}
-
-}
-
-
-
-// Closes the custom logout modal
 
 function closeLogoutModal() {
-
-const modal = document.getElementById('logout-modal');
-
-if (modal) {
-
-modal.style.display = 'none';
-
+    const modal = document.getElementById('logout-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
-
-}
-
-
-
-// Executes the actual Supabase sign-out
 
 async function confirmLogout() {
-
-try {
-
-const { error } = await supabaseClient.auth.signOut();
-
-if (error) throw error;
-
-window.location.reload();
-
-} catch (error) {
-
-console.error("Error logging out:", error.message);
-
-alert("Failed to log out. Please check your connection and try again.");
-
+    try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+        window.location.reload();
+    } catch (error) {
+        console.error("Error logging out:", error.message);
+        alert("Failed to log out. Please check your connection and try again.");
+    }
 }
-
-}
-
-
 
 function setupAuthUIEvents() {
-
-if (currentUser) {
-
-const logoutContainer = document.getElementById('logout-container');
-
-const userDisplay = document.getElementById('user-display');
-
-if (logoutContainer) logoutContainer.style.display = 'block';
-
-if (userDisplay) userDisplay.textContent = currentUser.email;
-
+    if (currentUser) {
+        const logoutContainer = document.getElementById('logout-container');
+        const userDisplay = document.getElementById('user-display');
+        if (logoutContainer) logoutContainer.style.display = 'block';
+        if (userDisplay) userDisplay.textContent = currentUser.email;
+    }
 }
-
-}
-
-
 
 async function initDashboard() {
+    const authContainer = document.getElementById('auth-container');
+    if (authContainer) authContainer.style.display = 'none';
 
-const authContainer = document.getElementById('auth-container');
+    const mainContent = document.querySelector('main');
+    if (mainContent) mainContent.style.display = '';
 
-if (authContainer) authContainer.style.display = 'none';
+    const hubGrid = document.querySelector('.hub-grid');
+    if (hubGrid) hubGrid.style.display = 'grid';
 
+    const siteNav = document.querySelector('.site-nav');
+    if (siteNav) siteNav.style.display = '';
 
+    const logoutContainer = document.getElementById('logout-container');
+    if (logoutContainer) logoutContainer.style.display = 'block';
 
-// Show main content and layouts when logged in
+    const userDisplay = document.getElementById('user-display');
+    if (userDisplay && currentUser) userDisplay.textContent = currentUser.email;
 
-const mainContent = document.querySelector('main');
-
-if (mainContent) mainContent.style.display = ''; // resets to default CSS display
-
-
-
-const hubGrid = document.querySelector('.hub-grid');
-
-if (hubGrid) hubGrid.style.display = 'grid';
-
-
-
-const siteNav = document.querySelector('.site-nav');
-
-if (siteNav) siteNav.style.display = '';
-
-
-
-const logoutContainer = document.getElementById('logout-container');
-
-if (logoutContainer) logoutContainer.style.display = 'block';
-
-
-const userDisplay = document.getElementById('user-display');
-
-if (userDisplay && currentUser) userDisplay.textContent = currentUser.email;
-
-
-
-// Optional safe calls if functions exist on the current page
-
-if (typeof fetchTasksFromCloud === 'function') await fetchTasksFromCloud();
-
-if (typeof loadLatestVideos === 'function') loadLatestVideos();
-
-if (typeof loadSpaceNews === 'function') loadSpaceNews();
-
-if (typeof setupScratchpadCloud === 'function') setupScratchpadCloud('scratchpad');
-if (typeof setupIdeasCloud === 'function') setupIdeasCloud();
-
+    if (typeof fetchTasksFromCloud === 'function') await fetchTasksFromCloud();
+    if (typeof loadLatestVideos === 'function') loadLatestVideos();
+    if (typeof loadSpaceNews === 'function') loadSpaceNews();
+    if (typeof setupScratchpadCloud === 'function') setupScratchpadCloud('scratchpad');
+    if (typeof setupIdeasCloud === 'function') setupIdeasCloud();
 }
-
-
-
 
 
 /* =========================================================================
-   1. KANBAN TASK BOARD LOGIC (Cloud Synchronized)
+   1. KANBAN TASK BOARD LOGIC (Cloud Synchronized & Page Isolated)
    ========================================================================= */
 async function fetchTasksFromCloud() {
+    const projectId = getCurrentProjectId();
     const { data, error } = await supabaseClient
         .from('tasks')
         .select('*')
-        .eq('user_id', currentUser.id);
+        .eq('user_id', currentUser.id)
+        .eq('project_id', projectId);
 
     if (error) {
         console.error('Error fetching tasks:', error);
         return;
     }
 
-    if (data && data.length > 0) {
-        tasks = data;
-    }
+    tasks = data || [];
     renderTasks();
 }
 
 async function saveTaskToCloud(task) {
     task.user_id = currentUser.id;
+    task.project_id = getCurrentProjectId();
     await supabaseClient.from('tasks').upsert(task);
 }
 
@@ -290,6 +174,9 @@ function renderTasks() {
         return task.energy === currentEnergyFilter;
     });
 
+    // Style definition for the larger box button
+    const boxBtnStyle = "background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s;";
+
     visibleTasks.forEach(task => {
         const card = document.createElement('div');
         card.className = `task-card energy-${task.energy}`;
@@ -302,14 +189,14 @@ function renderTasks() {
 
         let moveButtonsHtml = '';
         if (task.status === 'todo') {
-            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')">➡️</button>`;
+            moveButtonsHtml = `<button class="task-move-btn" style="${boxBtnStyle}" onclick="moveTask('${task.id}', 'inprogress')" title="Move to In Progress">➡️</button>`;
         } else if (task.status === 'inprogress') {
             moveButtonsHtml = `
-                <button class="task-move-btn" onclick="moveTask('${task.id}', 'todo')">⬅️</button>
-                <button class="task-move-btn" onclick="moveTask('${task.id}', 'done')">➡️</button>
+                <button class="task-move-btn" style="${boxBtnStyle}" onclick="moveTask('${task.id}', 'todo')" title="Move to To Do">⬅️</button>
+                <button class="task-move-btn" style="${boxBtnStyle}" onclick="moveTask('${task.id}', 'done')" title="Move to Done">➡️</button>
             `;
         } else if (task.status === 'done') {
-            moveButtonsHtml = `<button class="task-move-btn" onclick="moveTask('${task.id}', 'inprogress')">⬅️</button>`;
+            moveButtonsHtml = `<button class="task-move-btn" style="${boxBtnStyle}" onclick="moveTask('${task.id}', 'inprogress')" title="Move to In Progress">⬅️</button>`;
         }
 
         const isDone = task.status === 'done';
@@ -320,14 +207,14 @@ function renderTasks() {
                     <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskComplete('${task.id}')">
                     <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}; margin: 0;">${escapeHtml(task.title)}</p>
                 </div>
-                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: none; border: none; cursor: pointer; opacity: 0.6; font-size: 0.85rem; padding: 0; line-height: 1;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">🗑️</button>
+                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2); border-radius: 6px; color: #ff4d4d; cursor: pointer; font-size: 0.85rem; padding: 5px 8px; line-height: 1;" onmouseover="this.style.background='rgba(255,77,77,0.2)'" onmouseout="this.style.background='rgba(255,77,77,0.1)'">🗑️</button>
             </div>
-            <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 10px;">
+            <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 12px;">
                 <div class="task-info-center" style="display: flex; gap: 6px; align-items: center;">
                     <span class="task-tag">${task.energy.toUpperCase()}</span>
                     ${task.time ? `<span class="task-tag">⏱️ ${escapeHtml(task.time)}</span>` : ''}
                 </div>
-                <div class="task-actions" style="display: flex; gap: 4px;">
+                <div class="task-actions" style="display: flex; gap: 6px;">
                     ${moveButtonsHtml}
                 </div>
             </div>
@@ -415,327 +302,176 @@ function escapeHtml(text) {
 
 
 /* =========================================================================
-
-2. YOUTUBE FEED LOGIC
-
-========================================================================= */
-
+   2. YOUTUBE FEED LOGIC
+   ========================================================================= */
 const creators = [
-
-{ name: "MrBeast", channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA" },
-
-{ name: "Beast Gaming", channelId: "UCIPPMRA040LQr5QPyJEbmXA" },
-
-{ name: "Beast Philanthropy", channelId: "UCAiLfjNXkNv24uhpzUgPa6A" },
-
-{ name: "Ryan Trahan", channelId: "UCnmGIkw-KdI0W5siakKPKog" },
-
-{ name: "StarTalk", channelId: "UCqoAEDirJPjEUFcF2FklnBA" },
-
-{ name: "Mumbo Jumbo", channelId: "UChFur_NwVSbUozOcF_F2kMg" },
-
-{ name: "Coridor Crew", channelId: "UCSpFnDQr88xCZ80N-X7t0nQ" },
-
-{ name: "Dylan Page", channelId: "UCzPpbeK8ANcNKg5aoMB0miw" }
-
+    { name: "MrBeast", channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA" },
+    { name: "Beast Gaming", channelId: "UCIPPMRA040LQr5QPyJEbmXA" },
+    { name: "Beast Philanthropy", channelId: "UCAiLfjNXkNv24uhpzUgPa6A" },
+    { name: "Ryan Trahan", channelId: "UCnmGIkw-KdI0W5siakKPKog" },
+    { name: "StarTalk", channelId: "UCqoAEDirJPjEUFcF2FklnBA" },
+    { name: "Mumbo Jumbo", channelId: "UChFur_NwVSbUozOcF_F2kMg" },
+    { name: "Coridor Crew", channelId: "UCSpFnDQr88xCZ80N-X7t0nQ" },
+    { name: "Dylan Page", channelId: "UCzPpbeK8ANcNKg5aoMB0miw" }
 ];
 
-
-
 async function loadLatestVideos() {
+    const container = document.getElementById('youtube-feed-container');
+    if (!container) return;
 
-const container = document.getElementById('youtube-feed-container');
+    container.innerHTML = 'Loading YouTube feed...';
+    let allVideos = [];
 
-if (!container) return;
+    for (const creator of creators) {
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.youtube.com%2Ffeeds%2Fvideos.xml%3Fchannel_id%3D${creator.channelId}`;
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
 
+            if (data.status === 'ok' && data.items && data.items.length > 0) {
+                const video = data.items.find(item => !item.link.includes('/shorts/'));
+                if (video) {
+                    const videoId = video.guid.split(':')[2];
+                    const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                    const videoDate = new Date(video.pubDate);
+                    const diffDays = Math.max(0, Math.floor((new Date() - videoDate) / (1000 * 60 * 60 * 24)));
 
+                    let dateString = diffDays === 0 ? "Today" : diffDays === 1 ? "Yesterday" : `${diffDays} days ago`;
+                    if (diffDays > 29) dateString = `${Math.floor(diffDays / 30)} months ago`;
 
-container.innerHTML = 'Loading YouTube feed...';
+                    allVideos.push({
+                        title: video.title,
+                        link: video.link,
+                        thumbUrl: thumbUrl,
+                        pubDate: videoDate,
+                        dateString: dateString,
+                        creatorName: creator.name
+                    });
+                }
+            }
+        } catch (error) { console.error("Failed to load:", creator.name); }
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
 
-let allVideos = [];
+    allVideos.sort((a, b) => b.pubDate - a.pubDate);
+    container.innerHTML = allVideos.length === 0 ? '<p>No videos found.</p>' : '';
 
-
-
-for (const creator of creators) {
-
-const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.youtube.com%2Ffeeds%2Fvideos.xml%3Fchannel_id%3D${creator.channelId}`;
-
-try {
-
-const response = await fetch(apiUrl);
-
-const data = await response.json();
-
-
-if (data.status === 'ok' && data.items && data.items.length > 0) {
-
-const video = data.items.find(item => !item.link.includes('/shorts/'));
-
-if (video) {
-
-const videoId = video.guid.split(':')[2];
-
-const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-const videoDate = new Date(video.pubDate);
-
-const diffDays = Math.max(0, Math.floor((new Date() - videoDate) / (1000 * 60 * 60 * 24)));
-
-
-let dateString = diffDays === 0 ? "Today" : diffDays === 1 ? "Yesterday" : `${diffDays} days ago`;
-
-if (diffDays > 29) dateString = `${Math.floor(diffDays / 30)} months ago`;
-
-
-
-allVideos.push({
-
-title: video.title,
-
-link: video.link,
-
-thumbUrl: thumbUrl,
-
-pubDate: videoDate,
-
-dateString: dateString,
-
-creatorName: creator.name
-
-});
-
+    allVideos.forEach(video => {
+        container.innerHTML += `
+            <a href="${video.link}" target="_blank" class="video-button">
+                <img src="${video.thumbUrl}" alt="${video.title}">
+                <span class="video-title">${video.title}</span>
+                <small class="video-date">${video.dateString}</small>
+                <span class="creator-name">${video.creatorName}</span>
+            </a>
+        `;
+    });
 }
-
-}
-
-} catch (error) { console.error("Failed to load:", creator.name); }
-
-await new Promise(resolve => setTimeout(resolve, 300));
-
-}
-
-
-
-allVideos.sort((a, b) => b.pubDate - a.pubDate);
-
-container.innerHTML = allVideos.length === 0 ? '<p>No videos found.</p>' : '';
-
-
-allVideos.forEach(video => {
-
-container.innerHTML += `
-
-<a href="${video.link}" target="_blank" class="video-button">
-
-<img src="${video.thumbUrl}" alt="${video.title}">
-
-<span class="video-title">${video.title}</span>
-
-<small class="video-date">${video.dateString}</small>
-
-<span class="creator-name">${video.creatorName}</span>
-
-</a>
-
-`;
-
-});
-
-}
-
-
-
 
 
 /* =========================================================================
-
-3. SCRATCHPAD & IDEAS CLOUD LOGIC
-
-========================================================================= */
-
+   3. SCRATCHPAD & IDEAS CLOUD LOGIC
+   ========================================================================= */
 async function setupScratchpadCloud(id) {
-
-const pad = document.getElementById(id);
-
-if (!pad) return;
-
-
-
-const { data } = await supabaseClient
-
-.from('scratchpad')
-
-.select('content')
-
-.eq('user_id', currentUser.id)
-
-.single();
-
-
-
-if (data) {
-
-pad.innerHTML = data.content || '';
-
-}
-
-
-
-let timeoutId;
-
-pad.addEventListener('input', () => {
-
-clearTimeout(timeoutId);
-
-timeoutId = setTimeout(async () => {
-
-await supabaseClient.from('scratchpad').upsert({
-
-user_id: currentUser.id,
-
-content: pad.innerHTML
-
-});
-
-}, 800);
-
-});
-
-
-
-pad.addEventListener('click', (e) => {
-
-const anchor = e.target.closest('a');
-
-if (anchor && anchor.href) {
-
-e.preventDefault();
-
-window.open(anchor.href, '_blank');
-
-}
-
-});
-
-
-
-pad.addEventListener('paste', (e) => {
-
-e.preventDefault();
-
-const text = e.clipboardData.getData('text/plain');
-
-const urlRegex = /^(https?:\/\/[^\s]+|[a-zA-Z0-9][-a-zA-Z0-90-9]*\.[a-zA-Z]{2,}[^\s]*)$/;
-
-
-if (urlRegex.test(text.trim())) {
-
-const cleanUrl = text.trim().startsWith('http') ? text.trim() : 'https://' + text.trim();
-
-insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
-
-} else {
-
-insertHtmlAtCursor(text);
-
-}
-
-pad.dispatchEvent(new Event('input'));
-
-});
-
-
-
-pad.addEventListener('keydown', (e) => {
-
-if (e.key === ' ' || e.key === 'Enter') {
-
-const sel = window.getSelection();
-
-if (sel.rangeCount > 0) {
-
-const range = sel.getRangeAt(0);
-
-const node = range.startContainer;
-
-if (node.nodeType === Node.TEXT_NODE) {
-
-const text = node.textContent;
-
-const words = text.split(/\s+/);
-
-const lastWord = words[words.length - 1];
-
-
-if (lastWord && (lastWord.startsWith('http://') || lastWord.startsWith('https://') || (lastWord.includes('.') && !lastWord.endsWith('.')))) {
-
-const cleanUrl = lastWord.startsWith('http') ? lastWord : 'https://' + lastWord;
-
-const leadingText = text.substring(0, text.length - lastWord.length);
-
-
-const span = document.createElement('span');
-
-span.textContent = leadingText;
-
-
-const a = document.createElement('a');
-
-a.href = cleanUrl;
-
-a.textContent = lastWord;
-
-a.target = '_blank';
-
-
-const parent = node.parentNode;
-
-parent.insertBefore(span, node);
-
-parent.insertBefore(a, node);
-
-
-const spaceNode = document.createTextNode(e.key === ' ' ? ' ' : '\n');
-
-parent.insertBefore(spaceNode, node);
-
-parent.removeChild(node);
-
-
-range.setStartAfter(spaceNode);
-
-range.collapse(true);
-
-sel.removeAllRanges();
-
-sel.addRange(range);
-
-
-e.preventDefault();
-
-pad.dispatchEvent(new Event('input'));
-
-}
-
-}
-
-}
-
-}
-
-});
-
+    const pad = document.getElementById(id);
+    if (!pad) return;
+
+    const { data } = await supabaseClient
+        .from('scratchpad')
+        .select('content')
+        .eq('user_id', currentUser.id)
+        .single();
+
+    if (data) {
+        pad.innerHTML = data.content || '';
+    }
+
+    let timeoutId;
+    pad.addEventListener('input', () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(async () => {
+            await supabaseClient.from('scratchpad').upsert({
+                user_id: currentUser.id,
+                content: pad.innerHTML
+            });
+        }, 800);
+    });
+
+    pad.addEventListener('click', (e) => {
+        const anchor = e.target.closest('a');
+        if (anchor && anchor.href) {
+            e.preventDefault();
+            window.open(anchor.href, '_blank');
+        }
+    });
+
+    pad.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text/plain');
+        const urlRegex = /^(https?:\/\/[^\s]+|[a-zA-Z0-9][-a-zA-Z0-90-9]*\.[a-zA-Z]{2,}[^\s]*)$/;
+
+        if (urlRegex.test(text.trim())) {
+            const cleanUrl = text.trim().startsWith('http') ? text.trim() : 'https://' + text.trim();
+            insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
+        } else {
+            insertHtmlAtCursor(text);
+        }
+        pad.dispatchEvent(new Event('input'));
+    });
+
+    pad.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                const node = range.startContainer;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    const words = text.split(/\s+/);
+                    const lastWord = words[words.length - 1];
+
+                    if (lastWord && (lastWord.startsWith('http://') || lastWord.startsWith('https://') || (lastWord.includes('.') && !lastWord.endsWith('.')))) {
+                        const cleanUrl = lastWord.startsWith('http') ? lastWord : 'https://' + lastWord;
+                        const leadingText = text.substring(0, text.length - lastWord.length);
+
+                        const span = document.createElement('span');
+                        span.textContent = leadingText;
+
+                        const a = document.createElement('a');
+                        a.href = cleanUrl;
+                        a.textContent = lastWord;
+                        a.target = '_blank';
+
+                        const parent = node.parentNode;
+                        parent.insertBefore(span, node);
+                        parent.insertBefore(a, node);
+
+                        const spaceNode = document.createTextNode(e.key === ' ' ? ' ' : '\n');
+                        parent.insertBefore(spaceNode, node);
+                        parent.removeChild(node);
+
+                        range.setStartAfter(spaceNode);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+
+                        e.preventDefault();
+                        pad.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+        }
+    });
 }
 
 async function setupIdeasCloud() {
     const ideaInputs = document.querySelectorAll('.idea-input, .idea-box, textarea.idea, input.idea');
     if (ideaInputs.length === 0) return;
 
-    // Ensure every idea text box/input has a unique ID
     ideaInputs.forEach((el, index) => {
         if (!el.id) el.id = `idea-field-${index}`;
     });
 
-    // Fetch saved ideas dictionary from Supabase
     const { data } = await supabaseClient
         .from('ideas')
         .select('content')
@@ -751,7 +487,6 @@ async function setupIdeasCloud() {
         }
     }
 
-    // Populate fields with saved values
     ideaInputs.forEach(el => {
         if (savedData[el.id] !== undefined) {
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
@@ -762,7 +497,6 @@ async function setupIdeasCloud() {
         }
     });
 
-    // Save changes globally with debounce on input
     let timeoutId;
     ideaInputs.forEach(el => {
         el.addEventListener('input', () => {
@@ -782,79 +516,43 @@ async function setupIdeasCloud() {
     });
 }
 
-
-
 function insertHtmlAtCursor(html) {
-
-const sel = window.getSelection();
-
-if (sel.getRangeAt && sel.rangeCount) {
-
-let range = sel.getRangeAt(0);
-
-range.deleteContents();
-
-let el = document.createElement("div");
-
-el.innerHTML = html;
-
-let frag = document.createDocumentFragment(), node, lastNode;
-
-while ((node = el.firstChild)) {
-
-lastNode = frag.appendChild(node);
-
+    const sel = window.getSelection();
+    if (sel.getRangeAt && sel.rangeCount) {
+        let range = sel.getRangeAt(0);
+        range.deleteContents();
+        let el = document.createElement("div");
+        el.innerHTML = html;
+        let frag = document.createDocumentFragment(), node, lastNode;
+        while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+        }
+        range.insertNode(frag);
+        if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
 }
-
-range.insertNode(frag);
-
-if (lastNode) {
-
-range = range.cloneRange();
-
-range.setStartAfter(lastNode);
-
-range.collapse(true);
-
-sel.removeAllRanges();
-
-sel.addRange(range);
-
-}
-
-}
-
-}
-
-
 
 function addLink(id) {
+    const pad = document.getElementById(id);
+    if (!pad) return;
+    pad.focus();
 
-const pad = document.getElementById(id);
+    const url = prompt("Enter URL:");
+    if (!url) return;
+    const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
 
-if (!pad) return;
-
-pad.focus();
-
-
-const url = prompt("Enter URL:");
-
-if (!url) return;
-
-const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
-
-
-insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
-
-pad.dispatchEvent(new Event('input'));
-
+    insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
+    pad.dispatchEvent(new Event('input'));
 }
-
-
 
 function triggerImageUpload(id) {
     const fileInput = document.getElementById('file-' + id);
-    
     if (fileInput) {
         try {
             fileInput.click();
@@ -878,209 +576,109 @@ function openImagePrompt(id) {
     }
 }
 
-
-
 function handleFileSelect(event, id) {
-
-const pad = document.getElementById(id);
-
-const file = event.target.files[0];
-
-if (file && file.type.startsWith('image/')) {
-
-const reader = new FileReader();
-
-reader.onload = function(e) {
-
-if (pad) {
-
-pad.focus();
-
-insertHtmlAtCursor(`<img src="${e.target.result}" alt="Uploaded Image">`);
-
-pad.dispatchEvent(new Event('input'));
-
+    const pad = document.getElementById(id);
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (pad) {
+                pad.focus();
+                insertHtmlAtCursor(`<img src="${e.target.result}" alt="Uploaded Image">`);
+                pad.dispatchEvent(new Event('input'));
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+    event.target.value = '';
 }
-
-};
-
-reader.readAsDataURL(file);
-
-}
-
-event.target.value = '';
-
-}
-
-
-
 
 
 /* =========================================================================
-
-4. SPACE NEWS LOGIC
-
-========================================================================= */
-
+   4. SPACE NEWS LOGIC
+   ========================================================================= */
 async function loadSpaceNews() {
+    const container = document.getElementById('space-news-container');
+    if (!container) return;
 
-const container = document.getElementById('space-news-container');
-
-if (!container) return;
-
-
-try {
-
-const response = await fetch('https://api.spaceflightnewsapi.net/v4/articles/?limit=6');
-
-const data = await response.json();
-
-if (data.results) {
-
-container.innerHTML = '';
-
-data.results.forEach(article => {
-
-const pubDate = new Date(article.published_at);
-
-container.innerHTML += `
-
-<a href="${article.url}" target="_blank" class="space-news-card">
-
-<img src="${article.image_url}" alt="${article.title}">
-
-<div class="space-news-content">
-
-<span class="space-news-title">${article.title}</span>
-
-<small class="space-news-date">${pubDate.toLocaleDateString()} • ${article.news_site}</small>
-
-</div>
-
-</a>
-
-`;
-
-});
-
+    try {
+        const response = await fetch('https://api.spaceflightnewsapi.net/v4/articles/?limit=6');
+        const data = await response.json();
+        if (data.results) {
+            container.innerHTML = '';
+            data.results.forEach(article => {
+                const pubDate = new Date(article.published_at);
+                container.innerHTML += `
+                    <a href="${article.url}" target="_blank" class="space-news-card">
+                        <img src="${article.image_url}" alt="${article.title}">
+                        <div class="space-news-content">
+                            <span class="space-news-title">${article.title}</span>
+                            <small class="space-news-date">${pubDate.toLocaleDateString()} • ${article.news_site}</small>
+                        </div>
+                    </a>
+                `;
+            });
+        }
+    } catch (error) {
+        container.innerHTML = '<p style="color: red;">Failed to load space news.</p>';
+    }
 }
-
-} catch (error) {
-
-container.innerHTML = '<p style="color: red;">Failed to load space news.</p>';
-
-}
-
-}
-
-
-
 
 
 /* =========================================================================
-
-5. UI EVENT LISTENERS INITIALIZATION
-
-========================================================================= */
-
+   5. UI EVENT LISTENERS INITIALIZATION
+   ========================================================================= */
 function initEventListeners() {
+    const form = document.getElementById('task-form');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newTask = {
+                id: Date.now().toString(),
+                user_id: currentUser ? currentUser.id : null,
+                project_id: getCurrentProjectId(),
+                title: document.getElementById('task-title').value.trim(),
+                status: 'todo',
+                energy: document.getElementById('task-energy').value,
+                time: document.getElementById('task-time').value.trim()
+            };
+            if (newTask.title && newTask.user_id) {
+                tasks.push(newTask);
+                await saveTaskToCloud(newTask);
+                renderTasks();
+                form.reset();
+            }
+        });
+    }
 
-const form = document.getElementById('task-form');
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentEnergyFilter = e.target.dataset.filter;
+            renderTasks();
+        });
+    });
 
-if (form) {
+    const focusBtn = document.getElementById('focus-mode-btn');
+    const kanbanCard = document.querySelector('.kanban-card');
+    if (focusBtn && kanbanCard) {
+        focusBtn.addEventListener('click', () => {
+            focusModeActive = !focusModeActive;
+            kanbanCard.classList.toggle('focus-mode-active', focusModeActive);
+            focusBtn.textContent = focusModeActive ? '🎯 Focus Mode: On' : '🎯 Focus Mode: Off';
+        });
+    }
 
-form.addEventListener('submit', async (e) => {
-
-e.preventDefault();
-
-const newTask = {
-
-id: Date.now().toString(),
-
-user_id: currentUser ? currentUser.id : null,
-
-title: document.getElementById('task-title').value.trim(),
-
-status: 'todo',
-
-energy: document.getElementById('task-energy').value,
-
-time: document.getElementById('task-time').value.trim()
-
-};
-
-if (newTask.title && newTask.user_id) {
-
-tasks.push(newTask);
-
-await saveTaskToCloud(newTask);
-
-renderTasks();
-
-form.reset();
-
-}
-
-});
-
-}
-
-
-
-document.querySelectorAll('.filter-btn').forEach(btn => {
-
-btn.addEventListener('click', (e) => {
-
-document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-
-e.target.classList.add('active');
-
-currentEnergyFilter = e.target.dataset.filter;
-
-renderTasks();
-
-});
-
-});
-
-
-
-const focusBtn = document.getElementById('focus-mode-btn');
-
-const kanbanCard = document.querySelector('.kanban-card');
-
-if (focusBtn && kanbanCard) {
-
-focusBtn.addEventListener('click', () => {
-
-focusModeActive = !focusModeActive;
-
-kanbanCard.classList.toggle('focus-mode-active', focusModeActive);
-
-focusBtn.textContent = focusModeActive ? '🎯 Focus Mode: On' : '🎯 Focus Mode: Off';
-
-});
-
-}
-
-
-
-const clearDoneBtn = document.getElementById('clear-done-btn');
-
-if (clearDoneBtn) {
-
-clearDoneBtn.addEventListener('click', async () => {
-
-const doneTasks = tasks.filter(t => t.status === 'done');
-
-for (let t of doneTasks) {
-
-await deleteTaskFromCloud(t.id);
-
-}
-
-tasks = tasks.filter(t => t.status !== 'done');
-renderTasks();
-});
-}
+    const clearDoneBtn = document.getElementById('clear-done-btn');
+    if (clearDoneBtn) {
+        clearDoneBtn.addEventListener('click', async () => {
+            const doneTasks = tasks.filter(t => t.status === 'done');
+            for (let t of doneTasks) {
+                await deleteTaskFromCloud(t.id);
+            }
+            tasks = tasks.filter(t => t.status !== 'done');
+            renderTasks();
+        });
+    }
 }
