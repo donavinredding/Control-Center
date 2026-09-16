@@ -237,6 +237,7 @@ if (typeof loadLatestVideos === 'function') loadLatestVideos();
 if (typeof loadSpaceNews === 'function') loadSpaceNews();
 
 if (typeof setupScratchpadCloud === 'function') setupScratchpadCloud('scratchpad');
+if (typeof setupIdeasCloud === 'function') setupIdeasCloud();
 
 }
 
@@ -477,7 +478,6 @@ const videoId = video.guid.split(':')[2];
 const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 const videoDate = new Date(video.pubDate);
 
-// FIX APPLIED HERE: Math.max(0, ...) prevents negative day differences
 const diffDays = Math.max(0, Math.floor((new Date() - videoDate) / (1000 * 60 * 60 * 24)));
 
 
@@ -548,7 +548,7 @@ container.innerHTML += `
 
 /* =========================================================================
 
-3. SCRATCHPAD LOGIC
+3. SCRATCHPAD & IDEAS CLOUD LOGIC
 
 ========================================================================= */
 
@@ -726,6 +726,62 @@ pad.dispatchEvent(new Event('input'));
 
 }
 
+async function setupIdeasCloud() {
+    const ideaInputs = document.querySelectorAll('.idea-input, .idea-box, textarea.idea, input.idea');
+    if (ideaInputs.length === 0) return;
+
+    // Ensure every idea text box/input has a unique ID
+    ideaInputs.forEach((el, index) => {
+        if (!el.id) el.id = `idea-field-${index}`;
+    });
+
+    // Fetch saved ideas dictionary from Supabase
+    const { data } = await supabaseClient
+        .from('ideas')
+        .select('content')
+        .eq('user_id', currentUser.id)
+        .single();
+
+    let savedData = {};
+    if (data && data.content) {
+        try {
+            savedData = typeof data.content === 'object' ? data.content : JSON.parse(data.content);
+        } catch (e) {
+            savedData = {};
+        }
+    }
+
+    // Populate fields with saved values
+    ideaInputs.forEach(el => {
+        if (savedData[el.id] !== undefined) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.value = savedData[el.id];
+            } else {
+                el.innerHTML = savedData[el.id];
+            }
+        }
+    });
+
+    // Save changes globally with debounce on input
+    let timeoutId;
+    ideaInputs.forEach(el => {
+        el.addEventListener('input', () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(async () => {
+                const currentValues = {};
+                ideaInputs.forEach(input => {
+                    currentValues[input.id] = (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA') ? input.value : input.innerHTML;
+                });
+
+                await supabaseClient.from('ideas').upsert({
+                    user_id: currentUser.id,
+                    content: currentValues
+                });
+            }, 800);
+        });
+    });
+}
+
 
 
 function insertHtmlAtCursor(html) {
@@ -799,12 +855,10 @@ pad.dispatchEvent(new Event('input'));
 function triggerImageUpload(id) {
     const fileInput = document.getElementById('file-' + id);
     
-    // Check if the file input exists and we are not in a restricted mobile app environment
     if (fileInput) {
         try {
             fileInput.click();
         } catch (err) {
-            // Fallback for mobile apps where file input is blocked
             openImagePrompt(id);
         }
     } else {
@@ -1026,11 +1080,7 @@ await deleteTaskFromCloud(t.id);
 }
 
 tasks = tasks.filter(t => t.status !== 'done');
-
 renderTasks();
-
 });
-
 }
-
 }
