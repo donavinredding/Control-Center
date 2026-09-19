@@ -11,11 +11,23 @@
         .ideas-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            gap: 1.25rem;
+            max-width: 1600px;
+            width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 0.5rem; /* Stretches much closer to the edges on mobile */
+            box-sizing: border-box;
             align-items: start;
+        }
+
+        .ideas-grid .card {
+            background: #313843;
+            padding: 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0px 0px 6px #000000dc;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0;
         }
 
         details.card summary {
@@ -33,7 +45,9 @@
 
         details.card summary h2 {
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
         summary h2 {
@@ -53,8 +67,8 @@
         }
 
         .idea-box {
-            min-height: 200px;
-            max-height: 450px;
+            min-height: 220px;
+            max-height: 700px;
             margin-top: 12px;
             cursor: default;
         }
@@ -105,11 +119,11 @@
     </div>
 
     <!-- Main Content Grid -->
-    <main  class="page-block-layout">
+    <main class="ideas-grid">
         
         <!-- 1. Video Game Concepts -->
         <section class="card">
-            <details open>
+            <details>
                 <summary><h2>🎮 Video Game Concepts</h2></summary>
                 <div class="scratchpad-container" style="margin-top: 15px;">
                     <div class="scratchpad-toolbar">

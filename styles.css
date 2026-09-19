@@ -245,11 +245,11 @@ header {
 .page-block-layout {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem; /* Creates a nice, readable space between cards */
+    gap: 1.5rem;
     width: 100%;
-    max-width: 900px;
+    max-width: 1350px;
     margin: 1.5rem auto;
-    padding: 0 1.5rem;
+    padding: 0 0.75rem; /* Reduced side padding so cards stretch wider on mobile */
     box-sizing: border-box;
 }
 
@@ -805,6 +805,16 @@ textarea:focus {
 }
 
 @media (max-width: 768px) {
+
+    .page-block-layout {
+        padding: 0 0.5rem; /* Even tighter padding on very small screens */
+    }
+    
+    .hub-grid .card,
+    .page-block-layout .card {
+        padding: 1rem 0.85rem; /* Reduce internal card padding slightly to give content more room */
+    }
+
     .hub-grid {
         grid-template-columns: 1fr;
         padding: 0 0.75rem;
