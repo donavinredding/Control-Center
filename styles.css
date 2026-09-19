@@ -245,7 +245,7 @@ header {
 .page-block-layout {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem; /* Change this from 1.5rem/0.75rem down to 0.5rem or 0.25rem */
+    gap: 1.5rem; /* Creates a nice, readable space between cards */
     width: 100%;
     max-width: 900px;
     margin: 1.5rem auto;

@@ -48,7 +48,7 @@
     </div>
 
     <main class="page-block-layout">
-        <im class="card">
+        <div class="card">
             <h2>Design Ideas</h2>
             <p>Collect color palettes, UI inspirations, and references here.</p>
             <img src="https://images.unsplash.com/photo-1614726365930-627c75da663e?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="inspiration-img">
@@ -61,6 +61,7 @@
             <img src="" class="inspiration-img">
             <img src="" class="inspiration-img">
             <!-- Code for Image <img src="" class="inspiration-img"> -->
+        </div>
             
     </main>
 
