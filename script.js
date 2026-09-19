@@ -295,6 +295,42 @@ function deleteTask(id) {
     }
 }
 
+function clearDoneTasks() {
+    let modal = document.getElementById('clear-done-confirm-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'clear-done-confirm-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
+        modal.innerHTML = `
+            <div style="background: #1e2530; border: 1px solid rgba(255,255,255,0.1); padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem;">Clear Done Tasks?</h3>
+                <p style="color: #a0aec0; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to clear all completed tasks?</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="cancel-clear-done-btn" style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
+                    <button id="confirm-clear-done-btn" style="background: #ff4d4d; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Clear</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cancel-clear-done-btn').addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        document.getElementById('confirm-clear-done-btn').addEventListener('click', async () => {
+            const doneTasks = tasks.filter(t => t.status === 'done');
+            for (let t of doneTasks) {
+                await deleteTaskFromCloud(t.id);
+            }
+            tasks = tasks.filter(t => t.status !== 'done');
+            renderTasks();
+            modal.style.display = 'none';
+        });
+    } else {
+        modal.style.display = 'flex';
+    }
+}
+
 function escapeHtml(text) {
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return text.replace(/[&<>"']/g, m => map[m]);
@@ -302,7 +338,7 @@ function escapeHtml(text) {
 
 
 /* =========================================================================
-   2. YOUTUBE FEED LOGIC
+   2. YOUTUBE FEED LOGIC (With Persistent Popup Window PiP)
    ========================================================================= */
 const creators = [
     { name: "MrBeast", channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA" },
@@ -341,7 +377,7 @@ async function loadLatestVideos() {
 
                     allVideos.push({
                         title: video.title,
-                        link: video.link,
+                        videoId: videoId,
                         thumbUrl: thumbUrl,
                         pubDate: videoDate,
                         dateString: dateString,
@@ -357,15 +393,35 @@ async function loadLatestVideos() {
     container.innerHTML = allVideos.length === 0 ? '<p>No videos found.</p>' : '';
 
     allVideos.forEach(video => {
-        container.innerHTML += `
-            <a href="${video.link}" target="_blank" class="video-button">
-                <img src="${video.thumbUrl}" alt="${video.title}">
-                <span class="video-title">${video.title}</span>
-                <small class="video-date">${video.dateString}</small>
-                <span class="creator-name">${video.creatorName}</span>
-            </a>
+        // Create card element with a click trigger for the popup window
+        const card = document.createElement('div');
+        card.className = 'video-button';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+            <img src="${video.thumbUrl}" alt="${escapeHtml(video.title)}">
+            <span class="video-title">${escapeHtml(video.title)}</span>
+            <small class="video-date">${video.dateString}</small>
+            <span class="creator-name">${video.creatorName}</span>
         `;
+        card.addEventListener('click', () => {
+            openPopupPlayer(video.videoId);
+        });
+        container.appendChild(card);
     });
+}
+
+function openPopupPlayer(videoId) {
+    const width = 480;
+    const height = 270;
+    // Calculate position so it pops up nicely in the bottom-right corner of your screen
+    const left = window.screen.width - width - 30;
+    const top = window.screen.height - height - 100;
+    
+    window.open(
+        `https://www.youtube.com/embed/${videoId}?autoplay=1`,
+        'YouTubePiPWindow',
+        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
+    );
 }
 
 
@@ -672,13 +728,11 @@ function initEventListeners() {
 
     const clearDoneBtn = document.getElementById('clear-done-btn');
     if (clearDoneBtn) {
-        clearDoneBtn.addEventListener('click', async () => {
+        clearDoneBtn.addEventListener('click', () => {
             const doneTasks = tasks.filter(t => t.status === 'done');
-            for (let t of doneTasks) {
-                await deleteTaskFromCloud(t.id);
+            if (doneTasks.length > 0) {
+                clearDoneTasks();
             }
-            tasks = tasks.filter(t => t.status !== 'done');
-            renderTasks();
         });
     }
 }

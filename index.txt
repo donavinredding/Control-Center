@@ -1,858 +1,172 @@
-/* =========================================================================
-   GLOBAL STYLES
-   ========================================================================= */
-body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(#515e74, #353e4d);
-    background-color: #353e4d;
-    color: #e3e8ef;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-}
-
-a {
-    color: #61afef;
-}
-
-/* =========================================================================
-   HEADER & USER WIDGET LAYOUT (Centered Brand/Nav, Right-Aligned Logout)
-   ========================================================================= */
-header {
-    background: #181c22;
-    color: #61afef;
-    border: 1px solid #61afef;
-    text-align: center;
-    padding: 0.75rem 1rem;
-    margin: 0 auto;
-    position: relative;
-}
-
-.header-brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-}
-
-.site-icon {
-    object-fit: contain;
-}
-
-.site-nav {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.site-nav a {
-    color: #b0c4de;
-    text-decoration: none;
-    padding: 6px 14px;
-    background: #272e38;
-    border: 1px solid #3f4a5a;
-    border-radius: 4px;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
-.site-nav a:hover, .site-nav a.active {
-    background: #61afef;
-    color: #181c22;
-    border-color: #61afef;
-}
-
-.header-user-widget {
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.85rem;
-}
-
-.user-email {
-    color: #e3e8ef;
-    opacity: 0.85;
-}
-
-.logout-action-btn {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: background 0.2s;
-}
-
-.logout-action-btn:hover {
-    background: rgba(239, 68, 68, 0.25);
-}
-
-/* =========================================================================
-   MOBILE RESPONSIVENESS & CUSTOM LAYOUT ORDER
-   ========================================================================= */
-@media (max-width: 900px) {
-    .hub-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        margin: 1rem auto;
-        padding: 0 0.5rem;
-    }
-
-    .hub-grid > div {
-        display: contents;
-    }
-
-    .kanban-card {
-        order: 1;
-    }
-
-    .column-right .card:nth-child(2) {
-        order: 2;
-    }
-
-    .youtube-section {
-        order: 3;
-    }
-
-    .column-right .card:nth-child(1) {
-        order: 4;
-    }
-
-    .column-center .card:nth-child(2) {
-        order: 5;
-    }
-
-    .column-center .card:nth-child(3) {
-        order: 6;
-    }
-
-    .links-section {
-        order: 7;
-    }
-
-    .kanban-board {
-        grid-template-columns: 1fr;
-    }
-
-    header h1 {
-        font-size: 1.25rem;
-    }
-
-    header {
-        padding: 0.5rem;
-    }
-
-    .card {
-        padding: 1rem;
-    }
-
-    #scratchpad {
-        height: 20rem;
-    }
-}
-
-/* =========================================================================
-   AUTHENTICATION STYLES (Centered Layout)
-   ========================================================================= */
-.auth-container-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: calc(100vh - 140px);
-    padding: 20px;
-    box-sizing: border-box; /* Fixed horizontal overflow */
-}
-
-.auth-card-box {
-    width: 100%;
-    max-width: 420px;
-    text-align: center;
-    margin: 0 auto;
-    box-sizing: border-box;
-}
-
-.auth-card-box h2 {
-    margin-bottom: 8px;
-}
-
-.auth-subtitle {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-bottom: 20px;
-}
-
-.auth-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.auth-input {
-    width: 100%;
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 6px;
-    color: inherit;
-    font-size: 0.95rem;
-    outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.2s;
-}
-
-.auth-input:focus {
-    border-color: #61afef;
-}
-
-.auth-buttons-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 5px;
-}
-
-.auth-btn {
-    flex: 1;
-    padding: 10px 16px;
-    border-radius: 6px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.auth-btn:hover {
-    opacity: 0.9;
-}
-
-.login-btn {
-    background: #4f46e5;
-    color: white;
-}
-
-.signup-btn {
-    background: rgba(255, 255, 255, 0.1);
-    color: inherit;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.auth-error-msg {
-    color: #ef4444;
-    font-size: 0.85rem;
-    min-height: 20px;
-}
-
-/* =========================================================================
-   MAIN GRID & CARDS LAYOUT
-   ========================================================================= */
-.hub-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 0.9fr;
-    gap: 2rem;
-    max-width: none;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    align-items: start;
-}
-
-.column-left, .column-center, .column-right {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.card {
-    background: #313843;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0px 0px 6px #000000dc;
-}
-
-.card h2 {
-    margin-top: 0;
-    color: #f0f4f8;
-    border-bottom: 2px solid #3f4a5a;
-    padding-bottom: 0.5rem;
-}
-
-/* =========================================================================
-   PROJECTS & IMAGES
-   ========================================================================= */
-.project-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    display: inline-block;
-}
-
-.project-image {
-    display: block;
-    width: 95%;
-    max-width: 700px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
-    transition: transform 0.2s;
-    background-color: #272e38;
-    border: solid 1px #272e38;
-    margin: 0px 30px 30px 0;
-}
-
-.project-image:hover {
-    transform: scale(1.02);
-    border: solid 2px #61afef;
-}
-
-/* =========================================================================
-   YOUTUBE FEED
-   ========================================================================= */
-.video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.video-button {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: #e3e8ef;
-    background: #272e38;
-    border: 2px solid #3f4a5a;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
-}
-
-.video-button:hover {
-    transform: scale(1.03);
-    border-color: #61afef;
-}
-
-.video-button img {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-}
-
-.video-button span {
-    padding: 10px;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-
-.video-button .video-date {
-    display: block;
-    color: #9aa5b1;
-    font-size: 0.75rem;
-    padding: 0px 10px 5px 10px;
-    margin: 0;
-}
-
-.video-button .creator-name {
-    margin: 0 0 1px 0;
-    padding: 8px;
-    border-top: solid 1px #3f4a5a;
-}
-
-.video-title {
-    padding: 2px 10px 0px 10px;
-    margin: 0;
-    font-size: 0.85rem;
-    color: #cbd5e0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-}
-
-/* =========================================================================
-   SCRATCHPAD
-   ========================================================================= */
-textarea {
-    width: 100%;
-    height: 150px;
-    background: #272e38;
-    color: #e3e8ef;
-    border: 1px solid #3f4a5a;
-    border-radius: 4px;
-    padding: 10px;
-    resize: vertical;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-textarea:focus {
-    outline: none;
-    border-color: #61afef;
-}
-
-#scratchpad {
-    height: 35rem;
-}
-
-.scratchpad-container {
-    border: 1px solid #3f4a5a;
-    border-radius: 6px;
-    overflow: hidden;
-    background: #272e38;
-}
-
-.scratchpad-toolbar {
-    background: #1e242d;
-    padding: 6px 10px;
-    display: flex;
-    gap: 12px;
-    border-bottom: 1px solid #3f4a5a;
-}
-
-.scratchpad-toolbar button {
-    background: none;
-    border: none;
-    color: #b0c4de;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    transition: color 0.2s, background 0.2s;
-}
-
-.scratchpad-toolbar button:hover {
-    color: #ffffff;
-    background: #313d4f;
-}
-
-.scratchpad-box {
-    width: 100%;
-    min-height: 150px;
-    max-height: 95%;
-    color: #e3e8ef;
-    padding: 12px;
-    overflow-y: auto;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-    outline: none;
-}
-
-.scratchpad-box:focus {
-    background: #232a33;
-}
-
-.file-input {
-    display: none;
-}
-
-.scratchpad-box img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-    margin: 10px 0;
-    display: block;
-}
-
-.scratchpad-box input[type="checkbox"] {
-    margin-right: 6px;
-    accent-color: #61afef;
-    cursor: pointer;
-}
-
-.scratchpad-box a {
-    color: #61afef;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.scratchpad-box a:hover {
-    color: #98c379;
-}
-
-/* =========================================================================
-   KANBAN BOARD COMPONENT
-   ========================================================================= */
-.kanban-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 1rem;
-}
-
-.kanban-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.kanban-action-btn {
-    background: #272e38;
-    border: 1px solid #3f4a5a;
-    color: #e3e8ef;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: background 0.2s, border-color 0.2s;
-}
-
-.kanban-action-btn:hover {
-    background: #313d4f;
-    border-color: #61afef;
-}
-
-.energy-filters {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    background: #272e38;
-    color: #8892b0;
-    border: 1px solid #3f4a5a;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.filter-btn:hover {
-    background: #313d4f;
-    color: #e2e8f0;
-    border-color: #61afef;
-}
-
-.filter-btn.active {
-    background: #61afef;
-    color: #15181e;
-    font-weight: 600;
-    border-color: #61afef;
-    box-shadow: 0 0 10px rgba(97, 175, 239, 0.3);
-}
-
-.task-form {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.task-form input[type="text"], 
-.task-form select {
-    background: #272e38;
-    border: 1px solid #3f4a5a;
-    color: #e3e8ef;
-    padding: 8px 10px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    outline: none;
-}
-
-.task-form input[id="task-title"] {
-    flex: 2;
-    min-width: 120px;
-}
-
-.task-form select {
-    flex: 1;
-}
-
-#task-time {
-    flex: 0.8;
-    min-width: 60px;
-}
-
-#add-task-btn {
-    background: #61afef;
-    color: #181c22;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#add-task-btn:hover {
-    opacity: 0.9;
-}
-
-.kanban-board {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-}
-
-.kanban-column {
-    background: #272e38;
-    border: 1px solid #3f4a5a;
-    border-radius: 6px;
-    padding: 10px;
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-}
-
-.kanban-column h3 {
-    margin-top: 0;
-    font-size: 0.9rem;
-    color: #abb2bf;
-    border-bottom: 1px solid #3f4a5a;
-    padding-bottom: 5px;
-    margin-bottom: 8px;
-}
-
-.task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-grow: 1;
-    min-height: 30px;
-}
-
-.task-card {
-    background: #313843;
-    border: 1px solid #3f4a5a;
-    border-radius: 6px;
-    padding: 8px;
-    cursor: grab;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.task-card:active {
-    cursor: grabbing;
-}
-
-.task-card.energy-low {
-    border-left: 4px solid #98c379;
-}
-
-.task-card.energy-medium {
-    border-left: 4px solid #e5c07b;
-}
-
-.task-card.energy-high {
-    border-left: 4px solid #e06c75;
-}
-
-.task-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-.task-title-area {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    word-break: break-word;
-    flex-grow: 1;
-}
-
-.task-checkbox {
-    cursor: pointer;
-    accent-color: #61afef;
-    width: 14px;
-    height: 14px;
-}
-
-.task-title {
-    font-size: 0.85rem;
-    color: #e3e8ef;
-    margin: 0;
-}
-
-.task-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.7rem;
-    color: #9aa5b1;
-    margin-top: 2px;
-}
-
-.task-tag {
-    background: #1e242d;
-    padding: 2px 5px;
-    border-radius: 3px;
-    border: 1px solid #3f4a5a;
-}
-
-.task-actions {
-    display: flex;
-    gap: 2px;
-}
-
-.task-move-btn, 
-.task-delete-btn {
-    background: none;
-    border: none;
-    color: #9aa5b1;
-    cursor: pointer;
-    font-size: 0.75rem;
-    padding: 2px 4px;
-    border-radius: 3px;
-    transition: color 0.2s, background 0.2s;
-}
-
-.task-move-btn:hover, 
-.task-delete-btn:hover {
-    color: #ffffff;
-    background: #3f4a5a;
-}
-
-/* =========================================================================
-   NEON / GLOW EFFECT FOR HYPERFOCUS SPOTLIGHT MODE
-   ========================================================================= */
-@keyframes neonPulse {
-    0% {
-        box-shadow: 0 0 12px rgba(97, 175, 239, 0.3), inset 0 0 10px rgba(97, 175, 239, 0.05);
-        border-color: #61afef;
-    }
-    50% {
-        box-shadow: 0 0 28px rgba(97, 175, 239, 0.75), inset 0 0 15px rgba(97, 175, 239, 0.2);
-        border-color: #98c379;
-    }
-    100% {
-        box-shadow: 0 0 12px rgba(97, 175, 239, 0.3), inset 0 0 10px rgba(97, 175, 239, 0.05);
-        border-color: #61afef;
-    }
-}
-
-.kanban-card.focus-mode-active {
-    animation: neonPulse 3s infinite ease-in-out;
-    border: 2px solid #61afef;
-}
-
-.kanban-card.focus-mode-active .kanban-column:not([data-column="inprogress"]) {
-    display: none;
-}
-
-.kanban-card.focus-mode-active .kanban-board {
-    grid-template-columns: 1fr;
-}
-
-.kanban-card.focus-mode-active #inprogress-list .task-card:nth-child(n+4) {
-    display: none;
-}
-
-/* =========================================================================
-   SPACE NEWS GRID
-   ========================================================================= */
-#space-news-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-    margin-top: 10px;
-}
-
-.space-news-card {
-    background-color: #1e2630;
-    border: 2px solid #3f4a5a;
-    border-radius: 8px;
-    overflow: hidden;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.space-news-card:hover {
-    transform: scale(1.02);
-    border: solid 2px #61afef;
-}
-
-.space-news-card img {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-}
-
-.space-news-content {
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-grow: 1;
-}
-
-.space-news-title {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #e2e8f0;
-    line-height: 1.2;
-    margin-bottom: 6px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.space-news-date {
-    font-size: 0.75rem;
-    color: #94a3b8;
-}
-
-/* =========================================================================
-   MOBILE RESPONSIVENESS FIXES
-   ========================================================================= */
-@media (max-width: 900px) {
-    .hub-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        margin: 1rem auto;
-        padding: 0 0.5rem;
-    }
-
-    .kanban-board {
-        grid-template-columns: 1fr;
-    }
-
-    header h1 {
-        font-size: 1.25rem;
-    }
-
-    header {
-        padding: 0.5rem;
-    }
-
-    .card {
-        padding: 1rem;
-    }
-
-    #scratchpad {
-        height: 20rem;
-    }
-}
-
-@media (max-width: 768px) {
-    header {
-        padding-top: 3rem;
-    }
-    .header-user-widget {
-        top: 10px;
-        transform: none;
-        right: 0.5rem;
-    }
-    .user-email {
-        display: none;
-    }
-    .auth-container-wrapper {
-        min-height: auto; /* Fixes vertical clipping on small mobile viewports */
-        padding: 15px 10px;
-    }
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donavin's Control Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <div class="header-brand">
+            <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon" style="width: 36px; height: 36px;">
+            <h1>Donavin's Control Center</h1>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html" class="active">Home</a>
+            <a href="snippets.html">Snippets</a>
+            <a href="projects.html">Projects</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="inspiration.html">Inspiration</a>
+            <a href="ideas.html">Ideas</a>
+            <a href="finance.html">Finance</a>
+            <a href="planner.html">Web Planner</a>
+        </nav>
+        
+        <!-- Reusable Header User Widget -->
+        <div id="logout-container" class="header-user-widget" style="display: none;">
+            <span id="user-display" class="user-email"></span>
+            <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container-wrapper" style="display: none;">
+        <section class="card auth-card-box">
+            <h2>🔐 Control Center Access</h2>
+            <div class="auth-form-group">
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email address..." required autocomplete="email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password..." required autocomplete="current-password">
+                <div class="auth-buttons-row">
+                    <button type="button" class="auth-btn login-btn" onclick="handleLogin()">Login</button>
+                </div>
+                <div id="auth-error" class="auth-error-msg"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <main class="hub-grid">
+        <section class="card kanban-card">
+            <div class="kanban-header">
+                <h2>✅Focus Board</h2>
+                <div class="kanban-controls">
+                    <button id="focus-mode-btn" class="kanban-action-btn" type="button">🎯 Focus Mode: Off</button>
+                    <button id="clear-done-btn" class="kanban-action-btn" type="button">🗑️ Clear Done</button>
+                </div>
+            </div>
+
+            <form id="task-form" class="task-form">
+                <input type="text" id="task-title" placeholder="Micro-step task (e.g., Do the Laundry)..." required autocomplete="off">
+                <select id="task-energy">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium" selected>🟡 Med</option>
+                    <option value="high">🔴 High</option>
+                </select>
+                <input type="text" id="task-time" placeholder="Time (e.g. 15m)" maxlength="6">
+                <button type="submit" id="add-task-btn">Add</button>
+            </form>
+
+            <div class="energy-filters">
+                <button type="button" class="filter-btn active" data-filter="all">All</button>
+                <button type="button" class="filter-btn" data-filter="low">🟢 Low</button>
+                <button type="button" class="filter-btn" data-filter="medium">🟡 Med</button>
+                <button type="button" class="filter-btn" data-filter="high">🔴 High</button>
+            </div>
+
+            <div class="kanban-board">
+                <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>To Do</h3>
+                    <div class="task-list" id="todo-list"></div>
+                </div>
+                <div class="kanban-column" data-column="inprogress" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>In Progress</h3>
+                    <div class="task-list" id="inprogress-list"></div>
+                </div>
+                <div class="kanban-column" data-column="done" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>Done</h3>
+                    <div class="task-list" id="done-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card scratchpad-section">
+            <h2>📝Scratchpad</h2>
+            <div class="scratchpad-container">
+                <div class="scratchpad-toolbar">
+                    <button type="button" class="scratchpad-tool-btn" onclick="addLink('scratchpad')">🔗 Add Link</button>
+                    <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('scratchpad')">📷 Add Image</button>
+                </div>
+                <div id="scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes or paste images here..."></div>
+                <input type="file" id="file-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'scratchpad')">
+            </div>
+        </section>
+
+        <section class="card youtube-section">
+            <h2>🟥Youtube</h2>
+            <div id="youtube-feed-container" class="video-grid"></div>
+        </section>
+
+        <section class="card space-news-section">
+            <h2>🔭Space News🛸</h2>
+            <div id="space-news-container" class="feed-grid"></div>
+        </section>
+
+        <section class="card projects-section">
+            <h2>📋Projects</h2>
+            <ol>
+                <li>
+                    <p>Learning JavaScript on Scrimba</p>
+                    <button class="project-button" onclick="window.location.href='https://scrimba.com/learn-javascript-c0v'">
+                        <img src="./images/scrimbacource.png" alt="Scrimba Logo" class="project-image">
+                    </button>
+                </li>
+                <li>
+                    <p>Elytra Models Project</p>
+                    <button class="project-button" onclick="window.location.href='./projectpages/addon.html'">
+                        <img src="./images/elytra-models.png" alt="Elytra Models Logo" class="project-image">
+                    </button>
+                </li>
+            </ol>
+        </section>
+
+        <section class="card fiverr-section">
+            <h2>Fiverr Studio</h2>
+            <p>Seller Dashboard</p>
+            <button class="project-button" onclick="window.location.href='https://www.fiverr.com/users/dreddingstudio/seller_dashboard'">
+                <img src="https://fiverr-res.cloudinary.com/npm-assets/layout-service/fiverr-og-logo.5fd6463.png" alt="Fiverr Logo" class="project-image">
+            </button>
+        </section>
+
+        <section class="card links-section">
+            <h2>Quick Links</h2>
+            <ul>
+                <li><a href="https://www.curseforge.com/members/dredding/projects" target="_blank">CurseForge</a></li>
+                <li><a href="https://www.youtube.com/@dredding2000" target="_blank">YouTube</a></li>
+                <li><a href="https://scrimba.com/learn-javascript-c0v" target="_blank">Scrimba</a></li>
+                <li><a href="https://github.com" target="_blank">GitHub</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 My Control Center</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- Custom Logout Confirmation Modal -->
+    <div id="logout-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
+        <div class="card" style="max-width: 400px; width: 100%; text-align: center; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+            <h3 style="margin-top: 0; color: #e3e8ef;">Confirm Logout</h3>
+            <p style="color: #9aa5b1; font-size: 0.9rem; margin-bottom: 1.5rem;">Are you sure you want to log out of your Control Center?</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; flex: 1;" onclick="closeLogoutModal()">Cancel</button>
+                <button type="button" class="auth-btn login-btn" style="flex: 1; background: #e06c75;" onclick="confirmLogout()">Log Out</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

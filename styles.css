@@ -16,7 +16,7 @@ a {
 }
 
 /* =========================================================================
-   HEADER & USER WIDGET LAYOUT (Centered Brand/Nav, Right-Aligned Logout)
+   HEADER & USER WIDGET LAYOUT
    ========================================================================= */
 header {
     background: #181c22;
@@ -26,6 +26,8 @@ header {
     padding: 0.75rem 1rem;
     margin: 0 auto;
     position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .header-brand {
@@ -98,7 +100,7 @@ header {
 }
 
 /* =========================================================================
-   AUTHENTICATION STYLES (Centered Layout)
+   AUTHENTICATION STYLES
    ========================================================================= */
 .auth-container-wrapper {
     display: flex;
@@ -190,34 +192,32 @@ header {
 }
 
 /* =========================================================================
-   MAIN GRID & CARDS LAYOUT (Desktop View: > 1080px)
+   MAIN GRID & CARDS LAYOUT (Fluid Full-Width Widescreen Setup)
    ========================================================================= */
 .hub-grid {
     display: grid;
-    grid-template-columns: 1fr 1.5fr 0.9fr;
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    width: 100%;
     max-width: none;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    align-items: start;
+    margin: 1.5rem 0;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
 }
 
-.column-left, .column-center, .column-right {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.card {
+.hub-grid .card {
     background: #313843;
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0px 0px 6px #000000dc;
-    
-    /* Uses Flexbox for internal vertical stacking, but natural height (no forced stretching) */
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+}
+
+/* Make Focus Board span 2 columns */
+.kanban-card {
+    grid-column: span 2;
 }
 
 .card h2 {
@@ -261,8 +261,8 @@ header {
    ========================================================================= */
 .video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
 }
 
 .video-button {
@@ -320,7 +320,7 @@ header {
 }
 
 /* =========================================================================
-   SCRATCHPAD
+   SCRATCHPAD (Dynamic Flex Scaling)
    ========================================================================= */
 textarea {
     width: 100%;
@@ -341,7 +341,7 @@ textarea:focus {
 }
 
 #scratchpad {
-    height: 35rem;
+    height: 35rem; /* Controls the total height of the Scratchpad card */
 }
 
 .scratchpad-container {
@@ -349,6 +349,9 @@ textarea:focus {
     border-radius: 6px;
     overflow: hidden;
     background: #272e38;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Makes the container fill the card height */
 }
 
 .scratchpad-toolbar {
@@ -357,6 +360,7 @@ textarea:focus {
     display: flex;
     gap: 12px;
     border-bottom: 1px solid #3f4a5a;
+    flex-shrink: 0; /* Keeps toolbar fixed size */
 }
 
 .scratchpad-toolbar button {
@@ -377,8 +381,8 @@ textarea:focus {
 
 .scratchpad-box {
     width: 100%;
+    flex-grow: 1; /* Dynamically expands to fill all remaining height inside the container */
     min-height: 150px;
-    max-height: 95%;
     color: #e3e8ef;
     padding: 12px;
     overflow-y: auto;
@@ -696,8 +700,8 @@ textarea:focus {
    ========================================================================= */
 #space-news-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
     margin-top: 10px;
 }
 
@@ -719,7 +723,7 @@ textarea:focus {
 
 .space-news-card img {
     width: 100%;
-    height: 100px;
+    height: 90px;
     object-fit: cover;
 }
 
@@ -732,7 +736,7 @@ textarea:focus {
 }
 
 .space-news-title {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     color: #e2e8f0;
     line-height: 1.2;
@@ -743,50 +747,85 @@ textarea:focus {
 }
 
 .space-news-date {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #94a3b8;
 }
 
 /* =========================================================================
-   RESPONSIVE MEDIA QUERIES (TABLET & MOBILE BREAKPOINTS)
+   FLOATING YOUTUBE PIP PLAYER
+   ========================================================================= */
+.pip-modal-overlay {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 360px;
+    background: #181c22;
+    border: 2px solid #61afef;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    z-index: 10000;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    resize: both;
+    min-width: 280px;
+    min-height: 200px;
+}
+
+.pip-header {
+    background: #21262d;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    border-bottom: 1px solid #3f4a5a;
+}
+
+.pip-title {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #e3e8ef;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+}
+
+.pip-close-btn {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.pip-body {
+    width: 100%;
+    flex-grow: 1;
+    background: #000;
+}
+
+.pip-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* =========================================================================
+   RESPONSIVE MEDIA QUERIES
    ========================================================================= */
 
-/* Tablet / Medium View (Screens under 1080px): 2 Columns (50/50 split) */
-@media (max-width: 1350px) {
+/* Tablet View (Screens under 1100px): 2 Columns */
+@media (max-width: 1100px) {
     .hub-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        margin: 1.5rem auto;
+        grid-template-columns: repeat(2, 1fr);
         padding: 0 1rem;
     }
 
-    .hub-grid > div {
-        display: contents;
-    }
-
-    /* Left Column: Kanban, YouTube, Projects, Quick Links (Orders 1, 3, 5, 7) */
-    /* Right Column: Scratchpad, Space News, Fiverr (Orders 2, 4, 6) */
     .kanban-card {
-        order: 1;
-    }
-    .column-right .card:nth-child(1) {
-        order: 2; /* Scratchpad */
-    }
-    .youtube-section {
-        order: 3; /* YouTube */
-    }
-    .column-right .card:nth-child(2) {
-        order: 4; /* Space News */
-    }
-    .column-center .card:nth-child(2) {
-        order: 5; /* Projects */
-    }
-    .column-center .card:nth-child(3) {
-        order: 6; /* Fiverr */
-    }
-    .links-section {
-        order: 7; /* Quick Links */
+        grid-column: span 2;
     }
 
     .kanban-board {
@@ -794,41 +833,15 @@ textarea:focus {
     }
 }
 
-/* Mobile View (Screens under 768px): 1-Column Vertical Stack */
+/* Mobile View (Screens under 768px): 1 Column */
 @media (max-width: 768px) {
     .hub-grid {
-        display: grid;
         grid-template-columns: 1fr;
-        gap: 1.25rem;
-        margin: 1rem auto;
-        padding: 0 0.5rem;
+        padding: 0 0.75rem;
     }
 
-    .hub-grid > div {
-        display: contents;
-    }
-
-    /* Exact Stack Order: Kanban -> Scratchpad -> YouTube -> Space News -> Projects -> Fiverr -> Quick Links */
     .kanban-card {
-        order: 1;
-    }
-    .column-right .card:nth-child(1) {
-        order: 2;
-    }
-    .youtube-section {
-        order: 3;
-    }
-    .column-right .card:nth-child(2) {
-        order: 4;
-    }
-    .column-center .card:nth-child(2) {
-        order: 5;
-    }
-    .column-center .card:nth-child(3) {
-        order: 6;
-    }
-    .links-section {
-        order: 7;
+        grid-column: span 1;
     }
 
     .kanban-board {
