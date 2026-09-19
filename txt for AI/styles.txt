@@ -61,7 +61,8 @@ header {
     font-weight: bold;
 }
 
-.site-nav a:hover, .site-nav a.active {
+.site-nav a:hover, 
+.site-nav a.active {
     background: #61afef;
     color: #181c22;
     border-color: #61afef;
@@ -215,16 +216,50 @@ header {
     box-sizing: border-box;
 }
 
-/* Make Focus Board span 2 columns */
-.kanban-card {
-    grid-column: span 2;
-}
-
 .card h2 {
     margin-top: 0;
     color: #f0f4f8;
     border-bottom: 2px solid #3f4a5a;
     padding-bottom: 0.5rem;
+}
+
+/* Make Focus Board span 2 columns */
+.kanban-card {
+    grid-column: span 2;
+}
+
+/* =========================================================================
+   INSPIRATION IMAGES
+   ========================================================================= */
+   .inspiration-img {
+    width: 90%;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0px 0px 6px #000000dc; 
+    border-radius: 8px;
+   }
+
+/* =========================================================================
+   PAGE BLOCK LAYOUT (For non-home pages)
+   ========================================================================= */
+.page-block-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Change this from 1.5rem/0.75rem down to 0.5rem or 0.25rem */
+    width: 100%;
+    max-width: 900px;
+    margin: 1.5rem auto;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+}
+
+.page-block-layout .card {
+    background: #313843;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0px 0px 6px #000000dc;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 /* =========================================================================
@@ -341,7 +376,7 @@ textarea:focus {
 }
 
 #scratchpad {
-    height: 35rem; /* Controls the total height of the Scratchpad card */
+    height: 35rem;
 }
 
 .scratchpad-container {
@@ -351,7 +386,7 @@ textarea:focus {
     background: #272e38;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Makes the container fill the card height */
+    flex-grow: 1;
 }
 
 .scratchpad-toolbar {
@@ -360,7 +395,7 @@ textarea:focus {
     display: flex;
     gap: 12px;
     border-bottom: 1px solid #3f4a5a;
-    flex-shrink: 0; /* Keeps toolbar fixed size */
+    flex-shrink: 0;
 }
 
 .scratchpad-toolbar button {
@@ -381,7 +416,7 @@ textarea:focus {
 
 .scratchpad-box {
     width: 100%;
-    flex-grow: 1; /* Dynamically expands to fill all remaining height inside the container */
+    flex-grow: 1;
     min-height: 150px;
     color: #e3e8ef;
     padding: 12px;
@@ -700,13 +735,13 @@ textarea:focus {
    ========================================================================= */
 #space-news-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
     margin-top: 10px;
 }
 
 .space-news-card {
-    background-color: #1e2630;
+    background-color: #272e38;
     border: 2px solid #3f4a5a;
     border-radius: 8px;
     overflow: hidden;
@@ -717,18 +752,18 @@ textarea:focus {
 }
 
 .space-news-card:hover {
-    transform: scale(1.02);
-    border: solid 2px #61afef;
+    transform: scale(1.03);
+    border-color: #61afef;
 }
 
 .space-news-card img {
     width: 100%;
-    height: 90px;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
 }
 
 .space-news-content {
-    padding: 8px 10px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -736,9 +771,9 @@ textarea:focus {
 }
 
 .space-news-title {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #cbd5e0;
     line-height: 1.2;
     margin-bottom: 6px;
     display: -webkit-box;
@@ -747,15 +782,13 @@ textarea:focus {
 }
 
 .space-news-date {
-    font-size: 0.7rem;
-    color: #94a3b8;
+    font-size: 0.75rem;
+    color: #9aa5b1;
 }
 
 /* =========================================================================
    RESPONSIVE MEDIA QUERIES
    ========================================================================= */
-
-/* Tablet View (Screens under 1100px): 2 Columns */
 @media (max-width: 1100px) {
     .hub-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -771,7 +804,6 @@ textarea:focus {
     }
 }
 
-/* Mobile View (Screens under 768px): 1 Column */
 @media (max-width: 768px) {
     .hub-grid {
         grid-template-columns: 1fr;
@@ -784,10 +816,6 @@ textarea:focus {
 
     .kanban-board {
         grid-template-columns: 1fr;
-    }
-
-    header h1 {
-        font-size: 1.25rem;
     }
 
     header {
@@ -805,7 +833,7 @@ textarea:focus {
         display: none;
     }
 
-    .card {
+    .hub-grid .card {
         padding: 1rem;
     }
 

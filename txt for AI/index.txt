@@ -108,12 +108,7 @@
             <h2>🟥Youtube</h2>
             <div id="youtube-feed-container" class="video-grid"></div>
         </section>
-
-        <section class="card space-news-section">
-            <h2>🔭Space News🛸</h2>
-            <div id="space-news-container" class="feed-grid"></div>
-        </section>
-
+        
         <section class="card projects-section">
             <h2>📋Projects</h2>
             <ol>
@@ -130,6 +125,11 @@
                     </button>
                 </li>
             </ol>
+        </section>
+
+        <section class="card space-news-section">
+            <h2>🔭Space News🛸</h2>
+            <div id="space-news-container" class="feed-grid"></div>
         </section>
 
         <section class="card fiverr-section">
