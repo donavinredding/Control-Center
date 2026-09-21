@@ -104,7 +104,10 @@
 
             <!-- Project Description Card -->
             <section class="card">
-                <h2 id="project-card-title">Overview</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 id="project-card-title" style="margin: 0; border: none; padding: 0;">Overview</h2>
+                    <button type="button" class="kanban-action-btn" onclick="openEditProjectModal()">✏️ Edit Project</button>
+                </div>
                 <p id="project-description" style="color: #9aa5b1; margin: 0;">Loading description...</p>
             </section>
 
@@ -171,6 +174,32 @@
 
     </main>
 
+    <!-- Edit Project Modal -->
+    <div id="edit-project-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
+        <div class="card" style="max-width: 500px; width: 100%; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+            <h3 style="margin-top: 0; color: #e3e8ef;">Edit Project Details</h3>
+            <form id="edit-project-form" onsubmit="handleSaveProject(event)" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <label for="edit-title" style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">Project Title</label>
+                    <input type="text" id="edit-title" class="auth-input" required autocomplete="off" style="padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 4px; color: #e3e8ef;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <label for="edit-description" style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">Description</label>
+                    <textarea id="edit-description" class="auth-input" rows="4" style="padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 4px; color: #e3e8ef; resize: vertical;"></textarea>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <label for="edit-external-link" style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">External Link (URL)</label>
+                    <input type="url" id="edit-external-link" class="auth-input" placeholder="https://..." autocomplete="off" style="padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 4px; color: #e3e8ef;">
+                </div>
+                <div id="edit-error-msg" style="color: #e06c75; font-size: 0.85rem;"></div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                    <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; padding: 8px 16px;" onclick="closeEditProjectModal()">Cancel</button>
+                    <button type="submit" class="auth-btn login-btn" style="padding: 8px 16px; background: #61afef; color: #1e242d; font-weight: bold;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 My Control Center</p>
     </footer>
@@ -178,6 +207,7 @@
     <!-- Dynamic Loader Script -->
     <script>
         let KANBAN_STORAGE_KEY = 'default_kanban_tasks';
+        let currentProjectData = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -207,6 +237,9 @@
                 return;
             }
 
+            // Store project data locally for editing
+            currentProjectData = project;
+
             // Populate the page with project data
             document.getElementById('browser-title').textContent = `${project.title} - My Control Center`;
             document.getElementById('project-header-title').textContent = project.title;
@@ -221,6 +254,65 @@
                 banner.style.display = 'flex';
             }
         });
+
+        function openEditProjectModal() {
+            if (!currentProjectData) return;
+            document.getElementById('edit-title').value = currentProjectData.title || '';
+            document.getElementById('edit-description').value = currentProjectData.description || '';
+            document.getElementById('edit-external-link').value = currentProjectData.external_link || '';
+            document.getElementById('edit-error-msg').textContent = '';
+            document.getElementById('edit-project-modal').style.display = 'flex';
+        }
+
+        function closeEditProjectModal() {
+            document.getElementById('edit-project-modal').style.display = 'none';
+        }
+
+        async function handleSaveProject(event) {
+            event.preventDefault();
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id');
+
+            const updatedTitle = document.getElementById('edit-title').value.trim();
+            const updatedDescription = document.getElementById('edit-description').value.trim();
+            const updatedExternalLink = document.getElementById('edit-external-link').value.trim();
+
+            const { error } = await supabaseClient
+                .from('projects')
+                .update({
+                    title: updatedTitle,
+                    description: updatedDescription,
+                    external_link: updatedExternalLink || null
+                })
+                .eq('id', projectId);
+
+            if (error) {
+                console.error('Error updating project:', error);
+                document.getElementById('edit-error-msg').textContent = 'Failed to update project: ' + error.message;
+                return;
+            }
+
+            // Update local state and DOM elements instantly
+            currentProjectData.title = updatedTitle;
+            currentProjectData.description = updatedDescription;
+            currentProjectData.external_link = updatedExternalLink;
+
+            document.getElementById('browser-title').textContent = `${updatedTitle} - My Control Center`;
+            document.getElementById('project-header-title').textContent = updatedTitle;
+            document.getElementById('project-card-title').textContent = updatedTitle;
+            document.getElementById('project-description').textContent = updatedDescription || 'No description provided.';
+
+            const banner = document.getElementById('external-banner-wrapper');
+            const linkEl = document.getElementById('external-banner-link');
+            if (updatedExternalLink) {
+                linkEl.href = updatedExternalLink;
+                banner.style.display = 'flex';
+            } else {
+                banner.style.display = 'none';
+            }
+
+            closeEditProjectModal();
+        }
     </script>
     <script src="script.js"></script>
 </body>

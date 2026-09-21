@@ -93,10 +93,10 @@
         </section>
 
         <section class="card scratchpad-section">
-            <h2>📝Scratchpad</h2>
+            <h2>📝 Scratchpad</h2>
             <div class="scratchpad-container">
                 <div class="scratchpad-toolbar">
-                    <button type="button" class="scratchpad-tool-btn" onclick="addLink('scratchpad')">🔗 Add Link</button>
+                    <button type="button" class="scratchpad-tool-btn" onclick="openLinkModal('scratchpad')">🔗 Add Link</button>
                     <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('scratchpad')">📷 Add Image</button>
                 </div>
                 <div id="scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes or paste images here..."></div>
@@ -166,6 +166,30 @@
                 <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; flex: 1;" onclick="closeLogoutModal()">Cancel</button>
                 <button type="button" class="auth-btn login-btn" style="flex: 1; background: #e06c75;" onclick="confirmLogout()">Log Out</button>
             </div>
+        </div>
+    </div>
+    <!-- Global Link Insertion Modal -->
+    <div id="link-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
+        <div class="card" style="max-width: 400px; width: 100%; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+            <h3 style="margin-top: 0; color: #e3e8ef; margin-bottom: 1rem;">Insert Link</h3>
+            <form id="link-form" onsubmit="handleInsertLink(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="hidden" id="link-target-id">
+                
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 0.85rem; color: #9aa5b1;">Link Text (Display Name):</label>
+                    <input type="text" id="link-display-text" class="auth-input" placeholder="e.g., Supabase Docs" required autocomplete="off">
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 0.85rem; color: #9aa5b1;">URL Destination:</label>
+                    <input type="url" id="link-url-input" class="auth-input" placeholder="https://..." required autocomplete="off">
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 0.5rem;">
+                    <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; flex: 1;" onclick="closeLinkModal()">Cancel</button>
+                    <button type="submit" class="auth-btn login-btn" style="flex: 1; background: #61afef; color: #fff;">Insert Link</button>
+                </div>
+            </form>
         </div>
     </div>
 </body>

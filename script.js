@@ -121,6 +121,7 @@ async function initDashboard() {
     if (userDisplay && currentUser) userDisplay.textContent = currentUser.email;
 
     if (typeof fetchTasksFromCloud === 'function') await fetchTasksFromCloud();
+    if (typeof fetchProjects === 'function') fetchProjects();
     if (typeof loadLatestVideos === 'function') loadLatestVideos();
     if (typeof loadSpaceNews === 'function') loadSpaceNews();
     if (typeof setupScratchpadCloud === 'function') setupScratchpadCloud('scratchpad');
@@ -174,7 +175,6 @@ function renderTasks() {
         return task.energy === currentEnergyFilter;
     });
 
-    // Style definition for the larger box button
     const boxBtnStyle = "background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s;";
 
     visibleTasks.forEach(task => {
@@ -393,7 +393,6 @@ async function loadLatestVideos() {
     container.innerHTML = allVideos.length === 0 ? '<p>No videos found.</p>' : '';
 
     allVideos.forEach(video => {
-        // Create card element with a click trigger for the popup window
         const card = document.createElement('div');
         card.className = 'video-button';
         card.style.cursor = 'pointer';
@@ -413,7 +412,6 @@ async function loadLatestVideos() {
 function openPopupPlayer(videoId) {
     const width = 480;
     const height = 270;
-    // Calculate position so it pops up nicely in the bottom-right corner of your screen
     const left = window.screen.width - width - 30;
     const top = window.screen.height - height - 100;
     
@@ -682,7 +680,166 @@ async function loadSpaceNews() {
 
 
 /* =========================================================================
-   5. UI EVENT LISTENERS INITIALIZATION
+   5. PROJECTS SHOWROOM LOGIC (Edit Button Removed)
+   ========================================================================= */
+
+async function fetchProjects() {
+    const container = document.getElementById('projects-list-container');
+    if (!container) return;
+    
+    container.innerHTML = '<p style="opacity: 0.7; text-align: center;">Loading projects...</p>';
+    
+    const { data, error } = await supabaseClient
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching projects:', error.message);
+        container.innerHTML = '<p style="color: #e06c75; text-align: center;">Failed to load projects.</p>';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p style="opacity: 0.7; text-align: center;">No projects added yet. Use the dropdown above to create one!</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    data.forEach(proj => {
+        const card = document.createElement('section');
+        card.className = 'card';
+        
+        const imageThumbnail = proj.image_url 
+            ? `<img src="${proj.image_url}" alt="Project Image" style="width: 110px; height: 70px; object-fit: contain; background: #151a21; border-radius: 8px; border: 1px solid #3f4a5a; flex-shrink: 0;">` 
+            : '';
+
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start; flex: 1; min-width: 250px;">
+                    ${imageThumbnail}
+                    <div>
+                        <h2 style="margin-top: 0; margin-bottom: 0.5rem; color: #e3e8ef;">${escapeHtml(proj.title)}</h2>
+                        <p style="margin-bottom: 1rem; opacity: 0.85; color: #9aa5b1;">${escapeHtml(proj.description || '')}</p>
+                        <a href="project.html?id=${proj.id}" style="color: #61afef; text-decoration: none; font-weight: 500;">Open Project Hub &rarr;</a>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button type="button" onclick="openDeleteModal('${proj.id}')" style="background: #272e38; border: 1px solid #3f4a5a; color: #e06c75; cursor: pointer; font-size: 0.85rem; padding: 8px 14px; border-radius: 6px; font-weight: 500;" title="Delete Project">🗑️ Delete</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function updateFileName(input, targetId) {
+    const span = document.getElementById(targetId);
+    if (!span) return;
+    if (input.files && input.files.length > 0) {
+        span.textContent = input.files[0].name;
+        span.style.color = '#e3e8ef';
+    } else {
+        span.textContent = 'No file chosen';
+        span.style.color = '#9aa5b1';
+    }
+}
+
+function convertFileToBase64(fileInput) {
+    return new Promise((resolve, reject) => {
+        const file = fileInput.files[0];
+        if (!file) {
+            resolve(null);
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
+
+async function handleAddProject(event) {
+    event.preventDefault();
+    const title = document.getElementById('proj-title').value.trim();
+    const description = document.getElementById('proj-desc').value.trim();
+    const external_link = document.getElementById('proj-link').value.trim();
+    const fileInput = document.getElementById('proj-image-file');
+
+    if (!title) {
+        alert('Please provide a project title.');
+        return;
+    }
+
+    try {
+        const image_url = await convertFileToBase64(fileInput);
+
+        const { error } = await supabaseClient
+            .from('projects')
+            .insert([{ title, description, external_link, image_url }]);
+
+        if (error) {
+            console.error('Error adding project:', error.message);
+            alert('Failed to add project: ' + error.message);
+        } else {
+            document.getElementById('add-project-form').reset();
+            const fileNameSpan = document.getElementById('proj-file-name');
+            if (fileNameSpan) {
+                fileNameSpan.textContent = 'No file chosen';
+                fileNameSpan.style.color = '#9aa5b1';
+            }
+            toggleAddProjectForm();
+            fetchProjects();
+        }
+    } catch (err) {
+        console.error('Image processing error:', err);
+        alert('Failed to process image file.');
+    }
+}
+
+function openDeleteModal(id) {
+    document.getElementById('delete-proj-id').value = id;
+    const modal = document.getElementById('delete-project-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('delete-project-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function confirmDeleteProject() {
+    const id = document.getElementById('delete-proj-id').value;
+    const { error } = await supabaseClient
+        .from('projects')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error('Error deleting project:', error.message);
+        alert('Failed to delete project.');
+    } else {
+        closeDeleteModal();
+        fetchProjects();
+    }
+}
+
+function toggleAddProjectForm() {
+    const form = document.getElementById('add-project-form');
+    const btn = document.getElementById('form-toggle-btn');
+    if (!form || !btn) return;
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'flex';
+        btn.textContent = '▲ Close';
+    } else {
+        form.style.display = 'none';
+        btn.textContent = '▼ Open';
+    }
+}
+
+
+/* =========================================================================
+   6. UI EVENT LISTENERS INITIALIZATION
    ========================================================================= */
 function initEventListeners() {
     const form = document.getElementById('task-form');
@@ -736,3 +893,110 @@ function initEventListeners() {
         });
     }
 }
+
+
+/* =========================================================================
+   7. ADD LINK MODAL HANDLERS
+   ========================================================================= */
+
+let activeScratchpadId = null;
+let savedSelectionRange = null;
+
+function openLinkModal(scratchpadId) {
+    activeScratchpadId = scratchpadId;
+    document.getElementById('link-target-id').value = scratchpadId;
+    document.getElementById('link-display-text').value = '';
+    document.getElementById('link-url-input').value = '';
+
+    // Capture the cursor position / text selection inside the contenteditable div
+    const el = document.getElementById(scratchpadId);
+    if (el) {
+        el.focus();
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            savedSelectionRange = selection.getRangeAt(0);
+            const selectedText = savedSelectionRange.toString().trim();
+            if (selectedText) {
+                document.getElementById('link-display-text').value = selectedText;
+            }
+        }
+    }
+
+    const modal = document.getElementById('link-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeLinkModal() {
+    const modal = document.getElementById('link-modal');
+    if (modal) modal.style.display = 'none';
+    activeScratchpadId = null;
+    savedSelectionRange = null;
+}
+
+function handleInsertLink(event) {
+    event.preventDefault();
+    const text = document.getElementById('link-display-text').value.trim();
+    const url = document.getElementById('link-url-input').value.trim();
+
+    if (!activeScratchpadId || !text || !url) return;
+
+    const el = document.getElementById(activeScratchpadId);
+    if (!el) {
+        closeLinkModal();
+        return;
+    }
+
+    el.focus();
+
+    // Restore selection range if it exists
+    const selection = window.getSelection();
+    if (savedSelectionRange) {
+        selection.removeAllRanges();
+        selection.addRange(savedSelectionRange);
+    }
+
+    // Create a styled clickable link element matching your theme
+    const a = document.createElement('a');
+    a.href = url;
+    a.textContent = text;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.style.color = '#61afef';
+    a.style.textDecoration = 'underline';
+
+    // Insert the link at the cursor position
+    if (savedSelectionRange && !savedSelectionRange.collapsed) {
+        savedSelectionRange.deleteContents();
+        savedSelectionRange.insertNode(a);
+    } else {
+        const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : document.createRange();
+        range.insertNode(a);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    // Trigger input event to update local storage persistence / cloud saving
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+
+    closeLinkModal();
+}
+
+
+/* =========================================================================
+   GLOBAL EVENT LISTENER FOR SCRATCHPAD LINKS
+   ========================================================================= */
+// Intercepts clicks on any links inside contenteditable boxes during the capturing phase
+// so they open in a new tab instead of trying to edit the text.
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('a');
+    if (link && link.closest('.scratchpad-box')) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const url = link.href;
+        if (url) {
+            window.open(url, '_blank');
+        }
+    }
+}, true);
