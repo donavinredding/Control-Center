@@ -130,7 +130,7 @@ async function initDashboard() {
 
 
 /* =========================================================================
-   1. KANBAN TASK BOARD LOGIC (Cloud Synchronized & Page Isolated)
+   1. KANBAN TASK BOARD LOGIC
    ========================================================================= */
 async function fetchTasksFromCloud() {
     const projectId = getCurrentProjectId();
@@ -207,7 +207,7 @@ function renderTasks() {
                     <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskComplete('${task.id}')">
                     <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}; margin: 0;">${escapeHtml(task.title)}</p>
                 </div>
-                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2); border-radius: 6px; color: #ff4d4d; cursor: pointer; font-size: 0.85rem; padding: 5px 8px; line-height: 1;" onmouseover="this.style.background='rgba(255,77,77,0.2)'" onmouseout="this.style.background='rgba(255,77,77,0.1)'">🗑️</button>
+                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2); border-radius: 6px; color: #ff4d4d; cursor: pointer; font-size: 0.85rem; padding: 5px 8px; line-height: 1;">🗑️</button>
             </div>
             <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 2px;">
                 <div class="task-info-center" style="display: flex; gap: 6px; align-items: center;">
@@ -338,7 +338,7 @@ function escapeHtml(text) {
 
 
 /* =========================================================================
-   2. YOUTUBE FEED LOGIC (With Persistent Popup Window PiP)
+   2. YOUTUBE FEED LOGIC
    ========================================================================= */
 const creators = [
     { name: "MrBeast", channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA" },
@@ -450,72 +450,6 @@ async function setupScratchpadCloud(id) {
             });
         }, 800);
     });
-
-    pad.addEventListener('click', (e) => {
-        const anchor = e.target.closest('a');
-        if (anchor && anchor.href) {
-            e.preventDefault();
-            window.open(anchor.href, '_blank');
-        }
-    });
-
-    pad.addEventListener('paste', (e) => {
-        e.preventDefault();
-        const text = e.clipboardData.getData('text/plain');
-        const urlRegex = /^(https?:\/\/[^\s]+|[a-zA-Z0-9][-a-zA-Z0-90-9]*\.[a-zA-Z]{2,}[^\s]*)$/;
-
-        if (urlRegex.test(text.trim())) {
-            const cleanUrl = text.trim().startsWith('http') ? text.trim() : 'https://' + text.trim();
-            insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
-        } else {
-            insertHtmlAtCursor(text);
-        }
-        pad.dispatchEvent(new Event('input'));
-    });
-
-    pad.addEventListener('keydown', (e) => {
-        if (e.key === ' ' || e.key === 'Enter') {
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0) {
-                const range = sel.getRangeAt(0);
-                const node = range.startContainer;
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const text = node.textContent;
-                    const words = text.split(/\s+/);
-                    const lastWord = words[words.length - 1];
-
-                    if (lastWord && (lastWord.startsWith('http://') || lastWord.startsWith('https://') || (lastWord.includes('.') && !lastWord.endsWith('.')))) {
-                        const cleanUrl = lastWord.startsWith('http') ? lastWord : 'https://' + lastWord;
-                        const leadingText = text.substring(0, text.length - lastWord.length);
-
-                        const span = document.createElement('span');
-                        span.textContent = leadingText;
-
-                        const a = document.createElement('a');
-                        a.href = cleanUrl;
-                        a.textContent = lastWord;
-                        a.target = '_blank';
-
-                        const parent = node.parentNode;
-                        parent.insertBefore(span, node);
-                        parent.insertBefore(a, node);
-
-                        const spaceNode = document.createTextNode(e.key === ' ' ? ' ' : '\n');
-                        parent.insertBefore(spaceNode, node);
-                        parent.removeChild(node);
-
-                        range.setStartAfter(spaceNode);
-                        range.collapse(true);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
-
-                        e.preventDefault();
-                        pad.dispatchEvent(new Event('input'));
-                    }
-                }
-            }
-        }
-    });
 }
 
 async function setupIdeasCloud() {
@@ -608,11 +542,7 @@ function addLink(id) {
 function triggerImageUpload(id) {
     const fileInput = document.getElementById('file-' + id);
     if (fileInput) {
-        try {
-            fileInput.click();
-        } catch (err) {
-            openImagePrompt(id);
-        }
+        fileInput.click();
     } else {
         openImagePrompt(id);
     }
@@ -624,7 +554,7 @@ function openImagePrompt(id) {
         const pad = document.getElementById(id);
         if (pad) {
             pad.focus();
-            insertHtmlAtCursor(`<img src="${imageUrl.trim()} " alt="Uploaded Image" style="max-width: 100%; height: auto;">`);
+            insertHtmlAtCursor(`<img src="${imageUrl.trim()}" alt="Uploaded Image" style="max-width: 100%; height: auto;">`);
             pad.dispatchEvent(new Event('input'));
         }
     }
@@ -680,9 +610,8 @@ async function loadSpaceNews() {
 
 
 /* =========================================================================
-   5. PROJECTS SHOWROOM LOGIC (Edit Button Removed)
+   5. PROJECTS SHOWROOM LOGIC
    ========================================================================= */
-
 async function fetchProjects() {
     const container = document.getElementById('projects-list-container');
     if (!container) return;
@@ -695,146 +624,39 @@ async function fetchProjects() {
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('Error fetching projects:', error.message);
         container.innerHTML = '<p style="color: #e06c75; text-align: center;">Failed to load projects.</p>';
         return;
     }
 
     if (!data || data.length === 0) {
-        container.innerHTML = '<p style="opacity: 0.7; text-align: center;">No projects added yet. Use the dropdown above to create one!</p>';
+        container.innerHTML = '<p style="opacity: 0.7; text-align: center;">No projects added yet.</p>';
         return;
     }
 
     container.innerHTML = '';
     data.forEach(proj => {
         const card = document.createElement('section');
-        card.className = 'card';
+        card.className = 'card project-showcase-card';
         
         const imageThumbnail = proj.image_url 
-            ? `<img src="${proj.image_url}" alt="Project Image" style="width: 110px; height: 70px; object-fit: contain; background: #151a21; border-radius: 8px; border: 1px solid #3f4a5a; flex-shrink: 0;">` 
-            : '';
+            ? `<div class="project-card-image-wrap"><img src="${proj.image_url}" alt="Project Image" class="project-card-img"></div>` 
+            : `<div class="project-card-image-wrap placeholder-wrap"><span>📁</span></div>`;
 
         card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
-                <div style="display: flex; gap: 1rem; align-items: flex-start; flex: 1; min-width: 250px;">
-                    ${imageThumbnail}
-                    <div>
-                        <h2 style="margin-top: 0; margin-bottom: 0.5rem; color: #e3e8ef;">${escapeHtml(proj.title)}</h2>
-                        <p style="margin-bottom: 1rem; opacity: 0.85; color: #9aa5b1;">${escapeHtml(proj.description || '')}</p>
-                        <a href="project.html?id=${proj.id}" style="color: #61afef; text-decoration: none; font-weight: 500;">Open Project Hub &rarr;</a>
-                    </div>
+            <div class="project-card-inner">
+                ${imageThumbnail}
+                <div class="project-card-content">
+                    <h2 class="project-card-title">${escapeHtml(proj.title)}</h2>
+                    <p class="project-card-desc">${escapeHtml(proj.description || '')}</p>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button type="button" onclick="openDeleteModal('${proj.id}')" style="background: #272e38; border: 1px solid #3f4a5a; color: #e06c75; cursor: pointer; font-size: 0.85rem; padding: 8px 14px; border-radius: 6px; font-weight: 500;" title="Delete Project">🗑️ Delete</button>
-                </div>
+            </div>
+            <div class="project-card-footer">
+                <a href="project.html?id=${proj.id}" class="project-hub-link">Open Project Hub &rarr;</a>
+                <button type="button" class="project-action-btn delete-btn" onclick="openDeleteModal('${proj.id}')">🗑️ Delete</button>
             </div>
         `;
         container.appendChild(card);
     });
-}
-
-function updateFileName(input, targetId) {
-    const span = document.getElementById(targetId);
-    if (!span) return;
-    if (input.files && input.files.length > 0) {
-        span.textContent = input.files[0].name;
-        span.style.color = '#e3e8ef';
-    } else {
-        span.textContent = 'No file chosen';
-        span.style.color = '#9aa5b1';
-    }
-}
-
-function convertFileToBase64(fileInput) {
-    return new Promise((resolve, reject) => {
-        const file = fileInput.files[0];
-        if (!file) {
-            resolve(null);
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-    });
-}
-
-async function handleAddProject(event) {
-    event.preventDefault();
-    const title = document.getElementById('proj-title').value.trim();
-    const description = document.getElementById('proj-desc').value.trim();
-    const external_link = document.getElementById('proj-link').value.trim();
-    const fileInput = document.getElementById('proj-image-file');
-
-    if (!title) {
-        alert('Please provide a project title.');
-        return;
-    }
-
-    try {
-        const image_url = await convertFileToBase64(fileInput);
-
-        const { error } = await supabaseClient
-            .from('projects')
-            .insert([{ title, description, external_link, image_url }]);
-
-        if (error) {
-            console.error('Error adding project:', error.message);
-            alert('Failed to add project: ' + error.message);
-        } else {
-            document.getElementById('add-project-form').reset();
-            const fileNameSpan = document.getElementById('proj-file-name');
-            if (fileNameSpan) {
-                fileNameSpan.textContent = 'No file chosen';
-                fileNameSpan.style.color = '#9aa5b1';
-            }
-            toggleAddProjectForm();
-            fetchProjects();
-        }
-    } catch (err) {
-        console.error('Image processing error:', err);
-        alert('Failed to process image file.');
-    }
-}
-
-function openDeleteModal(id) {
-    document.getElementById('delete-proj-id').value = id;
-    const modal = document.getElementById('delete-project-modal');
-    if (modal) modal.style.display = 'flex';
-}
-
-function closeDeleteModal() {
-    const modal = document.getElementById('delete-project-modal');
-    if (modal) modal.style.display = 'none';
-}
-
-async function confirmDeleteProject() {
-    const id = document.getElementById('delete-proj-id').value;
-    const { error } = await supabaseClient
-        .from('projects')
-        .delete()
-        .eq('id', id);
-
-    if (error) {
-        console.error('Error deleting project:', error.message);
-        alert('Failed to delete project.');
-    } else {
-        closeDeleteModal();
-        fetchProjects();
-    }
-}
-
-function toggleAddProjectForm() {
-    const form = document.getElementById('add-project-form');
-    const btn = document.getElementById('form-toggle-btn');
-    if (!form || !btn) return;
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'flex';
-        btn.textContent = '▲ Close';
-    } else {
-        form.style.display = 'none';
-        btn.textContent = '▼ Open';
-    }
 }
 
 
@@ -893,110 +715,3 @@ function initEventListeners() {
         });
     }
 }
-
-
-/* =========================================================================
-   7. ADD LINK MODAL HANDLERS
-   ========================================================================= */
-
-let activeScratchpadId = null;
-let savedSelectionRange = null;
-
-function openLinkModal(scratchpadId) {
-    activeScratchpadId = scratchpadId;
-    document.getElementById('link-target-id').value = scratchpadId;
-    document.getElementById('link-display-text').value = '';
-    document.getElementById('link-url-input').value = '';
-
-    // Capture the cursor position / text selection inside the contenteditable div
-    const el = document.getElementById(scratchpadId);
-    if (el) {
-        el.focus();
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-            savedSelectionRange = selection.getRangeAt(0);
-            const selectedText = savedSelectionRange.toString().trim();
-            if (selectedText) {
-                document.getElementById('link-display-text').value = selectedText;
-            }
-        }
-    }
-
-    const modal = document.getElementById('link-modal');
-    if (modal) modal.style.display = 'flex';
-}
-
-function closeLinkModal() {
-    const modal = document.getElementById('link-modal');
-    if (modal) modal.style.display = 'none';
-    activeScratchpadId = null;
-    savedSelectionRange = null;
-}
-
-function handleInsertLink(event) {
-    event.preventDefault();
-    const text = document.getElementById('link-display-text').value.trim();
-    const url = document.getElementById('link-url-input').value.trim();
-
-    if (!activeScratchpadId || !text || !url) return;
-
-    const el = document.getElementById(activeScratchpadId);
-    if (!el) {
-        closeLinkModal();
-        return;
-    }
-
-    el.focus();
-
-    // Restore selection range if it exists
-    const selection = window.getSelection();
-    if (savedSelectionRange) {
-        selection.removeAllRanges();
-        selection.addRange(savedSelectionRange);
-    }
-
-    // Create a styled clickable link element matching your theme
-    const a = document.createElement('a');
-    a.href = url;
-    a.textContent = text;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.style.color = '#61afef';
-    a.style.textDecoration = 'underline';
-
-    // Insert the link at the cursor position
-    if (savedSelectionRange && !savedSelectionRange.collapsed) {
-        savedSelectionRange.deleteContents();
-        savedSelectionRange.insertNode(a);
-    } else {
-        const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : document.createRange();
-        range.insertNode(a);
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-
-    // Trigger input event to update local storage persistence / cloud saving
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-
-    closeLinkModal();
-}
-
-
-/* =========================================================================
-   GLOBAL EVENT LISTENER FOR SCRATCHPAD LINKS
-   ========================================================================= */
-// Intercepts clicks on any links inside contenteditable boxes during the capturing phase
-// so they open in a new tab instead of trying to edit the text.
-document.addEventListener('click', (event) => {
-    const link = event.target.closest('a');
-    if (link && link.closest('.scratchpad-box')) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        const url = link.href;
-        if (url) {
-            window.open(url, '_blank');
-        }
-    }
-}, true);

@@ -24,12 +24,6 @@
             }
         }
 
-        .column-left-wide, .column-right-narrow {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
         .external-link-banner {
             display: flex;
             justify-content: space-between;
@@ -93,104 +87,113 @@
     <!-- Main Content Grid -->
     <main class="page-block-layout">
         
-        <!-- Left Column: Action Core -->
-        <div class="column-left-wide">
-            
-            <!-- External Link Banner (Hidden if no link provided) -->
-            <div id="external-banner-wrapper" class="external-link-banner" style="display: none;">
-                <span id="external-banner-label">📦 Official Release</span>
-                <a id="external-banner-link" href="#" target="_blank">View External Page ↗</a>
+        <!-- External Link Banner (Hidden if no link provided) -->
+        <div id="external-banner-wrapper" class="external-link-banner" style="display: none;">
+            <span id="external-banner-label">📦 Official Release</span>
+            <a id="external-banner-link" href="#" target="_blank">View External Page ↗</a>
+        </div>
+
+        <!-- Project Overview Card -->
+        <section class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div id="project-thumbnail-container" style="display: none; width: 60px; height: 60px; border-radius: 6px; overflow: hidden; border: 1px solid #3f4a5a; background: #151a21;">
+                        <img id="project-thumbnail-img" src="" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <h2 id="project-card-title" style="margin: 0; border: none; padding: 0;">Overview</h2>
+                </div>
+                <button type="button" class="kanban-action-btn" onclick="openEditProjectModal()">✏️ Edit Project</button>
+            </div>
+            <p id="project-description" style="color: #9aa5b1; margin: 0; line-height: 1.5;">Loading description...</p>
+        </section>
+
+        <!-- Individual Brain Dump Scratchpad -->
+        <section class="card scratchpad-card">
+            <h2>📝 Project Scratchpad</h2>
+            <p class="scratchpad-hint" style="color: #9aa5b1; font-size: 0.9rem; margin-bottom: 1rem;">Individual scratchpad specific to this project.</p>
+            <div class="scratchpad-container">
+                <div class="scratchpad-toolbar">
+                    <button type="button" class="scratchpad-tool-btn" onclick="openLinkModal('project-scratchpad')">🔗 Add Link</button>
+                    <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('project-scratchpad')">📷 Add Image</button>
+                </div>
+                <div id="project-scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down project notes here..."></div>
+                <input type="file" id="file-project-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'project-scratchpad')">
+            </div>
+        </section>
+
+        <!-- Individual Kanban Task Board Component -->
+        <section class="card kanban-card" id="project-kanban-section">
+            <div class="kanban-header">
+                <h2>✅ Project Task Breakdown</h2>
+                <div class="kanban-controls">
+                    <button id="focus-mode-btn" class="kanban-action-btn" type="button">🎯 Focus Mode: Off</button>
+                    <button id="clear-done-btn" class="kanban-action-btn" type="button">🗑️ Clear Done</button>
+                </div>
             </div>
 
-            <!-- Project Description Card -->
-            <section class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h2 id="project-card-title" style="margin: 0; border: none; padding: 0;">Overview</h2>
-                    <button type="button" class="kanban-action-btn" onclick="openEditProjectModal()">✏️ Edit Project</button>
-                </div>
-                <p id="project-description" style="color: #9aa5b1; margin: 0;">Loading description...</p>
-            </section>
+            <form id="task-form" class="task-form">
+                <input type="text" id="task-title" placeholder="Micro-step task..." required autocomplete="off">
+                <select id="task-energy">
+                    <option value="low">🟢 Low Energy</option>
+                    <option value="medium" selected>🟡 Med Energy</option>
+                    <option value="high">🔴 High Energy</option>
+                </select>
+                <input type="text" id="task-time" placeholder="Time (e.g. 15m)" maxlength="6">
+                <button type="submit" id="add-task-btn">Add</button>
+            </form>
 
-        <!-- Brain Dump -->
-        <div class="column-right-narrow">
-            <section class="card scratchpad-card">
-                <h2>📝 Brain Dump Scratchpad</h2>
-                <p class="scratchpad-hint">Park random ideas or notes here so you don't lose focus.</p>
-                <div class="scratchpad-container">
-                    <div class="scratchpad-toolbar">
-                        <button type="button" class="scratchpad-tool-btn" onclick="addLink('project-scratchpad')">🔗 Add Link</button>
-                        <button type="button" class="scratchpad-tool-btn" onclick="triggerImageUpload('project-scratchpad')">📷 Add Image</button>
-                    </div>
-                    <div id="project-scratchpad" class="scratchpad-box" contenteditable="true" placeholder="Jot down notes here..."></div>
-                    <input type="file" id="file-project-scratchpad" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'project-scratchpad')">
-                </div>
-            </section>
-        </div>
+            <div class="energy-filters">
+                <button type="button" class="filter-btn active" data-filter="all">All</button>
+                <button type="button" class="filter-btn" data-filter="low">🟢 Low</button>
+                <button type="button" class="filter-btn" data-filter="medium">🟡 Med</button>
+                <button type="button" class="filter-btn" data-filter="high">🔴 High</button>
+            </div>
 
-            <!-- Kanban Task Board Component -->
-            <section class="card kanban-card" id="project-kanban-section">
-                <div class="kanban-header">
-                    <h2>✅ Task Breakdown</h2>
-                    <div class="kanban-controls">
-                        <button id="focus-mode-btn" class="kanban-action-btn" type="button">🎯 Focus Mode: Off</button>
-                        <button id="clear-done-btn" class="kanban-action-btn" type="button">🗑️ Clear Done</button>
-                    </div>
+            <div class="kanban-board">
+                <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>To Do</h3>
+                    <div class="task-list" id="todo-list"></div>
                 </div>
-
-                <form id="task-form" class="task-form">
-                    <input type="text" id="task-title" placeholder="Micro-step task..." required autocomplete="off">
-                    <select id="task-energy">
-                        <option value="low">🟢 Low Energy</option>
-                        <option value="medium" selected>🟡 Med Energy</option>
-                        <option value="high">🔴 High Energy</option>
-                    </select>
-                    <input type="text" id="task-time" placeholder="Time (e.g. 15m)" maxlength="6">
-                    <button type="submit" id="add-task-btn">Add</button>
-                </form>
-
-                <div class="energy-filters">
-                    <button type="button" class="filter-btn active" data-filter="all">All</button>
-                    <button type="button" class="filter-btn" data-filter="low">🟢 Low</button>
-                    <button type="button" class="filter-btn" data-filter="medium">🟡 Med</button>
-                    <button type="button" class="filter-btn" data-filter="high">🔴 High</button>
+                <div class="kanban-column" data-column="inprogress" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>In Progress</h3>
+                    <div class="task-list" id="inprogress-list"></div>
                 </div>
-
-                <div class="kanban-board">
-                    <div class="kanban-column" data-column="todo" ondragover="allowDrop(event)" ondrop="drop(event)">
-                        <h3>To Do</h3>
-                        <div class="task-list" id="todo-list"></div>
-                    </div>
-                    <div class="kanban-column" data-column="inprogress" ondragover="allowDrop(event)" ondrop="drop(event)">
-                        <h3>In Progress</h3>
-                        <div class="task-list" id="inprogress-list"></div>
-                    </div>
-                    <div class="kanban-column" data-column="done" ondragover="allowDrop(event)" ondrop="drop(event)">
-                        <h3>Done 🎉</h3>
-                        <div class="task-list" id="done-list"></div>
-                    </div>
+                <div class="kanban-column" data-column="done" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>Done 🎉</h3>
+                    <div class="task-list" id="done-list"></div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
 
     </main>
 
     <!-- Edit Project Modal -->
     <div id="edit-project-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
-        <div class="card" style="max-width: 500px; width: 100%; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
-            <h3 style="margin-top: 0; color: #e3e8ef;">Edit Project Details</h3>
-            <form id="edit-project-form" onsubmit="handleSaveProject(event)" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+        <div class="card" style="max-width: 500px; width: 100%; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem;">
+            <h3 style="margin-top: 0; color: #e3e8ef;">✏️ Edit Project Details</h3>
+            <form onsubmit="handleSaveProject(event)" style="display: flex; flex-direction: column; gap: 14px; margin-top: 15px;">
                 <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <label for="edit-title" style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">Project Title</label>
-                    <input type="text" id="edit-title" class="auth-input" required autocomplete="off" style="padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 4px; color: #e3e8ef;">
+                    <label style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">Project Title</label>
+                    <input type="text" id="edit-title" class="auth-input" required autocomplete="off">
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <label for="edit-description" style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">Description</label>
-                    <textarea id="edit-description" class="auth-input" rows="4" style="padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 4px; color: #e3e8ef; resize: vertical;"></textarea>
+                    <label style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">Description</label>
+                    <textarea id="edit-description" class="auth-input" rows="4" style="resize: vertical;"></textarea>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <label for="edit-external-link" style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">External Link (URL)</label>
-                    <input type="url" id="edit-external-link" class="auth-input" placeholder="https://..." autocomplete="off" style="padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 4px; color: #e3e8ef;">
+                    <label style="font-size: 0.85rem; color: #e3e8ef; font-weight: bold;">External Link (URL)</label>
+                    <input type="url" id="edit-external-link" class="auth-input" placeholder="https://..." autocomplete="off">
                 </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 6px; background: #151a21; border: 1px solid #3f4a5a; padding: 1rem; border-radius: 8px;">
+                    <label style="font-size: 0.85rem; color: #e3e8ef; font-weight: 500;">Change Thumbnail Image:</label>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <input type="file" id="edit-image-file" accept="image/*" style="display: none;" onchange="updateFileName(this, 'edit-file-name')">
+                        <label for="edit-image-file" style="background: #272e38; border: 1px solid #3f4a5a; color: #61afef; cursor: pointer; font-size: 0.85rem; padding: 8px 16px; border-radius: 6px;">📁 Choose New Image</label>
+                        <span id="edit-file-name" style="font-size: 0.85rem; color: #9aa5b1;">Keep existing image</span>
+                    </div>
+                </div>
+
                 <div id="edit-error-msg" style="color: #e06c75; font-size: 0.85rem;"></div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
                     <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; padding: 8px 16px;" onclick="closeEditProjectModal()">Cancel</button>
@@ -200,14 +203,37 @@
         </div>
     </div>
 
+    <!-- Link Insertion Modal for Scratchpad -->
+    <div id="link-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 9999; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;">
+        <div class="card" style="max-width: 400px; width: 100%; background: #1e242d; border: 1px solid #3f4a5a; padding: 2rem;">
+            <h3 style="margin-top: 0; color: #e3e8ef;">🔗 Insert Link</h3>
+            <form onsubmit="handleInsertLink(event)" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                <input type="hidden" id="link-target-id">
+                <input type="text" id="link-display-text" class="auth-input" placeholder="Display text..." required>
+                <input type="url" id="link-url-input" class="auth-input" placeholder="https://..." required>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" class="auth-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; flex: 1;" onclick="closeLinkModal()">Cancel</button>
+                    <button type="submit" class="auth-btn login-btn" style="flex: 1; background: #61afef; color: #1e242d; font-weight: bold;">Insert</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 My Control Center</p>
     </footer>
 
-    <!-- Dynamic Loader Script -->
+    <script src="script.js"></script>
+
     <script>
-        let KANBAN_STORAGE_KEY = 'default_kanban_tasks';
         let currentProjectData = null;
+
+        // Override getCurrentProjectId so tasks are isolated per project ID
+        function getCurrentProjectId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            return id ? `proj_${id}` : 'main';
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -218,11 +244,6 @@
                 window.location.href = 'projects.html';
                 return;
             }
-
-            // Set unique storage keys for this specific project's board & scratchpad
-            KANBAN_STORAGE_KEY = `project_kanban_${projectId}`;
-            const kanbanSection = document.getElementById('project-kanban-section');
-            if (kanbanSection) kanbanSection.setAttribute('data-storage-key', KANBAN_STORAGE_KEY);
 
             // Fetch project details from Supabase
             const { data: project, error } = await supabaseClient
@@ -237,21 +258,43 @@
                 return;
             }
 
-            // Store project data locally for editing
             currentProjectData = project;
 
-            // Populate the page with project data
+            // Populate UI
             document.getElementById('browser-title').textContent = `${project.title} - My Control Center`;
             document.getElementById('project-header-title').textContent = project.title;
             document.getElementById('project-card-title').textContent = project.title;
             document.getElementById('project-description').textContent = project.description || 'No description provided.';
 
-            // Handle optional external link banner
+            if (project.image_url) {
+                const thumbContainer = document.getElementById('project-thumbnail-container');
+                const thumbImg = document.getElementById('project-thumbnail-img');
+                thumbImg.src = project.image_url;
+                thumbContainer.style.display = 'block';
+            }
+
             if (project.external_link) {
                 const banner = document.getElementById('external-banner-wrapper');
                 const linkEl = document.getElementById('external-banner-link');
                 linkEl.href = project.external_link;
                 banner.style.display = 'flex';
+            }
+
+            // Load Individual Scratchpad content from project record
+            const scratchpadEl = document.getElementById('project-scratchpad');
+            if (scratchpadEl) {
+                scratchpadEl.innerHTML = project.scratchpad || '';
+                
+                let timeoutId;
+                scratchpadEl.addEventListener('input', () => {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(async () => {
+                        await supabaseClient
+                            .from('projects')
+                            .update({ scratchpad: scratchpadEl.innerHTML })
+                            .eq('id', projectId);
+                    }, 800);
+                });
             }
         });
 
@@ -260,12 +303,40 @@
             document.getElementById('edit-title').value = currentProjectData.title || '';
             document.getElementById('edit-description').value = currentProjectData.description || '';
             document.getElementById('edit-external-link').value = currentProjectData.external_link || '';
+            document.getElementById('edit-image-file').value = '';
+            document.getElementById('edit-file-name').textContent = 'Keep existing image';
             document.getElementById('edit-error-msg').textContent = '';
             document.getElementById('edit-project-modal').style.display = 'flex';
         }
 
         function closeEditProjectModal() {
             document.getElementById('edit-project-modal').style.display = 'none';
+        }
+
+        function updateFileName(input, targetId) {
+            const span = document.getElementById(targetId);
+            if (!span) return;
+            if (input.files && input.files.length > 0) {
+                span.textContent = input.files[0].name;
+                span.style.color = '#e3e8ef';
+            } else {
+                span.textContent = 'Keep existing image';
+                span.style.color = '#9aa5b1';
+            }
+        }
+
+        function convertFileToBase64(fileInput) {
+            return new Promise((resolve, reject) => {
+                const file = fileInput.files[0];
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
         }
 
         async function handleSaveProject(event) {
@@ -276,44 +347,31 @@
             const updatedTitle = document.getElementById('edit-title').value.trim();
             const updatedDescription = document.getElementById('edit-description').value.trim();
             const updatedExternalLink = document.getElementById('edit-external-link').value.trim();
+            const fileInput = document.getElementById('edit-image-file');
+
+            let updateData = {
+                title: updatedTitle,
+                description: updatedDescription,
+                external_link: updatedExternalLink || null
+            };
+
+            if (fileInput.files && fileInput.files.length > 0) {
+                const image_url = await convertFileToBase64(fileInput);
+                if (image_url) updateData.image_url = image_url;
+            }
 
             const { error } = await supabaseClient
                 .from('projects')
-                .update({
-                    title: updatedTitle,
-                    description: updatedDescription,
-                    external_link: updatedExternalLink || null
-                })
+                .update(updateData)
                 .eq('id', projectId);
 
             if (error) {
-                console.error('Error updating project:', error);
                 document.getElementById('edit-error-msg').textContent = 'Failed to update project: ' + error.message;
                 return;
             }
 
-            // Update local state and DOM elements instantly
-            currentProjectData.title = updatedTitle;
-            currentProjectData.description = updatedDescription;
-            currentProjectData.external_link = updatedExternalLink;
-
-            document.getElementById('browser-title').textContent = `${updatedTitle} - My Control Center`;
-            document.getElementById('project-header-title').textContent = updatedTitle;
-            document.getElementById('project-card-title').textContent = updatedTitle;
-            document.getElementById('project-description').textContent = updatedDescription || 'No description provided.';
-
-            const banner = document.getElementById('external-banner-wrapper');
-            const linkEl = document.getElementById('external-banner-link');
-            if (updatedExternalLink) {
-                linkEl.href = updatedExternalLink;
-                banner.style.display = 'flex';
-            } else {
-                banner.style.display = 'none';
-            }
-
-            closeEditProjectModal();
+            location.reload();
         }
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
