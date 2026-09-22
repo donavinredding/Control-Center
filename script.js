@@ -410,16 +410,25 @@ async function loadLatestVideos() {
 }
 
 function openPopupPlayer(videoId) {
-    const width = 480;
-    const height = 270;
-    const left = window.screen.width - width - 30;
-    const top = window.screen.height - height - 100;
-    
-    window.open(
-        `https://www.youtube.com/embed/${videoId}?autoplay=1`,
-        'YouTubePiPWindow',
-        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
-    );
+    // Check if the user is on a mobile device (iOS or Android)
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+        // Opens the standard watch URL, which mobile OS handles by opening the YouTube app
+        window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+    } else {
+        // Desktop Picture-in-Picture popup window behavior
+        const width = 480;
+        const height = 270;
+        const left = window.screen.width - width - 30;
+        const top = window.screen.height - height - 100;
+        
+        window.open(
+            `https://www.youtube.com/embed/${videoId}?autoplay=1`,
+            'YouTubePiPWindow',
+            `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
+        );
+    }
 }
 
 
