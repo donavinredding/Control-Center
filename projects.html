@@ -214,13 +214,28 @@
                     <div class="project-card-footer">
                         <a href="project.html?id=${proj.id}" class="project-hub-link">Open Hub &rarr;</a>
                         <div class="project-card-actions">
-                            <button type="button" class="project-action-btn edit-btn" onclick="openShowroomEditModal('${proj.id}', '${escapeAttr(proj.title)}', '${escapeAttr(proj.description || '')}', '${escapeAttr(proj.external_link || '')}')">✏️ Edit</button>
+                            <button type="button" class="project-action-btn edit-btn" 
+                                data-id="${proj.id}" 
+                                data-title="${escapeAttr(proj.title)}" 
+                                data-desc="${escapeAttr(proj.description || '')}" 
+                                data-link="${escapeAttr(proj.external_link || '')}" 
+                                onclick="handleCardEditClick(this)">✏️ Edit</button>
                             <button type="button" class="project-action-btn delete-btn" onclick="openDeleteModal('${proj.id}')">🗑️ Delete</button>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // Safe handler for edit button clicks using data attributes
+        function handleCardEditClick(button) {
+            const id = button.getAttribute('data-id');
+            const title = button.getAttribute('data-title');
+            const desc = button.getAttribute('data-desc');
+            const link = button.getAttribute('data-link');
+            
+            openShowroomEditModal(id, title, desc, link);
         }
 
         function openLinkModal() {

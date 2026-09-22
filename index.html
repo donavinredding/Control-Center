@@ -110,21 +110,34 @@
         </section>
         
         <section class="card projects-section">
-            <h2>📋Projects</h2>
-            <ol>
-                <li>
-                    <p>Learning JavaScript on Scrimba</p>
-                    <button class="project-button" onclick="window.location.href='https://scrimba.com/learn-javascript-c0v'">
-                        <img src="./images/scrimbacource.png" alt="Scrimba Logo" class="project-image">
-                    </button>
-                </li>
-                <li>
-                    <p>Elytra Models Project</p>
-                    <button class="project-button" onclick="window.location.href='./projectpages/addon.html'">
-                        <img src="./images/elytra-models.png" alt="Elytra Models Logo" class="project-image">
-                    </button>
-                </li>
-            </ol>
+            <h2>📋 Projects</h2>
+            <div class="projects-grid" style="grid-template-columns: 1fr; gap: 1rem;">
+                
+                <div class="card project-showcase-card">
+                    <div class="project-card-image-wrap" style="height: 160px;">
+                        <img src="./images/scrimbacource.png" alt="Scrimba Logo" class="project-card-img">
+                    </div>
+                    <div class="project-card-content">
+                        <h3 class="project-card-title" style="font-size: 1rem;">Learning JavaScript on Scrimba</h3>
+                    </div>
+                    <div class="project-card-footer">
+                        <a href="https://scrimba.com/learn-javascript-c0v" target="_blank" class="project-hub-link">Open Course &rarr;</a>
+                    </div>
+                </div>
+
+                <div class="card project-showcase-card">
+                    <div class="project-card-image-wrap" style="height: 160px;">
+                        <img src="./images/elytra-models.png" alt="Elytra Models Logo" class="project-card-img">
+                    </div>
+                    <div class="project-card-content">
+                        <h3 class="project-card-title" style="font-size: 1rem;">Elytra Models Project</h3>
+                    </div>
+                    <div class="project-card-footer">
+                        <a href="https://authors.curseforge.com/#/projects/1637966/general" class="project-hub-link">Open Project Hub &rarr;</a>
+                    </div>
+                </div>
+
+            </div>
         </section>
 
         <section class="card space-news-section">

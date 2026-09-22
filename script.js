@@ -633,30 +633,39 @@ async function fetchProjects() {
         return;
     }
 
-    container.innerHTML = '';
-    data.forEach(proj => {
-        const card = document.createElement('section');
-        card.className = 'card project-showcase-card';
+    function handleCardEditClick(button) {
+        const id = button.getAttribute('data-id');
+        const title = button.getAttribute('data-title');
+        const desc = button.getAttribute('data-desc');
+        const link = button.getAttribute('data-link');
         
-        const imageThumbnail = proj.image_url 
-            ? `<div class="project-card-image-wrap"><img src="${proj.image_url}" alt="Project Image" class="project-card-img"></div>` 
-            : `<div class="project-card-image-wrap placeholder-wrap"><span>📁</span></div>`;
+        openShowroomEditModal(id, title, desc, link);
+    }
 
-        card.innerHTML = `
-            <div class="project-card-inner">
-                ${imageThumbnail}
-                <div class="project-card-content">
-                    <h2 class="project-card-title">${escapeHtml(proj.title)}</h2>
-                    <p class="project-card-desc">${escapeHtml(proj.description || '')}</p>
-                </div>
+    card.innerHTML = `
+    <div class="project-card-inner">
+        ${imageThumbnail}
+        <div class="project-card-content">
+            <div class="project-card-top-row">
+                <h2 class="project-card-title">${escapeHtml(proj.title)}</h2>
+                ${externalLinkBadge}
             </div>
-            <div class="project-card-footer">
-                <a href="project.html?id=${proj.id}" class="project-hub-link">Open Project Hub &rarr;</a>
-                <button type="button" class="project-action-btn delete-btn" onclick="openDeleteModal('${proj.id}')">🗑️ Delete</button>
-            </div>
-        `;
-        container.appendChild(card);
-    });
+            <p class="project-card-desc">${escapeHtml(proj.description || 'No description provided.')}</p>
+        </div>
+    </div>
+    <div class="project-card-footer">
+        <a href="project.html?id=${proj.id}" class="project-hub-link">Open Hub &rarr;</a>
+        <div class="project-card-actions">
+            <button type="button" class="project-action-btn edit-btn" 
+                data-id="${proj.id}" 
+                data-title="${escapeAttr(proj.title)}" 
+                data-desc="${escapeAttr(proj.description || '')}" 
+                data-link="${escapeAttr(proj.external_link || '')}" 
+                onclick="handleCardEditClick(this)">✏️ Edit</button>
+            <button type="button" class="project-action-btn delete-btn" onclick="openDeleteModal('${proj.id}')">🗑️ Delete</button>
+        </div>
+    </div>
+`;
 }
 
 
