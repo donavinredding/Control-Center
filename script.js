@@ -403,32 +403,36 @@ async function loadLatestVideos() {
             <span class="creator-name">${video.creatorName}</span>
         `;
         card.addEventListener('click', () => {
-            openPopupPlayer(video.videoId);
+            handleVideoClick(video.videoId);
         });
         container.appendChild(card);
     });
 }
 
-function openPopupPlayer(videoId) {
-    // Check if the user is on a mobile device
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+function handleVideoClick(videoId) {
+    // Check if the user is on a mobile device or narrow screen
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
     if (isMobile) {
-        // Opens the standard watch URL, which triggers the YouTube mobile app
+        // Opens standard YouTube URL, which triggers iOS/Android Universal Links to open the native app
         window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
     } else {
-        // Keeps your desktop floating PiP window behavior
-        const width = 480;
-        const height = 270;
-        const left = window.screen.width - width - 30;
-        const top = window.screen.height - height - 100;
-        
-        window.open(
-            `https://www.youtube.com/embed/${videoId}?autoplay=1`,
-            'YouTubePiPWindow',
-            `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
-        );
+        // Keeps your desktop PiP popup player behavior
+        openPopupPlayer(videoId);
     }
+}
+
+function openPopupPlayer(videoId) {
+    const width = 480;
+    const height = 270;
+    const left = window.screen.width - width - 30;
+    const top = window.screen.height - height - 100;
+    
+    window.open(
+        `https://www.youtube.com/embed/${videoId}?autoplay=1`,
+        'YouTubePiPWindow',
+        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
+    );
 }
 
 
