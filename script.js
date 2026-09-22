@@ -410,14 +410,14 @@ async function loadLatestVideos() {
 }
 
 function openPopupPlayer(videoId) {
-    // Check if the user is on a mobile device (iOS or Android)
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    // Check if the user is on a mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (isMobile) {
-        // Opens the standard watch URL, which mobile OS handles by opening the YouTube app
+        // Opens the standard watch URL, which triggers the YouTube mobile app
         window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
     } else {
-        // Desktop Picture-in-Picture popup window behavior
+        // Keeps your desktop floating PiP window behavior
         const width = 480;
         const height = 270;
         const left = window.screen.width - width - 30;
