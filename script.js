@@ -414,61 +414,28 @@ function handleVideoClick(videoId) {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
     if (isMobile) {
-        // Opens the yout-ube.com watch URL in a new tab on mobile
-        window.open(`https://www.yout-ube.com/watch?v=${videoId}`, '_blank');
+        // Mobile: Opens standard YouTube URL to trigger native app / tab
+        window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
     } else {
-        // Opens the PiP popup window on desktop
+        // Desktop: Opens the popup player window with yout-ube.com
         openPopupPlayer(videoId);
     }
 }
 
-function openPopupPlayer(videoId) {
+function openPopupPlayer(videoId, startTime = '') {
     const width = 480;
     const height = 270;
     const left = window.screen.width - width - 30;
     const top = window.screen.height - height - 100;
     
-    // Uses your requested youtube-nocookie embed URL with all parameters for desktop popup
-    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?playlist=${videoId}&autoplay=1&iv_load_policy=3&loop=1`;
-    
-    window.open(
-        embedUrl,
-        'YouTubePiPWindow',
-        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
-    );
-}
-
-function handleVideoClick(videoId) {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-
-    if (isMobile) {
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        
-        if (/android/i.test(userAgent)) {
-            // Android intent to launch the YouTube app directly
-            window.location.href = `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end;`;
-        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            // iOS custom scheme with a web fallback if the app isn't installed
-            window.location.href = `youtube://www.youtube.com/watch?v=${videoId}`;
-            setTimeout(() => {
-                window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
-            }, 500);
-        } else {
-            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
-        }
-    } else {
-        openPopupPlayer(videoId);
+    // Construct the yout-ube.com watch URL with optional timestamp parameter
+    let watchUrl = `https://www.yout-ube.com/watch?v=${videoId}`;
+    if (startTime) {
+        watchUrl += `&t=${startTime}`;
     }
-}
-
-function openPopupPlayer(videoId, embedUrl) {
-    const width = 480;
-    const height = 270;
-    const left = window.screen.width - width - 30;
-    const top = window.screen.height - height - 100;
     
     window.open(
-        embedUrl,
+        watchUrl,
         'YouTubePiPWindow',
         `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
     );
