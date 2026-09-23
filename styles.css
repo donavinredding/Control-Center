@@ -16,8 +16,12 @@ a {
     color: #61afef;
 }
 
-/* Modal Overlay */
-.logout-modal-overlay {
+/* =========================================================================
+   MODALS & POPUPS FIX (Responsive Overlay & Content)
+   ========================================================================= */
+.modal-overlay, 
+.logout-modal-overlay, 
+[id*="modal"] {
     position: fixed;
     top: 0;
     left: 0;
@@ -30,19 +34,23 @@ a {
     align-items: center;
     padding: 1rem;
     box-sizing: border-box;
-    backdrop-filter: blur(4px); /* Optional: adds a sleek modern blur effect */
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
 }
 
-/* Modal Card */
-.logout-card {
-    max-width: 400px;
+.modal-content,
+.logout-card,
+[id*="modal"] > div {
+    max-width: 500px;
     width: 100%;
-    text-align: center;
+    max-height: 90vh;
+    overflow-y: auto;
     background: #1e242d;
     border: 1px solid #3f4a5a;
     border-radius: 12px;
     padding: 2rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
 }
 
 .logout-title {
@@ -66,7 +74,8 @@ a {
 }
 
 /* Base Auth Button Adjustments for Modal */
-.logout-card .auth-btn {
+.logout-card .auth-btn,
+[id*="modal"] .auth-btn {
     flex: 1;
     font-family: inherit;
     border-radius: 8px;
@@ -74,6 +83,7 @@ a {
     cursor: pointer;
     font-weight: 500;
     transition: background-color 0.2s ease, transform 0.1s ease;
+    box-sizing: border-box;
 }
 
 .logout-card .cancel-btn {
