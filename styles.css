@@ -194,6 +194,27 @@ header {
 }
 
 /* =========================================================================
+   UNIVERSAL MOBILE RESPONSIVE IMAGE & CONTAINER FIX
+   ========================================================================= */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Ensure cards and widgets don't allow overflowing content */
+.card, 
+.video-button, 
+.project-card, 
+div[class*="fiverr"], 
+section {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+
+/* =========================================================================
    RESPONSIVE IMAGE FIX
    ========================================================================= */
 .video-button img,
