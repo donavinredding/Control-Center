@@ -410,14 +410,11 @@ async function loadLatestVideos() {
 }
 
 function handleVideoClick(videoId) {
-    // Check if the user is on a mobile device or narrow screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
     if (isMobile) {
-        // Mobile: Opens standard YouTube URL to trigger native app / tab
         window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
     } else {
-        // Desktop: Opens the popup player window with yout-ube.com
         openPopupPlayer(videoId);
     }
 }
@@ -428,7 +425,6 @@ function openPopupPlayer(videoId, startTime = '') {
     const left = window.screen.width - width - 30;
     const top = window.screen.height - height - 100;
     
-    // Construct the yout-ube.com watch URL with optional timestamp parameter
     let watchUrl = `https://www.yout-ube.com/watch?v=${videoId}`;
     if (startTime) {
         watchUrl += `&t=${startTime}`;
