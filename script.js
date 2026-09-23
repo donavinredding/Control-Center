@@ -410,13 +410,14 @@ async function loadLatestVideos() {
 }
 
 function handleVideoClick(videoId) {
+    // Check if the user is on a mobile device or narrow screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
     if (isMobile) {
-        // Option 1: Using yout-ube.com with optional timestamp parameter (e.g., &t=0s)
-        window.open(`https://www.yout-ube.com/watch?v=${videoId}&t=0s`, '_blank');
+        // Opens the yout-ube.com watch URL in a new tab on mobile
+        window.open(`https://www.yout-ube.com/watch?v=${videoId}`, '_blank');
     } else {
-        // Desktop popup player
+        // Opens the PiP popup window on desktop
         openPopupPlayer(videoId);
     }
 }
@@ -427,9 +428,39 @@ function openPopupPlayer(videoId) {
     const left = window.screen.width - width - 30;
     const top = window.screen.height - height - 100;
     
-    // Option 2: Using youtube-nocookie.com embed with playlist, autoplay, loop, and start time parameters
+    // Uses your requested youtube-nocookie embed URL with all parameters for desktop popup
+    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?playlist=${videoId}&autoplay=1&iv_load_policy=3&loop=1`;
+    
     window.open(
-        `https://www.youtube-nocookie.com/embed/${videoId}?playlist=${videoId}&autoplay=1&iv_load_policy=3&loop=1&start=0`,
+        embedUrl,
+        'YouTubePiPWindow',
+        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
+    );
+}
+
+function handleVideoClick(videoId) {
+    // Check if the user is on a mobile device or narrow screen
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?playlist=${videoId}&autoplay=1&iv_load_policy=3&loop=1`;
+
+    if (isMobile) {
+        // On mobile, open the embed link in a new tab
+        window.open(embedUrl, '_blank');
+    } else {
+        // On desktop, open as a small PiP popup window
+        openPopupPlayer(videoId, embedUrl);
+    }
+}
+
+function openPopupPlayer(videoId, embedUrl) {
+    const width = 480;
+    const height = 270;
+    const left = window.screen.width - width - 30;
+    const top = window.screen.height - height - 100;
+    
+    window.open(
+        embedUrl,
         'YouTubePiPWindow',
         `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
     );
