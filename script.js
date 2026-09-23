@@ -410,14 +410,13 @@ async function loadLatestVideos() {
 }
 
 function handleVideoClick(videoId) {
-    // Check if the user is on a mobile device or narrow screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
     if (isMobile) {
-        // Opens using yout-ube.com with the dash
-        window.open(`https://www.yout-ube.com/watch?v=${videoId}`, '_blank');
+        // Option 1: Using yout-ube.com with optional timestamp parameter (e.g., &t=0s)
+        window.open(`https://www.yout-ube.com/watch?v=${videoId}&t=0s`, '_blank');
     } else {
-        // Keeps your desktop PiP popup player behavior
+        // Desktop popup player
         openPopupPlayer(videoId);
     }
 }
@@ -428,8 +427,9 @@ function openPopupPlayer(videoId) {
     const left = window.screen.width - width - 30;
     const top = window.screen.height - height - 100;
     
+    // Option 2: Using youtube-nocookie.com embed with playlist, autoplay, loop, and start time parameters
     window.open(
-        `https://www.youtube.com/embed/${videoId}?autoplay=1`,
+        `https://www.youtube-nocookie.com/embed/${videoId}?playlist=${videoId}&autoplay=1&iv_load_policy=3&loop=1&start=0`,
         'YouTubePiPWindow',
         `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=no,status=no`
     );
