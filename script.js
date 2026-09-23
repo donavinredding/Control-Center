@@ -414,8 +414,8 @@ function handleVideoClick(videoId) {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
     if (isMobile) {
-        // Opens standard YouTube URL, which triggers iOS/Android Universal Links to open the native app
-        window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+        // Opens using yout-ube.com with the dash
+        window.open(`https://www.yout-ube.com/watch?v=${videoId}`, '_blank');
     } else {
         // Keeps your desktop PiP popup player behavior
         openPopupPlayer(videoId);
