@@ -439,17 +439,25 @@ function openPopupPlayer(videoId) {
 }
 
 function handleVideoClick(videoId) {
-    // Check if the user is on a mobile device or narrow screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
-    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?playlist=${videoId}&autoplay=1&iv_load_policy=3&loop=1`;
-
     if (isMobile) {
-        // On mobile, open the embed link in a new tab
-        window.open(embedUrl, '_blank');
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        
+        if (/android/i.test(userAgent)) {
+            // Android intent to launch the YouTube app directly
+            window.location.href = `intent://www.youtube.com/watch?v=${videoId}#Intent;package=com.google.android.youtube;scheme=https;end;`;
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            // iOS custom scheme with a web fallback if the app isn't installed
+            window.location.href = `youtube://www.youtube.com/watch?v=${videoId}`;
+            setTimeout(() => {
+                window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+            }, 500);
+        } else {
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+        }
     } else {
-        // On desktop, open as a small PiP popup window
-        openPopupPlayer(videoId, embedUrl);
+        openPopupPlayer(videoId);
     }
 }
 
