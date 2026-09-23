@@ -353,7 +353,8 @@ const creators = [
     { name: "StarTalk", channelId: "UCqoAEDirJPjEUFcF2FklnBA" },
     { name: "Mumbo Jumbo", channelId: "UChFur_NwVSbUozOcF_F2kMg" },
     { name: "Coridor Crew", channelId: "UCSpFnDQr88xCZ80N-X7t0nQ" },
-    { name: "Dylan Page", channelId: "UCzPpbeK8ANcNKg5aoMB0miw" }
+    { name: "Dylan Page", channelId: "UCzPpbeK8ANcNKg5aoMB0miw" },
+    { name: "Colin Furze", channelId: "UCp68_FLety0O-n9QU6phsgw" }
 ];
 
 async function loadLatestVideos() {
@@ -883,6 +884,7 @@ function handleCardEditClick(btn) {
     document.getElementById('edit-project-link').value = link;
     modal.style.display = 'flex';
 }
+
 
 
 /* =========================================================================

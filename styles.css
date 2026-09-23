@@ -10,6 +10,11 @@ body {
     padding: 0;
     min-height: 100vh;
     overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
 }
 
 a {
@@ -17,11 +22,13 @@ a {
 }
 
 /* =========================================================================
-   MODALS & POPUPS FIX (Responsive Overlay & Content)
+   MODALS & POPUPS (UNIVERSAL RESPONSIVE FIX)
    ========================================================================= */
-.modal-overlay, 
-.logout-modal-overlay, 
-[id*="modal"] {
+.logout-modal-overlay,
+.modal-overlay,
+.edit-modal-overlay,
+[class*="modal-overlay"],
+[class*="popup-overlay"] {
     position: fixed;
     top: 0;
     left: 0;
@@ -38,9 +45,11 @@ a {
     overflow-y: auto;
 }
 
-.modal-content,
 .logout-card,
-[id*="modal"] > div {
+.modal-card,
+.edit-modal-card,
+.project-edit-modal,
+div[class*="modal"]:not([class*="overlay"]) {
     max-width: 500px;
     width: 100%;
     max-height: 90vh;
@@ -48,9 +57,10 @@ a {
     background: #1e242d;
     border: 1px solid #3f4a5a;
     border-radius: 12px;
-    padding: 2rem;
+    padding: 1.5rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
+    margin: auto;
 }
 
 .logout-title {
@@ -75,7 +85,7 @@ a {
 
 /* Base Auth Button Adjustments for Modal */
 .logout-card .auth-btn,
-[id*="modal"] .auth-btn {
+.modal-card .auth-btn {
     flex: 1;
     font-family: inherit;
     border-radius: 8px;
@@ -83,27 +93,30 @@ a {
     cursor: pointer;
     font-weight: 500;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    box-sizing: border-box;
 }
 
-.logout-card .cancel-btn {
+.logout-card .cancel-btn,
+.modal-card .cancel-btn {
     background: #272e38;
     border: 1px solid #3f4a5a;
     color: #e3e8ef;
 }
 
-.logout-card .cancel-btn:hover {
+.logout-card .cancel-btn:hover,
+.modal-card .cancel-btn:hover {
     background: #323c4a;
     border-color: #4e5d73;
 }
 
-.logout-card .logout-confirm-btn {
+.logout-card .logout-confirm-btn,
+.modal-card .logout-confirm-btn {
     background: #e06c75;
     border: 1px solid #e06c75;
     color: #fff;
 }
 
-.logout-card .logout-confirm-btn:hover {
+.logout-card .logout-confirm-btn:hover,
+.modal-card .logout-confirm-btn:hover {
     background: #e8838b;
     border-color: #e8838b;
 }
@@ -605,20 +618,27 @@ section {
 /* =========================================================================
    SCRATCHPAD
    ========================================================================= */
-textarea {
+textarea,
+input[type="text"],
+select {
     width: 100%;
-    height: 150px;
     background: #272e38;
     color: #e3e8ef;
     border: 1px solid #3f4a5a;
     border-radius: 4px;
     padding: 10px;
-    resize: vertical;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
 
-textarea:focus {
+textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+select:focus {
     outline: none;
     border-color: #61afef;
 }
@@ -777,18 +797,6 @@ textarea:focus {
     gap: 8px;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
-}
-
-.task-form input[type="text"], 
-.task-form select {
-    background: #272e38;
-    border: 1px solid #3f4a5a;
-    color: #e3e8ef;
-    padding: 8px 10px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    outline: none;
-    box-sizing: border-box;
 }
 
 .task-form input[id="task-title"] {
