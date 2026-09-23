@@ -16,6 +16,88 @@ a {
     color: #61afef;
 }
 
+/* Modal Overlay */
+.logout-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    backdrop-filter: blur(4px); /* Optional: adds a sleek modern blur effect */
+}
+
+/* Modal Card */
+.logout-card {
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    background: #1e242d;
+    border: 1px solid #3f4a5a;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.logout-title {
+    margin-top: 0;
+    color: #e3e8ef;
+    font-family: inherit;
+}
+
+.logout-desc {
+    color: #9aa5b1;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-family: inherit;
+}
+
+/* Action Buttons Container */
+.logout-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Base Auth Button Adjustments for Modal */
+.logout-card .auth-btn {
+    flex: 1;
+    font-family: inherit;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.logout-card .cancel-btn {
+    background: #272e38;
+    border: 1px solid #3f4a5a;
+    color: #e3e8ef;
+}
+
+.logout-card .cancel-btn:hover {
+    background: #323c4a;
+    border-color: #4e5d73;
+}
+
+.logout-card .logout-confirm-btn {
+    background: #e06c75;
+    border: 1px solid #e06c75;
+    color: #fff;
+}
+
+.logout-card .logout-confirm-btn:hover {
+    background: #e8838b;
+    border-color: #e8838b;
+}
+
 /* =========================================================================
    HEADER & USER WIDGET LAYOUT
    ========================================================================= */
@@ -86,9 +168,9 @@ header {
 }
 
 .logout-action-btn {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(224, 108, 117, 0.15);
+    color: #e06c75;
+    border: 1px solid rgba(224, 108, 117, 0.3);
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -98,7 +180,7 @@ header {
 }
 
 .logout-action-btn:hover {
-    background: rgba(239, 68, 68, 0.25);
+    background: rgba(224, 108, 117, 0.25);
 }
 
 /* =========================================================================
@@ -142,8 +224,8 @@ header {
 .auth-input {
     width: 100%;
     padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #272e38;
+    border: 1px solid #3f4a5a;
     border-radius: 6px;
     color: inherit;
     font-size: 0.95rem;
@@ -177,24 +259,25 @@ header {
 }
 
 .login-btn {
-    background: #4f46e5;
-    color: white;
+    background: #61afef;
+    color: #181c22;
+    font-weight: bold;
 }
 
 .signup-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: #272e38;
     color: inherit;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid #3f4a5a;
 }
 
 .auth-error-msg {
-    color: #ef4444;
+    color: #e06c75;
     font-size: 0.85rem;
     min-height: 20px;
 }
 
 /* =========================================================================
-   UNIVERSAL MOBILE RESPONSIVE IMAGE & CONTAINER FIX
+   UNIVERSAL RESPONSIVE IMAGE & CONTAINER FIX
    ========================================================================= */
 img {
     max-width: 100%;
@@ -202,7 +285,6 @@ img {
     display: block;
 }
 
-/* Ensure cards and widgets don't allow overflowing content */
 .card, 
 .video-button, 
 .project-card, 
@@ -213,10 +295,6 @@ section {
     overflow: hidden;
 }
 
-
-/* =========================================================================
-   RESPONSIVE IMAGE FIX
-   ========================================================================= */
 .video-button img,
 .project-card-img,
 .card img {
@@ -226,7 +304,6 @@ section {
     object-fit: cover;
     display: block;
 }
-
 
 /* =========================================================================
    MAIN GRID & CARDS LAYOUT
@@ -289,7 +366,7 @@ section {
 }
 
 /* =========================================================================
-   ENHANCED PROJECT SHOWROOM GRID & CARDS (Nicer & Larger Images)
+   PROJECT SHOWROOM GRID & CARDS
    ========================================================================= */
 .projects-grid {
     display: grid;
@@ -301,7 +378,7 @@ section {
     background: #313843;
     border: 1px solid #3f4a5a;
     border-radius: 12px;
-    padding: 0 !important; /* Managed internally for clean image bleed */
+    padding: 0 !important;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -318,8 +395,8 @@ section {
 
 .project-card-image-wrap {
     width: 100%;
-    height: 240px; /* Much larger, cinematic image height */
-    background: #151a21;
+    height: 240px;
+    background: #181c22;
     overflow: hidden;
     position: relative;
     border-bottom: 1px solid #3f4a5a;
@@ -333,7 +410,7 @@ section {
 }
 
 .project-showcase-card:hover .project-card-img {
-    transform: scale(1.05); /* Smooth zoom-in on hover */
+    transform: scale(1.05);
 }
 
 .placeholder-wrap {
@@ -390,8 +467,8 @@ section {
     font-size: 0.92rem;
     line-height: 1.5;
     display: -webkit-box;
-    line-clamp: 3;             /* Standard property for modern browsers & linters */
-    -webkit-line-clamp: 3;     /* Compatibility for older WebKit browsers */
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -551,7 +628,7 @@ textarea:focus {
 }
 
 .scratchpad-toolbar {
-    background: #1e242d;
+    background: #181c22;
     padding: 6px 10px;
     display: flex;
     gap: 12px;
@@ -572,7 +649,7 @@ textarea:focus {
 
 .scratchpad-toolbar button:hover {
     color: #ffffff;
-    background: #313d4f;
+    background: #313843;
 }
 
 .scratchpad-box {
@@ -649,7 +726,7 @@ textarea:focus {
 }
 
 .kanban-action-btn:hover {
-    background: #313d4f;
+    background: #313843;
     border-color: #61afef;
 }
 
@@ -672,7 +749,7 @@ textarea:focus {
 }
 
 .filter-btn:hover {
-    background: #313d4f;
+    background: #313843;
     color: #e2e8f0;
     border-color: #61afef;
 }
@@ -839,7 +916,7 @@ textarea:focus {
 }
 
 .task-tag {
-    background: #1e242d;
+    background: #181c22;
     padding: 2px 5px;
     border-radius: 3px;
     border: 1px solid #3f4a5a;

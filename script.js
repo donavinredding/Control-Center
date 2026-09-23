@@ -175,7 +175,7 @@ function renderTasks() {
         return task.energy === currentEnergyFilter;
     });
 
-    const boxBtnStyle = "background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s;";
+    const boxBtnStyle = "background: #272e38; border: 1px solid #3f4a5a; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; color: #e3e8ef; transition: background 0.2s;";
 
     visibleTasks.forEach(task => {
         const card = document.createElement('div');
@@ -207,7 +207,7 @@ function renderTasks() {
                     <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTaskComplete('${task.id}')">
                     <p class="task-title" style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}; margin: 0;">${escapeHtml(task.title)}</p>
                 </div>
-                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.2); border-radius: 6px; color: #ff4d4d; cursor: pointer; font-size: 0.85rem; padding: 5px 8px; line-height: 1;">🗑️</button>
+                <button class="task-delete-btn" onclick="deleteTask('${task.id}')" title="Delete Task" style="background: rgba(224,108,117,0.15); border: 1px solid rgba(224,108,117,0.3); border-radius: 6px; color: #e06c75; cursor: pointer; font-size: 0.85rem; padding: 5px 8px; line-height: 1;">🗑️</button>
             </div>
             <div class="task-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 2px;">
                 <div class="task-info-center" style="display: flex; gap: 6px; align-items: center;">
@@ -265,12 +265,12 @@ function deleteTask(id) {
         modal.id = 'delete-confirm-modal';
         modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
         modal.innerHTML = `
-            <div style="background: #1e2530; border: 1px solid rgba(255,255,255,0.1); padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem;">Delete Task?</h3>
-                <p style="color: #a0aec0; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to delete this task?</p>
+            <div style="background: #313843; border: 1px solid #3f4a5a; padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem; color: #f0f4f8;">Delete Task?</h3>
+                <p style="color: #9aa5b1; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to delete this task?</p>
                 <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button id="cancel-delete-btn" style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
-                    <button id="confirm-delete-btn" style="background: #ff4d4d; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Delete</button>
+                    <button id="cancel-delete-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
+                    <button id="confirm-delete-btn" style="background: #e06c75; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Delete</button>
                 </div>
             </div>
         `;
@@ -302,12 +302,12 @@ function clearDoneTasks() {
         modal.id = 'clear-done-confirm-modal';
         modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
         modal.innerHTML = `
-            <div style="background: #1e2530; border: 1px solid rgba(255,255,255,0.1); padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem;">Clear Done Tasks?</h3>
-                <p style="color: #a0aec0; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to clear all completed tasks?</p>
+            <div style="background: #313843; border: 1px solid #3f4a5a; padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem; color: #f0f4f8;">Clear Done Tasks?</h3>
+                <p style="color: #9aa5b1; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to clear all completed tasks?</p>
                 <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button id="cancel-clear-done-btn" style="background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
-                    <button id="confirm-clear-done-btn" style="background: #ff4d4d; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Clear</button>
+                    <button id="cancel-clear-done-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
+                    <button id="confirm-clear-done-btn" style="background: #e06c75; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Clear</button>
                 </div>
             </div>
         `;
@@ -334,6 +334,11 @@ function clearDoneTasks() {
 function escapeHtml(text) {
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function escapeAttr(text) {
+    if (!text) return '';
+    return escapeHtml(text);
 }
 
 
@@ -425,7 +430,7 @@ function openPopupPlayer(videoId, startTime = '') {
     const left = window.screen.width - width - 30;
     const top = window.screen.height - height - 100;
     
-    let watchUrl = `https://www.yout-ube.com/watch?v=${videoId}`;
+    let watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
     if (startTime) {
         watchUrl += `&t=${startTime}`;
     }
@@ -464,6 +469,72 @@ async function setupScratchpadCloud(id) {
                 content: pad.innerHTML
             });
         }, 800);
+    });
+
+    pad.addEventListener('click', (e) => {
+        const anchor = e.target.closest('a');
+        if (anchor && anchor.href) {
+            e.preventDefault();
+            window.open(anchor.href, '_blank');
+        }
+    });
+
+    pad.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text/plain');
+        const urlRegex = /^(https?:\/\/[^\s]+|[a-zA-Z0-9][-a-zA-Z0-90-9]*\.[a-zA-Z]{2,}[^\s]*)$/;
+
+        if (urlRegex.test(text.trim())) {
+            const cleanUrl = text.trim().startsWith('http') ? text.trim() : 'https://' + text.trim();
+            insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
+        } else {
+            insertHtmlAtCursor(text);
+        }
+        pad.dispatchEvent(new Event('input'));
+    });
+
+    pad.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                const node = range.startContainer;
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    const words = text.split(/\s+/);
+                    const lastWord = words[words.length - 1];
+
+                    if (lastWord && (lastWord.startsWith('http://') || lastWord.startsWith('https://') || (lastWord.includes('.') && !lastWord.endsWith('.')))) {
+                        const cleanUrl = lastWord.startsWith('http') ? lastWord : 'https://' + lastWord;
+                        const leadingText = text.substring(0, text.length - lastWord.length);
+
+                        const span = document.createElement('span');
+                        span.textContent = leadingText;
+
+                        const a = document.createElement('a');
+                        a.href = cleanUrl;
+                        a.textContent = lastWord;
+                        a.target = '_blank';
+
+                        const parent = node.parentNode;
+                        parent.insertBefore(span, node);
+                        parent.insertBefore(a, node);
+
+                        const spaceNode = document.createTextNode(e.key === ' ' ? ' ' : '\n');
+                        parent.insertBefore(spaceNode, node);
+                        parent.removeChild(node);
+
+                        range.setStartAfter(spaceNode);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+
+                        e.preventDefault();
+                        pad.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+        }
     });
 }
 
@@ -541,55 +612,63 @@ function insertHtmlAtCursor(html) {
     }
 }
 
+function openLinkModal(id) {
+    addLink(id);
+}
+
 function addLink(id) {
     const pad = document.getElementById(id);
     if (!pad) return;
-    pad.focus();
 
-    const url = prompt("Enter URL:");
-    if (!url) return;
-    const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
+    let modal = document.getElementById('custom-link-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'custom-link-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
+        modal.innerHTML = `
+            <div style="background: #313843; border: 1px solid #61afef; padding: 24px; border-radius: 12px; width: 90%; max-width: 340px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 1.1rem; color: #f0f4f8;">Insert Link</h3>
+                <input type="text" id="custom-link-url-input" placeholder="https://example.com" style="width: 100%; padding: 10px; margin-bottom: 12px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 6px; color: #e3e8ef; font-size: 0.95rem; box-sizing: border-box; outline: none;">
+                <input type="text" id="custom-link-text-input" placeholder="Link text (optional)" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 6px; color: #e3e8ef; font-size: 0.95rem; box-sizing: border-box; outline: none;">
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="cancel-link-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
+                    <button id="confirm-link-btn" style="background: #61afef; border: none; color: #181c22; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; flex: 1;">Add</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
 
-    insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${cleanUrl}</a>&nbsp;`);
-    pad.dispatchEvent(new Event('input'));
-}
-
-function triggerImageUpload(id) {
-    const fileInput = document.getElementById('file-' + id);
-    if (fileInput) {
-        fileInput.click();
-    } else {
-        openImagePrompt(id);
+        document.getElementById('cancel-link-btn').addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
     }
-}
 
-function openImagePrompt(id) {
-    const imageUrl = prompt("Enter Image URL (or local file path):");
-    if (imageUrl && imageUrl.trim() !== "") {
-        const pad = document.getElementById(id);
-        if (pad) {
-            pad.focus();
-            insertHtmlAtCursor(`<img src="${imageUrl.trim()}" alt="Uploaded Image" style="max-width: 100%; height: auto;">`);
-            pad.dispatchEvent(new Event('input'));
+    const urlInput = document.getElementById('custom-link-url-input');
+    const textInput = document.getElementById('custom-link-text-input');
+    urlInput.value = '';
+    textInput.value = '';
+    modal.style.display = 'flex';
+    urlInput.focus();
+
+    const confirmBtn = document.getElementById('confirm-link-btn');
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener('click', () => {
+        const url = urlInput.value.trim();
+        if (!url) {
+            modal.style.display = 'none';
+            return;
         }
-    }
-}
+        const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
+        const linkText = textInput.value.trim() || cleanUrl;
 
-function handleFileSelect(event, id) {
-    const pad = document.getElementById(id);
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            if (pad) {
-                pad.focus();
-                insertHtmlAtCursor(`<img src="${e.target.result}" alt="Uploaded Image">`);
-                pad.dispatchEvent(new Event('input'));
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-    event.target.value = '';
+        pad.focus();
+        insertHtmlAtCursor(`<a href="${cleanUrl}" target="_blank">${escapeHtml(linkText)}</a>&nbsp;`);
+        pad.dispatchEvent(new Event('input'));
+
+        modal.style.display = 'none';
+    });
 }
 
 
@@ -619,7 +698,7 @@ async function loadSpaceNews() {
             });
         }
     } catch (error) {
-        container.innerHTML = '<p style="color: red;">Failed to load space news.</p>';
+        container.innerHTML = '<p style="color: #e06c75;">Failed to load space news.</p>';
     }
 }
 
@@ -645,7 +724,7 @@ async function fetchProjects() {
     }
 
     if (!data || data.length === 0) {
-        container.innerHTML = '<p style="opacity: 0.7; text-align: center; grid-column: 1 / -1; padding: 3rem; background: #1e242d; border: 1px solid #3f4a5a; border-radius: 8px;">No projects added yet.</p>';
+        container.innerHTML = '<p style="opacity: 0.7; text-align: center; grid-column: 1 / -1; padding: 3rem; background: #272e38; border: 1px solid #3f4a5a; border-radius: 8px;">No projects added yet.</p>';
         return;
     }
 
@@ -688,6 +767,121 @@ async function fetchProjects() {
         `;
         container.appendChild(card);
     });
+}
+
+let projectToDeleteId = null;
+
+function openDeleteModal(id) {
+    projectToDeleteId = id;
+    let modal = document.getElementById('project-delete-confirm-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'project-delete-confirm-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
+        modal.innerHTML = `
+            <div style="background: #313843; border: 1px solid #3f4a5a; padding: 24px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1rem; color: #f0f4f8;">Delete Project?</h3>
+                <p style="color: #9aa5b1; font-size: 0.9rem; margin-bottom: 20px;">Are you sure you want to delete this project?</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="cancel-project-delete-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Cancel</button>
+                    <button id="confirm-project-delete-btn" style="background: #e06c75; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex: 1;">Delete</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cancel-project-delete-btn').addEventListener('click', () => {
+            modal.style.display = 'none';
+            projectToDeleteId = null;
+        });
+
+        document.getElementById('confirm-project-delete-btn').addEventListener('click', async () => {
+            if (projectToDeleteId) {
+                const { error } = await supabaseClient.from('projects').delete().eq('id', projectToDeleteId).eq('user_id', currentUser.id);
+                if (error) {
+                    console.error('Error deleting project:', error.message);
+                    alert('Failed to delete project.');
+                } else {
+                    fetchProjects();
+                }
+            }
+            modal.style.display = 'none';
+            projectToDeleteId = null;
+        });
+    } else {
+        modal.style.display = 'flex';
+    }
+}
+
+function handleCardEditClick(btn) {
+    const id = btn.dataset.id;
+    const title = btn.dataset.title;
+    const desc = btn.dataset.desc;
+    const link = btn.dataset.link;
+
+    let modal = document.getElementById('project-edit-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'project-edit-modal';
+        modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999;';
+        modal.innerHTML = `
+            <div style="background: #313843; border: 1px solid #3f4a5a; padding: 24px; border-radius: 12px; width: 90%; max-width: 400px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.2rem; color: #f0f4f8;">Edit Project</h3>
+                <form id="edit-project-form">
+                    <input type="hidden" id="edit-project-id">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.85rem; color: #9aa5b1; margin-bottom: 4px;">Title</label>
+                        <input type="text" id="edit-project-title" required style="width: 100%; padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 6px; color: #e3e8ef; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.85rem; color: #9aa5b1; margin-bottom: 4px;">Description</label>
+                        <textarea id="edit-project-desc" rows="3" style="width: 100%; padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 6px; color: #e3e8ef; box-sizing: border-box; resize: vertical;"></textarea>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 0.85rem; color: #9aa5b1; margin-bottom: 4px;">External Link</label>
+                        <input type="text" id="edit-project-link" style="width: 100%; padding: 10px; background: #272e38; border: 1px solid #3f4a5a; border-radius: 6px; color: #e3e8ef; box-sizing: border-box;">
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" id="cancel-project-edit-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #e3e8ef; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+                        <button type="submit" style="background: #61afef; border: none; color: #181c22; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cancel-project-edit-btn').addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        document.getElementById('edit-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const projId = document.getElementById('edit-project-id').value;
+            const updatedTitle = document.getElementById('edit-project-title').value.trim();
+            const updatedDesc = document.getElementById('edit-project-desc').value.trim();
+            const updatedLink = document.getElementById('edit-project-link').value.trim();
+
+            const { error } = await supabaseClient
+                .from('projects')
+                .update({ title: updatedTitle, description: updatedDesc, external_link: updatedLink })
+                .eq('id', projId)
+                .eq('user_id', currentUser.id);
+
+            if (error) {
+                console.error('Error updating project:', error.message);
+                alert('Failed to update project.');
+            } else {
+                fetchProjects();
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById('edit-project-id').value = id;
+    document.getElementById('edit-project-title').value = title;
+    document.getElementById('edit-project-desc').value = desc;
+    document.getElementById('edit-project-link').value = link;
+    modal.style.display = 'flex';
 }
 
 
