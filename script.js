@@ -354,8 +354,11 @@ const creators = [
     { name: "Mumbo Jumbo", channelId: "UChFur_NwVSbUozOcF_F2kMg" },
     { name: "Coridor Crew", channelId: "UCSpFnDQr88xCZ80N-X7t0nQ" },
     { name: "Dylan Page", channelId: "UCzPpbeK8ANcNKg5aoMB0miw" },
-    { name: "Colin Furze", channelId: "UCp68_FLety0O-n9QU6phsgw" }
+    { name: "Colin Furze", channelId: "UCp68_FLety0O-n9QU6phsgw" },
+    { name: "Mark Rober", channelId: "UCY1kMZp36IQSyNx_9h4mpCg" },
+    { name: "DIY Perks", channelId: "UCUQo7nzH1sXVpzL92VesANw" }
 ];
+
 
 async function loadLatestVideos() {
     const container = document.getElementById('youtube-feed-container');
