@@ -945,3 +945,11 @@ function initEventListeners() {
         });
     }
 }
+// Add this wherever your Space News/YouTube fetch happens
+fetch("https://mxkawqbvtckdfffddeey.supabase.co/rest/v1/", {
+  headers: {
+    "apikey": "YOUR_SUPABASE_ANON_KEY",
+    "Authorization": "Bearer YOUR_SUPABASE_ANON_KEY"
+  }
+}).then(() => console.log("Gallery database kept alive!"))
+  .catch(err => console.error(err));
