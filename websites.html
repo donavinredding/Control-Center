@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Websites - My Control Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="./images/dcc_icon.svg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .website-card {
+            background: #313843;
+            border: 1px solid #3f4a5a;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+        .website-card:hover {
+            border-color: #61afef;
+        }
+        .website-preview-wrap {
+            width: 100%;
+            height: 220px;
+            background: #181c22;
+            border-bottom: 1px solid #3f4a5a;
+            position: relative;
+            overflow: hidden;
+        }
+        .website-preview-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+        }
+        .website-card-content {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 10px;
+        }
+        .website-notes-dropdown {
+            background: #272e38;
+            border: 1px solid #3f4a5a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+        }
+        .website-notes-dropdown summary {
+            cursor: pointer;
+            color: #61afef;
+            font-size: 0.9rem;
+            font-weight: 600;
+            outline: none;
+        }
+        .website-notes-textarea {
+            width: 100%;
+            height: 90px;
+            background: #1e242d;
+            border: 1px solid #3f4a5a;
+            border-radius: 6px;
+            color: #e3e8ef;
+            padding: 8px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .websites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.75rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-brand">
+            <img src="./images/dcc_icon.svg" alt="Control Center Icon" class="site-icon" style="width: 36px; height: 36px;">
+            <h1>My Websites Hub</h1>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html">Home</a>
+            <a href="websites.html" class="active">My Websites</a>
+            <a href="projects.html">Projects</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="inspiration.html">Inspiration</a>
+            <a href="ideas.html">Ideas</a>
+            <a href="finance.html">Finance</a>
+            <a href="planner.html">Web Planner</a>
+        </nav>
+        
+        <!-- Reusable Header User Widget -->
+        <div id="logout-container" class="header-user-widget" style="display: none;">
+            <span id="user-display" class="user-email"></span>
+            <button type="button" class="logout-action-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container-wrapper" style="display: none;">
+        <section class="card auth-card-box">
+            <h2>🔐 Control Center Access</h2>
+            <div class="auth-form-group">
+                <input type="email" id="auth-email" class="auth-input" placeholder="Email address..." required autocomplete="email">
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password..." required autocomplete="current-password">
+                <div class="auth-buttons-row">
+                    <button type="button" class="auth-btn login-btn" onclick="handleLogin()">Login</button>
+                </div>
+                <div id="auth-error" class="auth-error-msg"></div>
+            </div>
+        </section>
+    </div>
+
+    <main class="page-block-layout">
+        
+        <!-- Add New Website Collapsible Dropdown Card -->
+        <section class="card" style="margin-bottom: 2rem;">
+            <div onclick="toggleAddWebsiteForm()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
+                <h2 style="margin: 0; color: #e3e8ef; font-size: 1.25rem;">➕ Add New Website</h2>
+                <button type="button" id="form-toggle-btn" style="background: #272e38; border: 1px solid #3f4a5a; color: #61afef; cursor: pointer; font-size: 0.85rem; padding: 6px 14px; border-radius: 6px; font-weight: 500; pointer-events: none;">▼ Open</button>
+            </div>
+            
+            <form id="add-website-form" onsubmit="handleAddWebsite(event)" style="display: none; flex-direction: column; gap: 14px; margin-top: 1.2rem; border-top: 1px solid #3f4a5a; padding-top: 1.2rem;">
+                <input type="text" id="web-title" class="auth-input" placeholder="Website Name (e.g., Money Tracker)" required autocomplete="off">
+                <input type="url" id="web-url" class="auth-input" placeholder="Live URL (e.g., https://donavinredding.github.io/Money-Tracker/)" required autocomplete="off">
+                
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <label style="font-size: 0.85rem; color: #9aa5b1;">Category:</label>
+                    <select id="web-category" class="auth-input" required>
+                        <option value="App / Tool">App / Tool</option>
+                        <option value="Personal / Project">Personal / Project</option>
+                        <option value="Business">Business</option>
+                        <option value="Utility">Utility</option>
+                    </select>
+                </div>
+
+                <textarea id="web-desc" class="auth-input" placeholder="Brief description or initial notes..." style="height: 80px; resize: vertical;" autocomplete="off"></textarea>
+                
+                <button type="submit" class="auth-btn login-btn" style="align-self: flex-start; padding: 0.65rem 1.6rem; margin-top: 0.5rem; background: #61afef; color: #181c22; font-weight: bold;">Add Website</button>
+            </form>
+        </section>
+
+        <!-- Category Filter Bar -->
+        <div class="energy-filters" style="margin-bottom: 0.5rem;">
+            <button type="button" class="filter-btn active" data-filter="all" onclick="filterWebsites('all', this)">All Websites</button>
+            <button type="button" class="filter-btn" data-filter="App / Tool" onclick="filterWebsites('App / Tool', this)">Apps / Tools</button>
+            <button type="button" class="filter-btn" data-filter="Personal / Project" onclick="filterWebsites('Personal / Project', this)">Personal / Project</button>
+            <button type="button" class="filter-btn" data-filter="Business" onclick="filterWebsites('Business', this)">Business</button>
+            <button type="button" class="filter-btn" data-filter="Utility" onclick="filterWebsites('Utility', this)">Utility</button>
+        </div>
+
+        <!-- Dynamic Websites Grid Container -->
+        <div id="websites-list-container" class="websites-grid"></div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 My Control Center</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <script>
+        const defaultWebsites = [
+            { id: "1", title: "Money Tracker", url: "https://donavinredding.github.io/Money-Tracker/", category: "App / Tool", description: "Personal finance and expense tracking app.", notes: "" },
+            { id: "2", title: "Meal Planner", url: "https://donavinredding.github.io/Meal-Planner/", category: "App / Tool", description: "Weekly meal scheduling and recipe organization.", notes: "" },
+            { id: "3", title: "50 States Hub", url: "https://donavinredding.github.io/donavin-tianna-50-states/", category: "Personal / Project", description: "Travel tracker for Donavin & Tianna's 50 states journey.", notes: "" },
+            { id: "4", title: "Redding Handyman", url: "https://donavinredding.github.io/Redding-Handyman/", category: "Business", description: "Professional service listing and handyman portfolio.", notes: "" },
+            { id: "5", title: "AI Prompt Generator", url: "https://donavinredding.github.io/Ai-Prompt-Generater-Website/", category: "App / Tool", description: "Utility tool for generating and refining AI prompts.", notes: "" },
+            { id: "6", title: "Maintenance Hub", url: "https://donavinredding.github.io/Maintenance/", category: "Utility", description: "Maintenance tracking and schedule dashboard.", notes: "" }
+        ];
+
+        let currentCategoryFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                renderWebsites();
+            }
+        });
+
+        function toggleAddWebsiteForm() {
+            const form = document.getElementById('add-website-form');
+            const btn = document.getElementById('form-toggle-btn');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'flex';
+                btn.textContent = '▲ Close';
+            } else {
+                form.style.display = 'none';
+                btn.textContent = '▼ Open';
+            }
+        }
+
+        function getStoredWebsites() {
+            const saved = localStorage.getItem('my_control_center_websites');
+            if (saved) {
+                try { return JSON.parse(saved); } catch (e) { return defaultWebsites; }
+            }
+            return defaultWebsites;
+        }
+
+        function saveStoredWebsites(websites) {
+            localStorage.setItem('my_control_center_websites', JSON.stringify(websites));
+        }
+
+        function filterWebsites(category, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            currentCategoryFilter = category;
+            renderWebsites();
+        }
+
+        function renderWebsites() {
+            const container = document.getElementById('websites-list-container');
+            if (!container) return;
+
+            let websites = getStoredWebsites();
+
+            if (currentCategoryFilter !== 'all') {
+                websites = websites.filter(s => s.category === currentCategoryFilter);
+            }
+
+            if (websites.length === 0) {
+                container.innerHTML = '<p style="opacity: 0.7; text-align: center; grid-column: 1 / -1; padding: 3rem; background: #1e242d; border: 1px solid #3f4a5a; border-radius: 8px;">No websites found in this category.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            websites.forEach((site) => {
+                const card = document.createElement('div');
+                card.className = 'website-card';
+
+                card.innerHTML = `
+                    <div class="website-preview-wrap">
+                        <iframe src="${site.url}" title="${escapeHtml(site.title)}" loading="lazy"></iframe>
+                    </div>
+                    <div class="website-card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                            <div>
+                                <span class="task-tag" style="margin-bottom: 6px; display: inline-block;">${escapeHtml(site.category || 'General')}</span>
+                                <h2 style="margin: 0; color: #e3e8ef; font-size: 1.15rem;">${escapeHtml(site.title)}</h2>
+                            </div>
+                            <a href="${site.url}" target="_blank" class="project-external-badge" title="Visit Live Site">🔗 Visit Live</a>
+                        </div>
+                        <p style="margin: 0; color: #9aa5b1; font-size: 0.9rem; line-height: 1.4;">${escapeHtml(site.description || 'No description provided.')}</p>
+                        
+                        <details class="website-notes-dropdown">
+                            <summary>📝 To-Do & Notes</summary>
+                            <textarea class="website-notes-textarea" placeholder="Write down what you need to do with this website..." oninput="updateWebsiteNotes('${site.id}', this.value)">${escapeHtml(site.notes || '')}</textarea>
+                        </details>
+
+                        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                            <button type="button" class="project-action-btn delete-btn" onclick="deleteWebsite('${site.id}')">🗑️ Remove Website</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function handleAddWebsite(event) {
+            event.preventDefault();
+            const title = document.getElementById('web-title').value.trim();
+            const url = document.getElementById('web-url').value.trim();
+            const category = document.getElementById('web-category').value;
+            const description = document.getElementById('web-desc').value.trim();
+
+            if (!title || !url) {
+                alert('Please provide both a website name and URL.');
+                return;
+            }
+
+            let websites = getStoredWebsites();
+            const newSite = {
+                id: Date.now().toString(),
+                title,
+                url,
+                category,
+                description,
+                notes: ''
+            };
+
+            websites.unshift(newSite);
+            saveStoredWebsites(websites);
+
+            document.getElementById('add-website-form').reset();
+            toggleAddWebsiteForm();
+            renderWebsites();
+        }
+
+        function updateWebsiteNotes(id, notesValue) {
+            let websites = getStoredWebsites();
+            const site = websites.find(s => s.id === id);
+            if (site) {
+                site.notes = notesValue;
+                saveStoredWebsites(websites);
+            }
+        }
+
+        function deleteWebsite(id) {
+            if (confirm("Are you sure you want to remove this website from your hub?")) {
+                let websites = getStoredWebsites();
+                websites = websites.filter(s => s.id !== id);
+                saveStoredWebsites(websites);
+                renderWebsites();
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+
+    <!-- Custom Logout Confirmation Modal -->
+    <div id="logout-modal" class="logout-modal-overlay" style="display: none;">
+        <div class="card logout-card">
+            <h3 class="logout-title">Confirm Logout</h3>
+            <p class="logout-desc">Are you sure you want to log out of your Control Center?</p>
+            <div class="logout-actions">
+                <button type="button" class="auth-btn cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+                <button type="button" class="auth-btn login-btn logout-confirm-btn" onclick="confirmLogout()">Log Out</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
