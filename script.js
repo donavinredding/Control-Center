@@ -354,8 +354,11 @@ const creators = [
     { name: "Mumbo Jumbo", channelId: "UChFur_NwVSbUozOcF_F2kMg" },
     { name: "Coridor Crew", channelId: "UCSpFnDQr88xCZ80N-X7t0nQ" },
     { name: "Dylan Page", channelId: "UCzPpbeK8ANcNKg5aoMB0miw" },
-    { name: "Colin Furze", channelId: "UCp68_FLety0O-n9QU6phsgw" }
+    { name: "Colin Furze", channelId: "UCp68_FLety0O-n9QU6phsgw" },
+    { name: "Mark Rober", channelId: "UCY1kMZp36IQSyNx_9h4mpCg" },
+    { name: "DIY Perks", channelId: "UCUQo7nzH1sXVpzL92VesANw" }
 ];
+
 
 async function loadLatestVideos() {
     const container = document.getElementById('youtube-feed-container');
@@ -942,3 +945,11 @@ function initEventListeners() {
         });
     }
 }
+// Add this wherever your Space News/YouTube fetch happens
+fetch("https://mxkawqbvtckdfffddeey.supabase.co/rest/v1/", {
+  headers: {
+    "apikey": "YOUR_SUPABASE_ANON_KEY",
+    "Authorization": "Bearer YOUR_SUPABASE_ANON_KEY"
+  }
+}).then(() => console.log("Gallery database kept alive!"))
+  .catch(err => console.error(err));
